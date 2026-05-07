@@ -1,0 +1,203 @@
+/* player Info css */
+
+:host {
+    display: block;
+    font-family: 'Courier New', Courier, monospace;
+    transition: opacity 0.4s ease;
+}
+
+:host(.inactive) {
+    opacity: 0.45;
+}
+
+.player-info-wrapper {
+    background: #262522;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    height: 100%;
+    width: 300px;
+}
+
+/* ---- Header ---- */
+
+.player-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 2vh;
+    border-bottom: 1px solid #3a3734;
+}
+
+.player-avatar,
+.player-avatar-picture {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #3a3734;
+    color: #EEEED2;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #EEEED2;
+}
+
+.player-elo {
+    font-size: 0.8rem;
+    color: #888580;
+    margin-top: 4px;
+}
+
+.timer {
+    font-size: 1.3rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    padding: 8px 16px;
+    border-radius: 6px;
+    min-width: 80px;
+    text-align: center;
+}
+
+.timer--active {
+    background: #EEEED2;
+    color: #312e2b;
+}
+
+.timer--inactive {
+    background: #3a3734;
+    color: #888580;
+}
+
+.timer--low {
+    background: #7a2a2a;
+    color: #EEEED2;
+}
+
+/* ---- Divider ---- */
+
+.divider {
+    height: 1px;
+    background: #3a3734;
+}
+
+/* ---- Inventory & Rotation ---- */
+
+.side-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.mid-facing-cell-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.arrow {
+    width: 36px;
+    height: 36px;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.arrow:hover {
+    cursor: pointer;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.inventory {
+    cursor: pointer;
+}
+
+#mobile-inventory-canvas {
+    display: none;
+}
+
+
+@media (max-width: 64em) {
+
+    :host {
+        width: 100%;
+    }
+
+    .player-info-wrapper {
+        width: 100%;
+        padding: 0;
+        height: auto;
+        min-height: 0;
+        gap: 1vh;
+        justify-content: center;
+        background: transparent;
+        overflow: hidden;
+    }
+
+
+    .black{
+        justify-content: flex-end;
+    }
+
+    .white{
+        justify-content: flex-start;
+    }
+
+    .player-header {
+        display: flex;
+        width: 100%;
+        padding: 0;
+        flex-direction: row;
+        margin: 0 2vw;
+        justify-content: flex-start;
+        border: none;
+    }
+
+    #inventory-canvas {
+        display: none;
+    }
+
+    #mobile-inventory-canvas {
+        display: block;
+    }
+
+    .side-container {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .mid-facing-cell-container {
+        gap: 10px;
+    }
+
+    .timer {
+        font-size: 0.8rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        padding: 8px 16px;
+        border-radius: 6px;
+        min-width: 40px;
+        margin: 0 6vw;
+        margin-left: auto;
+    }
+
+    .player-avatar,
+    .player-avatar-picture {
+        width: 10vw;
+        height: 10vw;
+        border-radius: 50%;
+        font-size: 1rem;
+    }
+}

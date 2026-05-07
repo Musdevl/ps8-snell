@@ -1,0 +1,477 @@
+body {
+    padding: 0px;
+    margin: 0px;
+    background-color: #312e2b;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    height: 100vh;
+}
+
+notification-bar {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 80%;
+}
+
+.field {
+    padding-left: 5px;
+    height: 2.3rem;
+    font-size: 1em;
+    border-radius: 5px;
+    outline: none;
+    border: 2px solid transparent;
+    transition: border-color 0.15s;
+}
+
+.field:focus {
+    border: 2px solid #68b844;
+}
+
+.logo {
+    width: 18rem;
+    height: auto;
+}
+
+.logo-link {
+    width: 25rem;
+    height: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.left-container {
+    grid-area: 1 / 1 / 2 / 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5vh;
+    padding: 2rem 2rem;
+    background-color: #262522;
+
+    span {
+
+        color: white;
+        font-family: 'Courier New', Courier, monospace;
+    }
+}
+
+.register-title,
+.login-title {
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.submit {
+    background-color: #68b844;
+    border: none;
+    height: 2.5rem;
+    border-radius: 5px;
+    font-weight: 700;
+    color: white;
+    font-size: 16px;
+    border-bottom: 3px solid #0000008b;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        cursor: pointer;
+        transform: translateY(-5px);
+    }
+}
+
+
+.right-container {
+    grid-area: 1 / 2 / 2 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.game {
+    background-color: rgb(141, 141, 141);
+    border-radius: 20px;
+    width: 40rem;
+    height: 40rem;
+}
+
+
+.game img {
+    border-radius: 20px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.recovery-popup {
+    font-family: 'Courier New', Courier, monospace;
+
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s;
+}
+
+.recovery-box {
+    background: #262522;
+    border: 1px solid #3a3632;
+    border-radius: 8px;
+    padding: 2.5rem 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 22rem;
+}
+
+.recovery-label {
+    color: white;
+    font-size: 26px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.recovery-code {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #c8a84b;
+    background: #312e2b;
+    border: 1px solid #3a3632;
+    border-radius: 6px;
+    padding: 0.8rem 1.5rem;
+}
+
+.recovery-warn {
+    color: white;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+#recovery-ok {
+    padding-left: 10px;
+    font-weight: 700;
+    padding-right: 10px;
+}
+
+.reset-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    width: 90%;
+}
+
+.reset-title {
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.forgot {
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    text-decoration: underline;
+    transition: color 0.1s;
+}
+
+.forgot:hover {
+    color: #d4cfc9;
+}
+
+
+.forgot-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.forgot-choice-title {
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.forgot-choice-btns {
+    display: flex;
+    gap: 2rem;
+}
+
+#quiz-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5rem;
+}
+
+#quiz-next-btn {
+    align-self: center;
+    cursor: pointer;
+    padding: 10px 20px;
+}
+
+.quiz-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+#quiz-result {
+    display: flex;
+    width: 40%;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.result-label {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.8rem;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+}
+
+.result-label.honest {
+    color: #68b844;
+}
+
+.result-label.liar {
+    color: #c25050;
+}
+
+.forgot:hover {
+    color: white;
+}
+
+
+.active {
+    opacity: 1;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.register-link {
+    text-decoration: underline;
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+
+#choice-code-btn,
+#choice-quiz-btn {
+    padding: 7px 15px 7px 15px;
+}
+
+.back-btn {
+    display: none;
+}
+
+
+@media (max-width:64em) {
+
+
+    #quiz-form {
+        gap: 3rem;
+    }
+
+    body {
+        display: flex;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    .left-container {
+        min-height: 100vh;
+        width: 100%;
+        padding: 0;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .login-title,
+    .register-title {
+        font-size: 3em;
+    }
+
+    .field,
+    .submit {
+        height: 2.5em;
+        width: 100%;
+        font-size: 1.8em;
+
+        box-sizing: border-box;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .field {
+        padding-right: 0px;
+        border: 2px solid transparent;
+    }
+
+
+    .field:focus {
+        outline: none;
+        border: 2px solid #68b844;
+    }
+
+    .logo {
+        height: auto;
+        width: 24em;
+    }
+
+    .right-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        display: flex;
+        justify-content: flex-start;
+        background: #312e2b;
+        width: 100%;
+        z-index: 100;
+        overflow-y: auto;
+        transform: translateX(140%);
+    }
+
+    .back-btn {
+        color: white;
+        display: flex;
+        height: 2em;
+        width: 2em;
+        position: absolute;
+        left: 1.5em;
+        top: 1.5em;
+    }
+
+    .slide-in {
+        transform: translateX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .slide-out {
+        transform: translateX(140%);
+        transition: transform 0.3s ease;
+    }
+
+    .game {
+        display: none;
+    }
+
+
+    .forgot-choice-btns {
+        flex-direction: column;
+        width: 80%;
+        align-items: center;
+    }
+
+    #forgot-choice {
+        gap: 2em;
+    }
+
+    .reset-form {
+        padding-top: 15vh;
+    }
+
+    #quiz-result {
+        height: 100%;
+        display: flex;
+        width: 90%;
+        align-items: center;
+        flex-direction: column;
+        gap: 4em;
+        padding-top: 15vh;
+    }
+
+    #result-form {
+        width: 100%;
+    }
+
+    #reset-form.input-section {
+        width: 100%;
+    }
+
+    .forgot-choice {
+        padding-top: 15vh;
+    }
+
+
+
+}
+
+
+@media (max-width:40em) {
+
+
+    .recovery-box {
+        padding: 1em 2em;
+        gap: 1rem;
+        width: 60%;
+    }
+
+    .recovery-code {
+        font-size: 1.75rem;
+    }
+
+
+    .logo {
+        height: auto;
+        width: 12em;
+    }
+
+    .login-title,
+    .register-title {
+        font-size: 1.8em;
+    }
+
+    .field,
+    .submit {
+        height: 3em;
+        font-size: 1em;
+    }
+
+    .field:focus {
+        outline: none;
+        border: 2px solid #68b844;
+    }
+
+    #quiz-next-btn {
+        width: 80%;
+    }
+
+    #step-honesty {
+        padding-top: 15vh;
+    }
+}

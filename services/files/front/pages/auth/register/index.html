@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script type="module" src="/pages/auth/register/register.js"></script>
+    <script type="module" src="/components/notification/notification.js"></script>
+    <link rel="stylesheet" href="/pages/auth/shared/style.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@7.2.0/dist/capacitor.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+
+</head>
+
+
+
+<body>
+
+    <div id="recovery-popup" class="recovery-popup hidden">
+        <div class="recovery-box">
+            <p class="recovery-label">Save your recovery code</p>
+            <div class="recovery-code" id="recovery-code"></div>
+            <p class="recovery-warn">You won't be able to see it again.</p>
+            <button class="submit" id="recovery-ok">Continue</button>
+        </div>
+    </div>
+    <main class="left-container">
+        <a href="/"><img src="/assets/logo.png" alt="logo" class="logo"></a>
+        <h1 class="register-title">Register</h1>
+        <section class="input-section">
+            <input class="field" id="email" type="text" placeholder="Email" name="email">
+            <input class="field" id="username" type="text" placeholder="Username" name="username">
+            <input class="field" id="password" type="password" placeholder="Password" name="password">
+            <button class="submit" id="register-btn">Register</button>
+        </section>
+        <span class="helper-message">Already have an account ?
+            <a href="/pages/auth/login/index.html" class="register-link">Log in</a></span>
+    </main>
+
+    <section class="right-container">
+        <div class="game" id="game">
+            <img src="https://images-ext-1.discordapp.net/external/NogOB_WFXGgXDKKyqUGKZbODu3QOktClgonrRPUkp_E/https/assets-configurator.chess.com/image/configurator/chessboard_1768166350728.gif?width=963&height=963"
+                alt="game">
+        </div>
+    </section>
+    <notification-bar></notification-bar>
+
+</body>
+
+</html>

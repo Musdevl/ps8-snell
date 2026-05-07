@@ -1,0 +1,93 @@
+:host {
+    display: block;
+}
+
+.grid-container {
+    position: relative;
+}
+
+.board-container {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 100px;
+    align-items: flex-end;
+}
+
+.grid-container {
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+}
+
+#board-canvas {
+    z-index: 1;
+    border: 2px solid black;
+    border-radius: 25px;
+}
+
+#pieces-canvas {
+    z-index: 2;
+    cursor: pointer;
+}
+
+#laser-canvas {
+    z-index: 3;
+    cursor: pointer;
+}
+
+#interaction-canvas {
+    z-index: 4;
+}
+
+.arrow {
+    width: 50px;
+    height: 50px;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.facing-cell-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.mid-facing-cell-container {
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+}
+
+.side-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+
+@media (max-width: 64em) {
+    :host {
+        width: 100%;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+    .board-container {
+        width: 100%;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .grid-container {
+        max-width: 100%;
+    }
+}

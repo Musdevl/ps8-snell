@@ -1,0 +1,97 @@
+@font-face {
+    font-family: 'fortnite';
+    src: url('/assets/font/fortnite.otf') format('opentype');
+}
+
+body {
+    margin: 0;
+    background-color: #312e2b;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+}
+
+.layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    background: #262522;
+    padding: 3rem 4rem;
+    border-radius: 12px;
+    border-bottom: 3px solid #000;
+    text-align: center;
+}
+
+.coin-img {
+    width: 70px;
+    height: 70px;
+}
+
+h1 {
+    margin: 0;
+    font-family: 'fortnite';
+    font-size: 2.5rem;
+    letter-spacing: 1px;
+}
+
+p {
+    margin: 0;
+    color: #a09a92;
+    font-size: 1.1rem;
+}
+
+.home-btn {
+    background: #68b844;
+    border: none;
+    border-bottom: 3px solid #3d6e28;
+    color: white;
+    padding: 0.8rem 2.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+    margin-top: 0.5rem;
+}
+
+.home-btn:hover {
+    opacity: 0.85;
+}
+
+.hidden {
+    display: none;
+}
+
+.dancer {
+    width: clamp(120px, 18vw, 220px);
+    height: auto;
+    display: none;
+}
+
+.dancer.flipped {
+    transform: scaleX(-1);
+}
+
+.dancer.show-celebration {
+    display: block;
+}
+
+@media (max-width: 700px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .dancer {
+        display: none !important;
+    }
+}

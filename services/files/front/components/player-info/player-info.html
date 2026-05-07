@@ -1,0 +1,32 @@
+<template>
+    <link rel="stylesheet" href="/components/player-info/player-info.css">
+    <script type="module" src="/components/player-info/player-info.js"></script>
+
+    <div class="player-info-wrapper">
+
+        <div class="player-header">
+
+            <img src="" alt="player-avatar" class="player-avatar-picture">
+
+            <div class="player-meta">
+                <span class="player-name">Player Name</span>
+                <span class="player-elo">4269</span>
+            </div>
+            <div class="timer timer--inactive">05:00</div>
+
+        </div>
+
+        <div class="side-container">
+            <div class="facing-cell-container">
+                <div class="mid-facing-cell-container">
+                    <img src="/assets/left_circular_arrow.svg" alt="" class="arrow left-arrow">
+                    <canvas id="rotation-canvas"></canvas>
+                    <img src="/assets/right_circular_arrow.svg" alt="" class="arrow right-arrow">
+                </div>
+            </div>
+            <canvas id="inventory-canvas" class="inventory"></canvas>
+            <canvas id="mobile-inventory-canvas" class="inventory"></canvas>
+        </div>
+
+    </div>
+</template>

@@ -1,0 +1,123 @@
+.question-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.question-text {
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 28px;
+    text-align: center;
+}
+
+.personalities {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.personality {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: grab;
+}
+
+.personality img {
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    border: 2px solid #3a3632;
+    object-fit: cover;
+    transition: border-color 0.15s;
+}
+
+.personality img:hover {
+    border-color: #c8a84b;
+}
+
+.personality span {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    color: #a1978b;
+}
+
+.personality.dragging {
+    opacity: 0.4;
+}
+
+.categories {
+    display: flex;
+    gap: 2rem;
+}
+
+.category {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.category-label {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+    color: #a1978b;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.drop-zone {
+    min-width: 260px;
+    min-height: 160px;
+    background: #262522;
+    border: 1px dashed #3a3632;
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    transition: border-color 0.15s;
+}
+
+.drop-zone.drag-over {
+    border-color: #c8a84b;
+}
+
+@media (max-width:64em) {
+
+
+    .personalities img,
+    .personality img {
+        width: 5em;
+        height: 5em;
+    }
+
+    .personality span,
+    .personality span {
+        font-size: 0.8em
+    }
+
+    .drop-zone {
+        min-width: 10em;
+        max-width: 10em;
+        min-height: 10em;
+        max-height: 20em;
+        overflow-y: auto;
+    }
+
+    .categories {
+        display: flex;
+        justify-content: space-evenly;
+        gap: 0;
+        width: 100%;
+    }
+
+    .personality.dragging {
+        opacity: 0;
+    }
+
+}

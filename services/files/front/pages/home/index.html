@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Snell</title>
+    <link rel="stylesheet" href="/pages/home/style.css">
+    <script type="module" src="/pages/home/app.js"></script>
+    <script type="module" src="/components/social-bar/social-bar.js"></script>
+    <script type="module" src="/components/notification/notification.js"></script>
+    <script type="module" src="/components/nav-bar/nav-bar.js"></script>
+    <script type="module" src="/components/chat/chat.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@7.2.0/dist/capacitor.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+</head>
+
+<body>
+
+    <social-bar id="social-section"></social-bar>
+
+    <main>
+        <section class="global-container">
+            <div class="mobile-logo-container">
+                <img src="/assets/logo.png" alt="Snell-Logo" class="mobile-logo-ico">
+                <div class="snell-coins-container">
+                    <img src="/assets/snell-coin.png" alt="snell-coins" class="snell-coin-picture">
+                    <span id="snell-coins"></span>
+                    <button id="buy-coins-btn">+</button>
+                </div>
+            </div>
+            <section id="play-section">
+                <p class="section-title">PLAY</p>
+                <div class="play-container">
+                    <div class="play-btn-wrapper">
+                        <div class="play-btn" id="local-btn">
+                            <div class="btn-container">
+                                <img src="/assets/local_game.svg" alt="local_ico" class="play-btn-ico">
+                                <span>Local</span>
+                            </div>
+                        </div>
+                        <div class="time-selector hidden" id="local-time-selector">
+                            <a href="/pages/game/local-game/index.html?time=180" class="time-btn">3 min</a>
+                            <a href="/pages/game/local-game/index.html?time=600" class="time-btn">10 min</a>
+                            <a href="/pages/game/local-game/index.html?time=3600" class="time-btn">60 min</a>
+                        </div>
+                    </div>
+                    <div class="play-btn-wrapper">
+                        <a href="/pages/game/ai-game/index.html" class="play-btn">
+                            <div class="btn-container">
+                                <img src="/assets/bot.svg" alt="bot_ico" class="play-btn-ico">
+                                <span>AI</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="play-btn-wrapper">
+                        <div class="play-btn" id="multiplayer-btn">
+                            <div class="btn-container">
+                                <img src="/assets/multiplayer.svg" alt="multiplayer_ico" class="play-btn-ico">
+                                <span>Multiplayer</span>
+                            </div>
+                        </div>
+                        <div class="time-selector hidden" id="multiplayer-time-selector">
+                            <a href="/pages/game/multiplayer-game/index.html?time=180" class="time-btn">3 min</a>
+                            <a href="/pages/game/multiplayer-game/index.html?time=600" class="time-btn">10 min</a>
+                            <a href="/pages/game/multiplayer-game/index.html?time=3600" class="time-btn">60 min</a>
+                        </div>
+                    </div>
+
+                    <div class="play-btn-wrapper">
+                        <a href="/pages/game/tutorial/index.html" class="play-btn">
+                            <div class="btn-container">
+                                <img src="/assets/tutorial.svg" alt="tutorial_ico" class="play-btn-ico">
+                                <span>Tutorial</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="main-separator">
+
+            <section class="middle-section">
+                <div id="shop-section">
+                    <p class="section-title">SHOP</p>
+                    <div id="shop-wrapper">
+
+                        <div id="shop-featured" class="shop-section">
+                            <div class="shop-title-section">
+                                <span class="shop-title">FEATURED ITEM</span>
+                            </div>
+                            <div class="item-featured-list"></div>
+                        </div>
+
+                        <div id="shop-items" class="shop-section">
+                            <div class="shop-title-section">
+                                <div class="shop-title">ITEMS</div>
+                            </div>
+                            <div id="shop-list"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="chat-section">
+                    <p class="section-title">GLOBAL CHAT</p>
+                    <chat-component id="global-chat"></chat-component>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <nav-bar></nav-bar>
+
+    <notification-bar></notification-bar>
+
+    <div id="shop-overlay" class="shop-overlay hidden">
+        <div id="shop-popup" class="shop-popup">
+            <div class="popup-header" id="popup-header">
+                <button id="popup-close" class="popup-close">✕</button>
+                <img id="popup-img" class="popup-img" src="" alt="">
+                <div class="popup-header-content">
+                    <span id="popup-type" class="popup-type"></span>
+                    <h2 id="popup-name" class="popup-name"></h2>
+                </div>
+            </div>
+
+            <div class="popup-content-section">
+                <div class="popup-content-title">Content</div>
+                <div id="popup-content-list" class="popup-content-list"></div>
+            </div>
+
+            <div class="popup-footer">
+                <div class="popup-footer-price">
+                    <img src="/assets/snell-coin.png" class="snell-coin-img">
+                    <span id="popup-price-text" class="price-text"></span>
+                </div>
+                <button class="popup-purchase-btn" id="popup-purchase-btn">PURCHASE</button>
+            </div>
+            <div class="popup-owned-footer">
+                <span class="popup-owned">Owned</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

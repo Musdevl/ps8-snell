@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Log In</title>
+    <script type="module" src="/pages/auth/login/login.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script type="module" src="/components/notification/notification.js"></script>
+    <link rel="stylesheet" href="/pages/auth/shared/style.css">
+    <script type="module" src="/components/register/questions/questionHonesty/QuestionHonesty.js"></script>
+    <script type="module" src="/components/register/questions/questionDrag/QuestionDrag.js"></script>
+     <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@7.2.0/dist/capacitor.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+
+</head>
+
+<body>
+
+    <main class="left-container">
+        <a href="/pages/home/index.html" class="logo-link"><img src="/assets/logo.png" alt="logo" class="logo"></a>
+        <h1 class="login-title">Log in</h1>
+        <section class="input-section">
+            <input class="field" id="email" type="text" placeholder="Email" name="email">
+            <input class="field" id="password" type="password" placeholder="Password" name="password">
+            <button class="submit" id="login-btn">Log in</button>
+        </section>
+        <span class="helper-message">Don't have an account yet?
+            <a href="/pages/auth/register/index.html" class="register-link">Register</a></span>
+        <a class="forgot" id="forgot-btn" href="#">Forgot password?</a>
+    </main>
+
+
+    <section class="right-container">
+        <svg class="back-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 19-7-7 7-7"></path>
+            <path d="M19 12H5"></path>
+        </svg>
+        <div class="game" id="game">
+            <img src="https://images-ext-1.discordapp.net/external/NogOB_WFXGgXDKKyqUGKZbODu3QOktClgonrRPUkp_E/https/assets-configurator.chess.com/image/configurator/chessboard_1768166350728.gif?width=963&height=963"
+                alt="game">
+        </div>
+
+        <div id="forgot-choice" class="forgot-choice hidden">
+            <p class="forgot-choice-title">How do you want to reset?</p>
+            <div class="forgot-choice-btns">
+                <button class="submit" id="choice-code-btn">Recovery code</button>
+                <button class="submit" id="choice-quiz-btn">Honesty quiz</button>
+            </div>
+        </div>
+
+        <div id="quiz-result" class="hidden">
+            <p id="result-label" class="result-label"></p>
+            <div id="result-form" class="input-section hidden">
+                <input class="field" id="result-email" type="text" placeholder="Email">
+                <input class="field" id="result-password" type="password" placeholder="New password">
+                <button class="submit" id="result-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="reset-form hidden" id="reset-form">
+            <h1 class="reset-title">Reset password</h1>
+            <div class="input-section">
+                <input class="field" id="reset-email" type="text" placeholder="Email">
+                <input class="field" id="reset-code" type="text" placeholder="Recovery code">
+                <input class="field" id="reset-password" type="password" placeholder="New password">
+                <button class="submit" id="reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div id="quiz-form" class="hidden">
+            <question-honesty id="step-honesty"></question-honesty>
+            <question-drag id="step-drag" class="hidden"></question-drag>
+            <button class="submit submit-honesty" id="quiz-next-btn">Next</button>
+        </div>
+
+    </section>
+    <notification-bar></notification-bar>
+    <nav-bar></nav-bar>
+</body>
+
+</html>

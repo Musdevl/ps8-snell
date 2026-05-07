@@ -1,0 +1,105 @@
+#notification-container {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 1000;
+    width: fit-content;
+}
+
+.notification {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 1.2rem 1rem;
+    border-radius: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    min-width: 220px;
+    max-width: 90%;
+    border-left: 3px solid transparent;
+    background: #262522;
+    box-shadow: 0 4px 16px #00000066;
+    animation: slideIn 0.2s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.notification.hiding {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.notification.info {
+    border-color: #5c8fd6;
+}
+
+.notification.success, .notification.challenge {
+    border-color: #68b844;
+}
+
+.notification.error {
+    border-color: #7a2020;
+}
+
+.notification.achievement {
+    border-color: #874fb8;
+}
+
+.notification-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.notification.info .notification-dot {
+    background: #5c8fd6;
+}
+
+.notification.success .notification-dot {
+    background: #68b844;
+}
+
+.notification.error .notification-dot {
+    background: #c25050;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.deny-challenge,
+.accept-challenge {
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.accept-challenge {
+    background-color: #68b844;
+    border-bottom: 3px solid #3d6e28;
+}
+
+.deny-challenge {
+    background-color: #c25050;
+    border-bottom: 3px solid #7a2020;
+}
+
+.notif-picture {
+    width: 5rem;
+    height: 5rem;
+    object-fit: cover;
+}

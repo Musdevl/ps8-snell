@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="stylesheet" href="/pages/profile/profile.css" />
+    <script type="module" src="/components/social-bar/social-bar.js"></script>
+    <script type="module" src="/pages/profile/profile.js"></script>
+    <script type="module" src="/components/notification/notification.js"></script>
+    <script type="module" src="/components/chat/chat.js"></script>
+    <script type="module" src="/components/nav-bar/nav-bar.js"></script>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@7.2.0/dist/capacitor.min.js"></script>
+
+
+</head>
+
+<body>
+
+    <social-bar></social-bar>
+    <div class="tabs">
+        <button class="tab active" id="tab-profile">Profile</button>
+        <button class="tab" id="tab-chat">Chat</button>
+    </div>
+    <main>
+
+        <div id="loader">Loading...</div>
+
+
+
+        <div id="profile" class="hidden">
+            <div class="profile-left">
+                <section class="row">
+                    <div class="profile-header">
+                        <div class="profile-header-left-side">
+                            <img id="avatar" src="" alt="avatar" />
+                            <div>
+                                <div id="username"></div>
+                                <span id="elo" class="elo"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="card">
+                            <div id="wins" class="card-value"></div>
+                            <div class="card-label">Wins</div>
+                        </div>
+                        <div class="card">
+                            <div id="losses" class="card-value"></div>
+                            <div class="card-label">Losses</div>
+                        </div>
+                        <div class="card">
+                            <div id="draws" class="card-value"></div>
+                            <div class="card-label">Draws</div>
+                        </div>
+                        <div class="card">
+                            <div id="total" class="card-value"></div>
+                            <div class="card-label">Games</div>
+                        </div>
+                        <div class="card">
+                            <div id="winrate" class="card-value"></div>
+                            <div class="card-label">Win Rate</div>
+                        </div>
+                    </div>
+                </section>
+                <section class="row">
+                    <section id="friends-section">
+                        <div class="section-title">Friends</div>
+                        <div id="friends-list"></div>
+                    </section>
+                    <section id="achievements-section">
+                        <div class="section-title">Achievements</div>
+                        <div id="achievements"></div>
+                    </section>
+                </section>
+                <section class="section">
+                    <div class="section-title">Match history</div>
+                    <div id="history">
+                    </div>
+                </section>
+
+                <section class="inventory-section">
+                    <div class="section-title">Inventory</div>
+                    <section class="profile-picture-section">
+                        <span class="inventory-section-title">Profile picture</span>
+                        <div id="profile-picture-list" class="inventory-list"></div>
+                    </section>
+                    <section class="themes-section">
+                        <span class="inventory-section-title">Themes</span>
+                        <div id="theme-list" class="inventory-list"></div>
+                    </section>
+                    <section class="emotes-picture-section">
+                        <span class="inventory-section-title">Emotes</span>
+                        <div class="selected-emote-list inventory-list"></div>
+                    </section>
+                </section>
+
+                <button id="mobile-logout-btn" class="btn">Logout</button>
+
+            </div>
+            <div class="profile-right">
+                <chat-component id="chat"></chat-component>
+            </div>
+        </div>
+
+    </main>
+    <notification-bar></notification-bar>
+
+    <div id="inventory-modal">
+        <div class="emote-box">
+            <span class="section-title">Available Emotes</span>
+            <div id="emote-list"></div>
+        </div>
+    </div>
+
+    <nav-bar></nav-bar>
+</body>
+
+</html>

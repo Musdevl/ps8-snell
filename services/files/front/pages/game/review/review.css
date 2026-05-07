@@ -1,0 +1,37 @@
+review-analytics {
+    width: 30%;
+    height: 100%;
+}
+
+evaluation-bar {
+    width: 90%;
+}
+
+.game-box {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3rem;
+    margin-bottom: 15px;
+}
+
+@media (max-width:64em) {
+    #review-game {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    review-analytics {
+        width: 100%;
+        height: 100%;
+    }
+
+    .game-box{
+        gap: 1em;
+    }
+
+}

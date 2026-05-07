@@ -1,0 +1,907 @@
+@font-face {
+    font-family: 'fortnite';
+    src: url('/assets/font/fortnite.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --bg-body: #312e2b;
+    --bg-dark: #262522;
+    --bg-darker: #010012;
+    --bg-shop: rgba(65, 84, 143, 0.8);
+    --bg-shop-full: rgba(65, 84, 143, 1);
+    --font-game: 'fortnite', sans-serif;
+    --radius: 5px;
+}
+
+/* ── Layout général ── */
+body {
+    margin: 0;
+    display: grid;
+    height: 100vh;
+    grid-template-columns: 20% 1fr;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-body);
+}
+
+social-bar {
+    background-color: var(--bg-dark);
+    width: 100%;
+    height: 100%;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+.global-container {
+    width: 95%;
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+    gap: 4vh;
+    padding: 2em 0 4em 0;
+}
+
+notification-bar {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+}
+
+.section-title {
+    margin-left: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #5c574f;
+}
+
+.main-separator {
+    width: 100%;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ── Boutons de jeu ── */
+#play-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.play-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.play-btn {
+    background-color: var(--bg-dark);
+    width: 14rem;
+    height: 5rem;
+    border: none;
+    border-bottom: 3px solid #0000008b;
+    border-radius: var(--radius);
+    padding: 0 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease-in-out;
+}
+
+.play-btn span {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.play-btn:hover {
+    cursor: pointer;
+    background-color: rgba(210, 210, 210, 0.104);
+    transform: translateY(-5px);
+}
+
+.play-btn-ico {
+    width: 3rem;
+    height: auto;
+}
+
+.btn-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+}
+
+.play-btn-wrapper {
+    position: relative;
+}
+
+.time-selector {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    min-width: 100%;
+    background-color: var(--bg-dark);
+    border-radius: var(--radius);
+    border-bottom: 3px solid #0000008b;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.time-btn {
+    color: white;
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: background-color 0.2s;
+}
+
+.time-btn:hover {
+    background-color: rgba(210, 210, 210, 0.104);
+}
+
+/* ── Section centrale ── */
+.middle-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    flex: 1;
+    min-height: 0;
+}
+
+#shop-section {
+    flex: 2;
+    width: 100%;
+}
+
+#chat-section {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+}
+
+chat-component {
+    flex: 1;
+    display: flex;
+    height: 95%;
+    width: 100%;
+}
+
+/* ── Shop ── */
+#shop-wrapper {
+    display: flex;
+    justify-content: space-evenly;
+    background-image: url('/assets/shop_bg.png');
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+    gap: 2em;
+    height: 95%;
+    box-sizing: border-box;
+    padding: 2em;
+
+}
+
+.shop-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+}
+
+.shop-title-section {
+    font-family: var(--font-game);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    background-color: var(--bg-shop);
+    padding: 0.5rem;
+    letter-spacing: 1px;
+    display: flex;
+}
+
+.item-featured-list {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    height: 100%;
+}
+
+.item-featured {
+    flex: 1;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#shop-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5em;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.item-normal {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-size: 1.1rem;
+    width: calc(100%-3px);
+}
+
+.item-normal,
+.item-featured {
+    position: relative;
+}
+
+.item-normal:hover,
+.item-featured:hover {
+    cursor: pointer;
+    border-color: #ffff18;
+}
+
+.item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Couleurs items */
+.purplebg,
+.bluebg,
+.goldbg,
+.greenbg {
+    border-width: 3px;
+    border-style: solid;
+}
+
+.purplebg {
+    background: radial-gradient(circle, #9b72e0 0%, #7752b2 50%, #452c6a 100%);
+    border-color: #7752b2;
+}
+
+.bluebg {
+    background: radial-gradient(circle, #60b5ff 0%, #3da1f6 50%, #194468 100%);
+    border-color: #3da1f6;
+}
+
+.goldbg {
+    background: radial-gradient(circle, #edac20 0%, #ed6f20 60%, #a03308 100%);
+    border-color: #ed6f20;
+}
+
+.greenbg {
+    background: radial-gradient(circle, #47a822 0%, #2c7619 60%, #035201 100%);
+    border-color: #2c7619;
+}
+
+/* Prix */
+.price,
+.owned {
+    margin-top: auto;
+    width: 100%;
+    background-color: var(--bg-darker);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.owned {
+    color: rgba(255, 255, 255, 0.174);
+}
+
+.item-featured .price,
+.item-featured .owned {
+    padding: 5% 0;
+    font-size: 1.4rem;
+}
+
+.item-normal .price {
+    padding: 2.5% 0;
+    font-size: 1rem;
+}
+
+.snell-coin-img {
+    height: 25px;
+    width: auto;
+}
+
+.owned-ico {
+    height: 25px;
+    width: auto;
+}
+
+.price-text,
+.item-name {
+    color: white;
+    font-weight: 800;
+    font-family: system-ui;
+}
+
+.item-name {
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.item-type {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.593);
+    display: flex;
+    justify-content: center;
+}
+
+.footer-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    background-color: #00000035;
+}
+
+.footer-upper {
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.footer-upper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(6px);
+    z-index: -1;
+}
+
+/* ── Popup shop ── */
+.shop-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    z-index: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.shop-overlay.hidden {
+    display: none;
+}
+
+.shop-popup {
+    width: 65vw;
+    height: 80vh;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-header {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    min-height: 120px;
+}
+
+.popup-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 2;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-close:hover {
+    color: #ffff18;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.popup-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 3px;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.popup-header-content {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.popup-type {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.3rem;
+    font-family: var(--font-game);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.popup-name {
+    color: white;
+    font-size: 3.5rem;
+    font-family: var(--font-game);
+    margin: 0;
+}
+
+.popup-content-section {
+    background-color: var(--bg-shop-full);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+}
+
+.popup-content-title {
+    color: white;
+    font-family: var(--font-game);
+    font-size: 2.5rem;
+    letter-spacing: 1px;
+}
+
+.popup-content-list {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.popup-content-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.8rem;
+    min-width: 80px;
+}
+
+.popup-content-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.popup-content-item span {
+    color: white;
+    font-size: 1.4rem;
+    text-align: center;
+    font-family: var(--font-game);
+}
+
+.popup-footer {
+    background-color: var(--bg-darker);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.popup-footer-price {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 2rem;
+}
+
+.popup-footer-price .snell-coin-img {
+    height: 2.5rem;
+    width: auto;
+}
+
+nav-bar {
+    display: none;
+    box-sizing: border-box;
+}
+
+.popup-purchase-btn {
+    background: #eed923;
+    border: #fffca9 3px solid;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.4);
+    color: #2a2a38;
+    font-size: 2rem;
+    font-weight: 800;
+    font-family: var(--font-game);
+    padding: 0.8rem 3rem;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+}
+
+.popup-purchase-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.popup-owned {
+    background-color: var(--bg-darker);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+    font-family: var(--font-game);
+    font-size: 2rem;
+}
+
+@media (max-width: 60em) {
+
+    .play-container {
+        flex-wrap: wrap;
+        row-gap: 1em;
+        justify-content: space-evenly;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 2em 0;
+    }
+
+    social-bar {
+        display: none;
+    }
+
+    main {
+        width: 100%;
+        overflow-y: auto;
+    }
+
+    .global-container {
+        width: 90%;
+        height: 100%;
+        gap: 3vh;
+    }
+
+    .middle-section {
+        flex-direction: column;
+    }
+
+    #shop-wrapper {
+        flex-direction: column;
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .shop-section {
+        width: 100%;
+        height: auto;
+        align-items: center;
+    }
+
+    .item-featured-list {
+        height: auto;
+        min-height: 25em;
+        width: 90%;
+    }
+
+    .item-featured {
+        width: 100%;
+        height: auto;
+        min-height: 25em;
+        aspect-ratio: 3 / 5;
+    }
+
+    #shop-list {
+        height: auto;
+        overflow-y: auto;
+        width: 90%;
+    }
+
+    .item-normal {
+        width: calc(100%-3px);
+        height: auto;
+        aspect-ratio: 4 / 4;
+    }
+
+    .shop-title-section {
+        width: 100%;
+    }
+
+    .shop-popup {
+        width: 80%;
+        height: fit-content;
+    }
+
+    .popup-content-list {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+
+}
+
+.mobile-logo-container {
+    display: none;
+    align-items: center;
+}
+
+.mobile-logo-ico {
+    width: 30%;
+    height: auto;
+}
+
+
+@media (max-width: 40em) {
+
+    body {
+        padding: 0;
+        height: 100vh;
+    }
+
+    .item-featured {
+        height: auto;
+        min-height: 18em;
+        aspect-ratio: 3 / 5;
+    }
+
+    #shop-wrapper {
+        padding: 1em;
+    }
+
+    #popup-name {
+        font-size: 2.5em;
+        width: 120%;
+    }
+
+    .popup-content-title {
+        font-size: 2em
+    }
+
+    .popup-content-item {
+        padding: 0.2rem 0.8rem 0.8rem 0.8rem;
+    }
+
+    .shop-popup {
+        overflow-y: auto;
+        max-height: 70%;
+    }
+
+    .popup-header-content {
+        overflow-x: auto;
+    }
+
+
+    #shop-list {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .item-normal {
+        width: 100%;
+        height: auto;
+        min-height: 10em;
+    }
+
+    .item-featured-list {
+        height: auto;
+        min-height: 15em;
+        width: 100%;
+        overflow-y: auto;
+    }
+
+    chat-component {
+        display: none;
+    }
+
+    social-bar {
+        display: none;
+    }
+
+    social-bar:not(.nav-hidden) {
+        display: block !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 12%);
+        z-index: 100;
+        overflow-y: auto;
+    }
+
+    main {
+        height: 100%;
+        overflow-y: auto;
+        padding-bottom: 14vh;
+    }
+
+    .middle-section {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+
+
+    .shop-wrapper {
+        overflow-y: auto;
+    }
+
+    #shop-section.nav-hidden,
+    #chat-section.nav-hidden {
+        display: none;
+    }
+
+    .global-container {
+        margin: 0;
+        height: 100%;
+        padding: 0;
+    }
+
+    .section-title {
+        display: none;
+    }
+
+    .mobile-logo-container {
+        display: flex;
+        justify-content: space-around;
+        height: auto;
+        width: 100%;
+        padding: 1em 0;
+        height: 10%;
+        object-fit: cover;
+        border-bottom: 1px solid #808080;
+    }
+
+    .snell-coins-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        gap: 0.5rem;
+        border: 3px solid #3a3632;
+        padding: 0.5rem;
+        border-radius: 6px;
+        width: fit-content;
+        height: fit-content;
+        font-size: 1.2rem;
+        background-color: #1e1c1a;
+    }
+
+    .snell-coin-picture {
+        height: 2.2rem;
+        width: 2.1rem;
+        object-fit: cover;
+    }
+
+    #snell-coins {
+        font-weight: 700;
+        color: white;
+    }
+
+    #buy-coins-btn {
+        margin: 0;
+        border: 2px solid white;
+        border-radius: 5px;
+        width: 1rem;
+        height: 1rem;
+        font-size: 1.3rem;
+        font-weight: 600;
+        padding: 1rem 1rem;
+        background-color: #252320;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    nav-bar {
+        display: flex;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 12%;
+        width: 100%;
+        z-index: 999;
+    }
+
+
+    .play-container {
+        flex-direction: column;
+        gap: 2em;
+    }
+
+    .play-btn-wrapper {
+        width: 100%;
+    }
+
+    .play-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .btn-container {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .main-separator {
+        display: none;
+    }
+
+    #shop-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .shop-section {
+        width: 90%;
+    }
+
+    #shop-featured {
+        height: 100%;
+    }
+
+    .nav-hidden {
+        display: none !important;
+    }
+
+}
