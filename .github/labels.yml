@@ -1,0 +1,45 @@
+# Labels à créer sur le repo
+# Commande : gh label create --force -f .github/labels.yml
+
+# --- Suggestion (base) ---
+- name: suggestion
+  color: "8B5CF6"
+  description: Suggestion d'amélioration générale
+
+# --- Domaines ---
+- name: "ui"
+  color: "F472B6"
+  description: Interface, design, ergonomie
+
+- name: "feature"
+  color: "34D399"
+  description: Nouvelle fonctionnalité
+
+- name: "refactor"
+  color: "60A5FA"
+  description: Restructuration du code
+
+- name: "fix"
+  color: "F87171"
+  description: Correction d'un comportement
+
+- name: "performance"
+  color: "FBBF24"
+  description: Optimisation des performances
+
+- name: "docs"
+  color: "94A3B8"
+  description: Documentation
+
+# --- Importance ---
+- name: "importance: mineure"
+  color: "BFDBFE"
+  description: 🔵 Confort, nice-to-have
+
+- name: "importance: modérée"
+  color: "FDE68A"
+  description: 🟡 Améliore l'expérience de façon notable
+
+- name: "importance: majeure"
+  color: "FCA5A5"
+  description: 🔴 Bloquant ou fort impact utilisateur
