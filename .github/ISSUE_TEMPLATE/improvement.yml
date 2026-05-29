@@ -1,0 +1,53 @@
+name: "Suggestion d'amélioration"
+description: Proposer une amélioration ou une nouvelle fonctionnalité pour Snell
+title: "[DOMAINE] Titre court et clair"
+labels: ["suggestion"]
+body:
+  - type: dropdown
+    id: domain
+    attributes:
+      label: "Domaine"
+      description: Quel aspect du projet est concerné ?
+      options:
+        - "UI - Interface, design, ergonomie"
+        - "Feature - Nouvelle fonctionnalité"
+        - "Refactor - Restructuration du code"
+        - "Fix - Correction d'un comportement"
+        - "Performance - Optimisation"
+        - "Docs - Documentation"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: importance
+    attributes:
+      label: "Importance"
+      description: Quel est l'impact de cette amélioration ?
+      options:
+        - "Mineure - Confort, nice-to-have"
+        - "Modérée - Améliore l'expérience de façon notable"
+        - "Majeure - Bloquant ou fort impact utilisateur"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "# Description"
+      description: Qu'est-ce qui manque ou pourrait être mieux ?
+      placeholder: Décris l'amélioration en quelques phrases...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "# Proposition"
+      description: Comment tu imagines la solution ? (optionnel)
+      placeholder: Une idée de solution, une approche...
+
+  - type: textarea
+    id: context
+    attributes:
+      label: "# Contexte / Captures d'écran"
+      description: Screenshots, liens, exemples... (optionnel)
