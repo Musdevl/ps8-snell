@@ -74,12 +74,12 @@ if (accountService.isLoggedIn()) {
 }
 
 
-
-
 const navBar = document.querySelector('nav-bar');
 
 
-document.querySelector("social-bar").addEventListener("update-notification-dot", async () => {
+const social_bar = document.querySelector("social-bar");
+
+social_bar.addEventListener("update-notification-dot", async () => {
     await navBar.refreshNotificationDot();
 })
 
@@ -147,181 +147,16 @@ showSection(initialSection);
     });
 });
 
+// ── Shop ─────────────────────────────────────────────────────────────────────
 
-// ── Shop — rendu ─────────────────────────────────────────────────────────────
+const shop = document.getElementById('global-shop');
+await customElements.whenDefined('shop-component');
+await shop.readyPromise;
+await shop.render();
 
-async function fetchShopItems() {
-    const res = await accountService.authFetch(`${GATEWAY_URL}/api/shop/daily-items`);
-    if (!res.ok) console.error('Failed to retrieve shop items');
-    return res.json();
-}
-
-function createItemDiv(item, classes) {
-    const totalPrice = getTotalPrice(item);
-    const colorClass = getColorClass(totalPrice);
-
-    const footerHTML = item.owned
-        ? `<div class="owned">
-               <span class="price-text">Owned</span>
-               <img src="/assets/owned_shop.png" class="owned-ico">
-           </div>`
-        : `<div class="price">
-               <img src="/assets/snell-coin.png" class="snell-coin-img">
-               <span class="price-text">${totalPrice.toLocaleString()}</span>
-           </div>`;
-
-    const div = document.createElement('div');
-    div.classList.add(...classes, colorClass);
-    div.innerHTML = `
-        <img src="${item.global_picture}" class="item-img">
-        <div class="footer-container">
-            <section class="footer-upper">
-                <span class="item-name">${item.name}</span>
-                <span class="item-type">${item.type}</span>
-            </section>
-            ${footerHTML}
-        </div>
-    `;
-
-    div.addEventListener('click', () => openPopup(item));
-    return div;
-}
-
-async function renderShop() {
-
-    const shopItemList = await fetchShopItems();
-
-    const items = shopItemList.items.slice(0, 6);
-
-    if (accountService.isLoggedIn()) {
-        markOwnedItems(items);
-    }
-
-    const featuredList = document.querySelector('.item-featured-list');
-    const shopList = document.getElementById('shop-list');
-
-    featuredList.innerHTML = '';
-    shopList.innerHTML = '';
-
-    items.slice(0, 2).forEach(item => featuredList.appendChild(createItemDiv(item, ['item-featured'])));
-    items.slice(2, 6).forEach(item => shopList.appendChild(createItemDiv(item, ['item-normal'])));
-}
-
-function markOwnedItems(items) {
-    const ownedItems = [
-        ...accountService.getProfilePictureList(),
-        ...accountService.getThemes(),
-        ...accountService.getEmotes(),
-    ];
-
-    items.forEach(item => {
-        let fullyOwned = true;
-
-        item.content.forEach(it => {
-            if (ownedItems.find(owned => owned.id === it.id)) {
-                item.owned = true;
-            } else {
-                fullyOwned = false;
-            }
-        });
-
-        item.fully_owned = fullyOwned;
-    });
-}
-
-
-// ── Shop — popup ─────────────────────────────────────────────────────────────
-
-const social_bar = document.querySelector('social-bar');
-const overlay = document.getElementById('shop-overlay');
-const popupImg = document.getElementById('popup-img');
-const popupName = document.getElementById('popup-name');
-const popupType = document.getElementById('popup-type');
-const popupHeader = document.getElementById('popup-header');
-const popupPriceText = document.getElementById('popup-price-text');
-const popupContentList = document.getElementById('popup-content-list');
-const popupFooter = document.querySelector('.popup-footer');
-const popupOwnedFooter = document.querySelector('.popup-owned-footer');
-
-function openPopup(item) {
-    const totalPrice = getTotalPrice(item);
-    const colorClass = getColorClass(totalPrice);
-
-    // Header
-    popupImg.src = item.global_picture;
-    popupImg.style.border = `5px solid ${ITEM_BORDER_COLORS[colorClass]}`;
-    popupName.textContent = item.name;
-    popupType.textContent = item.content?.[0]?.type || '';
-    popupHeader.style.background = ITEM_GRADIENTS[colorClass];
-
-    // Prix
-    popupPriceText.textContent = totalPrice.toLocaleString();
-
-    // Contenu
-    popupContentList.innerHTML = '';
-    item.content.forEach(c => {
-        const div = document.createElement('div');
-        div.classList.add('popup-content-item');
-        div.innerHTML = `
-            <img src="${c.picture || '/assets/default_item.png'}" alt="${c.name}">
-            <span>${c.name || c.type}</span>
-        `;
-        popupContentList.appendChild(div);
-    });
-
-    // Footer : achat ou "déjà possédé"
-    const isOwned = item.fully_owned;
-    popupFooter.classList.toggle('hidden', isOwned);
-    popupOwnedFooter.classList.toggle('hidden', !isOwned);
-
-    if (!isOwned) {
-        document.querySelector('.popup-purchase-btn').onclick = () => purchaseItem(item);
-    }
-
-    overlay.classList.remove('hidden');
-}
-
-function closePopup() {
-    overlay.classList.add('hidden');
-}
-
-async function purchaseItem(item) {
-    if (!accountService.isLoggedIn()) {
-        window.location.replace('./pages/auth/login');
-        return;
-    }
-
-    try {
-        const purchaseRes = await accountService.authFetch(`${GATEWAY_URL}/api/shop/purchase`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ item, userId: accountService.getUserId() }),
-        });
-
-        if (!purchaseRes.ok) {
-            const result = await purchaseRes.json();
-            throw new Error(result.message);
-        }
-
-        // Mise à jour du compte local
-        const userRes = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${accountService.getUserId()}`);
-        const user = await userRes.json();
-        accountService.setAccount(user);
-
-        social_bar.updateSnellCoins();
-        closePopup();
-        await renderShop();
-        notify('Item successfully Purchased', 'success');
-
-    } catch (error) {
-        console.error(error);
-        notify(error.message, 'error');
-    }
-}
-
-document.getElementById('popup-close').addEventListener('click', closePopup);
-overlay.addEventListener('click', (e) => { if (e.target === overlay) closePopup(); });
-
+shop.addEventListener('purchase-success', () => {
+    social_bar.updateSnellCoins();
+});
 
 // ── Chat global ───────────────────────────────────────────────────────────────
 
@@ -365,6 +200,4 @@ function playSound(sound) {
 
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-
-await renderShop();
 await renderChat();

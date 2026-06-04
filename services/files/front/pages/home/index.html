@@ -11,6 +11,7 @@
     <script type="module" src="/components/notification/notification.js"></script>
     <script type="module" src="/components/nav-bar/nav-bar.js"></script>
     <script type="module" src="/components/chat/chat.js"></script>
+    <script type="module" src="/components/shop/shop.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@7.2.0/dist/capacitor.min.js"></script>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
 </head>
@@ -84,23 +85,7 @@
             <section class="middle-section">
                 <div id="shop-section">
                     <p class="section-title">SHOP</p>
-                    <div id="shop-wrapper">
-
-                        <div id="shop-featured" class="shop-section">
-                            <div class="shop-title-section">
-                                <span class="shop-title">FEATURED ITEM</span>
-                            </div>
-                            <div class="item-featured-list"></div>
-                        </div>
-
-                        <div id="shop-items" class="shop-section">
-                            <div class="shop-title-section">
-                                <div class="shop-title">ITEMS</div>
-                            </div>
-                            <div id="shop-list"></div>
-                        </div>
-
-                    </div>
+                    <shop-component id="global-shop"></shop-component>
                 </div>
 
                 <div id="chat-section">
