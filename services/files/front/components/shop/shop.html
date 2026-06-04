@@ -1,0 +1,44 @@
+<template>
+    <link rel="stylesheet" href="/components/shop/shop.css">
+    <div id="shop-wrapper">
+        <div id="shop-featured" class="shop-section">
+            <div class="shop-title-section">
+                <span class="shop-title">FEATURED ITEM</span>
+            </div>
+            <div class="item-featured-list"></div>
+        </div>
+        <div id="shop-items" class="shop-section">
+            <div class="shop-title-section">
+                <div class="shop-title">ITEMS</div>
+            </div>
+            <div id="shop-list"></div>
+        </div>
+    </div>
+
+    <div id="shop-overlay" class="shop-overlay hidden">
+        <div id="shop-popup" class="shop-popup">
+            <div class="popup-header" id="popup-header">
+                <button id="popup-close" class="popup-close">✕</button>
+                <img id="popup-img" class="popup-img" src="" alt="">
+                <div class="popup-header-content">
+                    <span id="popup-type" class="popup-type"></span>
+                    <h2 id="popup-name" class="popup-name"></h2>
+                </div>
+            </div>
+            <div class="popup-content-section">
+                <div class="popup-content-title">Content</div>
+                <div id="popup-content-list" class="popup-content-list"></div>
+            </div>
+            <div class="popup-footer">
+                <div class="popup-footer-price">
+                    <img src="/assets/snell-coin.png" class="snell-coin-img">
+                    <span id="popup-price-text" class="price-text"></span>
+                </div>
+                <button class="popup-purchase-btn" id="popup-purchase-btn">PURCHASE</button>
+            </div>
+            <div class="popup-owned-footer">
+                <span class="popup-owned">Owned</span>
+            </div>
+        </div>
+    </div>
+</template>
