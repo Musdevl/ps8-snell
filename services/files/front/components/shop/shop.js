@@ -205,11 +205,6 @@ class Shop extends HTMLElement {
         }
     }
 
-    // ── API publique (utilisable depuis app.js) ───────────────────────────────
-
-    updateSnellCoins() {
-        // délégué au parent via l'event purchase-success
-    }
 }
 
 customElements.define('shop-component', Shop);

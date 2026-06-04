@@ -74,12 +74,12 @@ if (accountService.isLoggedIn()) {
 }
 
 
-
-
 const navBar = document.querySelector('nav-bar');
 
 
-document.querySelector("social-bar").addEventListener("update-notification-dot", async () => {
+const social_bar = document.querySelector("social-bar");
+
+social_bar.addEventListener("update-notification-dot", async () => {
     await navBar.refreshNotificationDot();
 })
 
