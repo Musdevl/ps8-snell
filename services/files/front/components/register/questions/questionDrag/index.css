@@ -107,6 +107,7 @@
         min-height: 10em;
         max-height: 20em;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     .categories {

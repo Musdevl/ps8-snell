@@ -506,6 +506,7 @@ end-message {
         z-index: 1109;
         padding-top: 10%;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     /* Buttons */
