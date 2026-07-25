@@ -6,7 +6,7 @@ FRONT_ENV_FILE="./files/front/env.js"
 USER_ENV_FILE="./user/env.js"
 
 # Nouvelle valeur
-GATEWAY_URL="https://snell.ps8.pns.academy"
+GATEWAY_URL="https://snell.super-pi.fr"
 
 # Créer le contenu
 cat > "$FRONT_ENV_FILE" << EOF
