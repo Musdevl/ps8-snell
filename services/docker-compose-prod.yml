@@ -16,7 +16,7 @@ services:
       - GATEWAY_URL=https://gateway:8000
 
     volumes:
-      - ../../secrets/https:/app/https:ro # ro veut dire readonly
+      - ../secrets/https:/app/https:ro # ro veut dire readonly
     networks:
       - app-network
       
