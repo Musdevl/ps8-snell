@@ -19,6 +19,7 @@ services:
       - ../secrets/https:/app/https:ro # ro veut dire readonly
     networks:
       - app-network
+      - proxy
       
 
   game:
@@ -61,7 +62,6 @@ services:
       dockerfile: files/Dockerfile
     networks:
       - app-network
-      - proxy
 
   chat:
     build:
