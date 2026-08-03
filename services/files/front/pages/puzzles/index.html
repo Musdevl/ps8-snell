@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Puzzles</title>
+    <link rel="stylesheet" href="/pages/puzzles/style.css">
+    <script type="module" src="/pages/puzzles/puzzles.js"></script>
+    <script type="module" src="/components/social-bar/social-bar.js"></script>
+    <script type="module" src="/components/notification/notification.js"></script>
+    <script type="module" src="/components/nav-bar/nav-bar.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@7.2.0/dist/capacitor.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+</head>
+
+<body>
+
+    <social-bar id="social-section"></social-bar>
+
+    <main>
+        <section class="global-container">
+            <div class="mobile-logo-container">
+                <img src="/assets/logo.png" alt="Snell-Logo" class="mobile-logo-ico">
+                <div class="snell-coins-container">
+                    <img src="/assets/snell-coin.png" alt="snell-coins" class="snell-coin-picture">
+                    <span id="snell-coins"></span>
+                    <button id="buy-coins-btn">+</button>
+                </div>
+            </div>
+            <p class="section-title">PUZZLES</p>
+            <section class="search-section">
+                <input type="text" class="search-puzzles" placeholder="Search a puzzle" autocomplete="off">
+                <button class="search-puzzle-btn">Search</button>
+            </section>
+            <div class="puzzles"></div>
+        </section>
+
+    </main>
+
+    <nav-bar></nav-bar>
+
+    <notification-bar></notification-bar>
+</body>
+
+</html>

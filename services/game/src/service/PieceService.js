@@ -16,7 +16,7 @@ export function rotateRight(piece) {
     return (piece & 0b11001111) | newRotation;
 }
 
-export function createPiece(piece, color, direction, cooldown) {
+export function createPiece(piece, color, direction, cooldown=0) {
     return piece | color | direction | (cooldown << 6);
 }
 
