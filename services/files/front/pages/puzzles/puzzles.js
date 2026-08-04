@@ -1,4 +1,5 @@
-import * as accountService from '../../services/account-service.js';
+import * as accountService from '../../services/account-service.js'; 
+import { GATEWAY_URL } from '../../env.js';
 
 // Mobile
 
@@ -44,14 +45,13 @@ if (accountService.isLoggedIn()) {
 // Puzzles
 
 async function loadPuzzles() {
-    const puzzle_list = document.querySelector('puzzles')
     try {
-
-        const res = await this.puzzleService.authFetch(`${GATEWAY_URL}/api/game/puzzles`)
+        const puzzle_list = document.querySelector('.puzzles')
+        const res = await accountService.authFetch(`${GATEWAY_URL}/api/game/puzzles`)
 
         if (!res.ok) {
             console.error("Failed to load puzzles");
-            puzzle_list.innerHTML += `<div><span class="no-puzzles">No puzzles available</span></div>`
+            puzzle_list.innerHTML += `<div class="no-puzzles-container"><span class="no-puzzles">No puzzles available...</span></div>`
         } else {
 
             const puzzles = await res.json();
@@ -71,7 +71,7 @@ async function loadPuzzles() {
         }
 
     } catch (error) {
-        console.error('An Error Occured while fetching puzzles');
+        console.error('An Error Occured while fetching puzzles', error);
     }
 }
 

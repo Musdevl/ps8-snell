@@ -135,6 +135,19 @@ nav-bar {
     }
 }
 
+.no-puzzles-container {
+    display: flex;
+    justify-content: center;
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #fff;
+    padding: 5em 0;
+}
+
+.search-ico {
+    display: none;
+}
+
 @media (max-width: 60em) {
 
     body {
@@ -164,8 +177,20 @@ nav-bar {
         height: 100vh;
     }
 
+    .btn-label {
+        display: none;
+    }
+
     social-bar {
         display: none;
+    }
+
+    .search-ico{
+        display: flex;
+        align-items: center;
+        height: 2em;
+        width: 2em;
+        stroke-width: 5px;
     }
 
     main {
