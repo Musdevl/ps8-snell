@@ -19,7 +19,7 @@ app.post('/api/game', async (req, res) => {
 
     } catch (error) {
         console.error('Error while creating game:', error);
-        res.json({ error: 'Error while creating game', message: error.message }, 400);
+        res.json({ error: 'Error while creating game', message: error.message }, 503);
     }
 });
 
@@ -30,7 +30,7 @@ app.get('/api/game/review/{gameId}', async (req, res) => {
         res.json(gameReview, 200)
     } catch (error) {
         console.log(error);
-        res.json({ error: 'Error while retrieving the game review ' }, 400)
+        res.json({ error: 'Error while retrieving the game review ' }, 503)
     }
 })
 
@@ -44,7 +44,40 @@ app.get('/api/game/tutorial', async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        res.json({ error: 'Error while retrieving the tutorial steps' }, 400)
+        res.json({ error: 'Error while retrieving the tutorial steps' }, 503)
+    }
+})
+
+app.get('/api/game/puzzles', async (req, res) => {
+    try {
+        const puzzles = gameManager.getPuzzles();
+        if (puzzles) {
+            return res.json({ puzzles: puzzles }, 200);
+        } else {
+            throw new Error("Failed to retrieve puzzles");
+        }
+    } catch (error) {
+        console.log(error)
+        res.json({ error: 'Error while retrieving puzzles' }, 503)
+    }
+})
+
+app.get('/api/game/puzzles/{puzzleId}', async (req, res) => {
+
+    const puzzleId = req.params.puzzleId;
+
+    console.log(puzzleId);
+    try {
+        const puzzle = gameManager.getPuzzleDetails(puzzleId);
+        if (puzzle) {
+            return res.json({ puzzle: puzzle }, 200);
+        } else {
+            throw new Error("Failed to retrieve puzzle");
+        }
+
+    } catch (error) {
+        console.log(error)
+        res.json({ error: `Error while retrieving puzzle with id ${puzzleId}` }, 503)
     }
 })
 
@@ -57,7 +90,7 @@ app.post('/api/game/forward-message', async (req, res) => {
         res.json("Message successfully forwared", 200);
     } catch (error) {
         console.log("[User API] Failed to forward the message to the gateway", error);
-        res.json("Failed to forward the message", 500);
+        res.json("Failed to forward the message", 503);
     }
 
 })

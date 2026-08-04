@@ -4,6 +4,9 @@ import * as uint16Utils from "../../../utils/Uint16Utils.js";
 import { TUTORIAL_STEPS } from "../../../utils/TutorialSteps.js";
 import { authFetch } from "../../../services/account-service.js";
 
+const params = new URLSearchParams(window.location.search);
+const puzzle_id = params.get("id");
+
 let boardComponent;
 let whitePlayerInfoComponent;
 let blackPlayerInfoComponent;
@@ -28,17 +31,32 @@ let tutorial_message;
 let tutorial_next;
 let tutorial_previous;
 
+let puzzle;
+
 const incorrect_action = new Audio(`/assets/sounds/illegal.mp3`);
 const correct_action = new Audio(`/assets/sounds/correct.mp3`);
 
 // Initialisation
 async function init() {
     // Attendre que le composant game-board soit prêt
+    await fetchPuzzle();
     await waitForBoard();
     await setupGame();
     await startTutorial();
 }
 
+async function fetchPuzzle() {
+    const params = new URLSearchParams(window.location.search);
+    const puzzle_id = params.get("id");
+
+    try {
+        const response = await authFetch(`${GATEWAY_URL}/api/game/puzzles/${puzzle_id}`)
+        const res = await response.json();
+        console.log(res);
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 async function waitForBoard() {
     // Wait for the custom element to be defined
@@ -87,18 +105,17 @@ async function setupGame() {
 
     leave_btn.addEventListener("click", () => {
         showModal({
-            message: "Leave the tutorial ?",
+            message: "Leave puzzle ?",
             confirmLabel: "Leave",
             cancelLabel: "Cancel",
             onConfirm: () => {
-                window.location.replace(`/`);
+                window.location.replace(`/pages/puzzles`);
             }
         });
     });
 
     const res = await fetch(`${GATEWAY_URL}/api/game/tutorial`);
     const raw = await res.json();
-    console.log("States", raw);
     game_states = raw.grid_states.map(state => uint16Utils.normalizeGameState(state));
 
     tutorial_container = document.querySelector('.tutorial-container');
@@ -141,7 +158,7 @@ async function nextTutorielStep() {
     if (tutorial_index >= tutorial_steps.length - 1) {
 
         showModal({
-            message: "Congratulations, you finished the tutorial !",
+            message: "Congratulations, you've completed the puzzle !",
             confirmLabel: "Leave",
             cancelLabel: "Cancel",
             onConfirm: () => {

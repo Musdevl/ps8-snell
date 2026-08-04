@@ -1,25 +1,20 @@
 export class Puzzle {
 
+    id;
     name;
-    number;
-    initBoard;
+    game;
     steps;
+    difficulty;
+    game_states;
 
-    constructor(name, number, initBoard, steps) {
-        this.initBoard = initBoard
+    constructor(id, name = "", game, steps = [], difficulty) {
+        this.id = id;
+        this.game = game;
         this.steps = steps;
         this.name = name;
-        this.number = number;
+        this.difficulty = difficulty;
+        this.game_states = [];
     }
 
-    getSteps() { return this.steps; }
-
-    setSteps(steps) { this.steps = steps; }
-
-    getInitBoard(board) { this.initBoard = board; }
-
-    getName() { return this.name; }
-
-    getNumber() { return this.number; }
 
 };

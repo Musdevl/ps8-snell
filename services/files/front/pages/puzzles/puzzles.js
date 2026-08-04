@@ -1,4 +1,4 @@
-import * as accountService from '../../services/account-service.js'; 
+import * as accountService from '../../services/account-service.js';
 import { GATEWAY_URL } from '../../env.js';
 
 // Mobile
@@ -54,19 +54,34 @@ async function loadPuzzles() {
             puzzle_list.innerHTML += `<div class="no-puzzles-container"><span class="no-puzzles">No puzzles available...</span></div>`
         } else {
 
-            const puzzles = await res.json();
+            const { puzzles } = await res.json();
 
-            for (puzzle in puzzles) {
-                puzzle_list.innerHTML +=
-                    `<div class="puzzle-item">
-                    <div class="puzzle-ico-container">
-                        <img class="puzzle-ico" src="/assets/puzzle-piece-silver.svg">
-                        <span>${puzzle.number}</span>
+            puzzles.forEach(puzzle => {
+                const item = document.createElement('div');
+                item.classList.add('puzzle-item');
+                item.innerHTML += `
+                    <div class="puzzle-item-left">
+                        <div class="puzzle-ico-container">
+                            <img class="puzzle-ico" src="/assets/puzzle-piece-silver.svg">
+                            <span class="puzzle-number">${puzzle.id}</span>
+                        </div>
+                        <div class="puzzle-name">
+                        ${puzzle.name}
+                        </div>
                     </div>
-                    <div class="">
-                    </div>
-                </div>`
-            }
+                    <div class="puzzle-item-right">
+                        <svg class="see-more-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </div>`
+
+                item.addEventListener("click", () => {
+                    window.location.replace(`/pages/game/puzzles/index.html?id=${puzzle.id}`);
+                })
+
+                puzzle_list.appendChild(item);
+            });
 
         }
 

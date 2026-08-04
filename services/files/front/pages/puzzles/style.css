@@ -43,7 +43,7 @@ main {
     height: 95%;
     display: flex;
     flex-direction: column;
-    gap: 4vh;
+    gap: 2em;
     padding: 2em 0 0em 0;
 }
 
@@ -135,6 +135,14 @@ nav-bar {
     }
 }
 
+.puzzles {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    height: 100%;
+    overflow-y: auto;
+}
+
 .no-puzzles-container {
     display: flex;
     justify-content: center;
@@ -143,6 +151,60 @@ nav-bar {
     color: #fff;
     padding: 5em 0;
 }
+
+.puzzle-item {
+    display: flex;
+    padding: 1em 2em;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #808080;
+
+    &:hover {
+        cursor: pointer;
+        background-color: rgba(210, 210, 210, 0.05);
+    }
+}
+
+.see-more-ico {
+    width: 1.5em;
+    height: 1.5em;
+    color: #808080;
+}
+
+.puzzle-ico-container {
+    display: flex;
+    align-items: flex-end;
+}
+
+.puzzle-number {
+    font-size: 1.3em;
+    font-weight: 600;
+    text-shadow: 3px 0 #000, -3px 0 #000, 0 3px #000, 0 -3px #000,
+        2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000;
+    color: #fff;
+}
+
+.puzzle-name {
+    color: #fff;
+    font-size: 1em;
+}
+
+
+
+.puzzle-item-left {
+    display: flex;
+    gap: 2em;
+    align-items: center;
+}
+
+
+.puzzle-ico {
+    height: 3.5em;
+    width: 3.5em;
+}
+
+
 
 .search-ico {
     display: none;
@@ -185,13 +247,14 @@ nav-bar {
         display: none;
     }
 
-    .search-ico{
+    .search-ico {
         display: flex;
         align-items: center;
         height: 2em;
         width: 2em;
         stroke-width: 5px;
     }
+
 
     main {
         height: 100%;
@@ -230,6 +293,7 @@ nav-bar {
         margin: 0;
         height: 100%;
         padding: 0;
+        gap: 0.5em;
     }
 
     .snell-coin-picture {
