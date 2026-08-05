@@ -330,10 +330,11 @@ export function getPuzzles() {
 }
 
 export function getPuzzleDetails(puzzleId) {
-    console.log("reachiiing")
     const puzzle = puzzleService.findPuzzleById(puzzleId);
     if (puzzle) {
-        puzzle.game_states = game_states = computeGameSteps(puzzle.game, puzzle.steps);
+        if (puzzle.game_states.length === 0) {
+            puzzle.game_states = computeGameSteps(puzzle.game, puzzle.steps);
+        }
         return puzzle;
     } else {
         throw new Error(`Puzzle not found with id: ${puzzleId}`);

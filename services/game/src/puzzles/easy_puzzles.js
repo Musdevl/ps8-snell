@@ -46,16 +46,16 @@ const puzzle_1 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -102,16 +102,16 @@ const puzzle_2 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -158,16 +158,16 @@ const puzzle_3 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -214,16 +214,16 @@ const puzzle_4 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -270,16 +270,16 @@ const puzzle_5 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -326,16 +326,16 @@ const puzzle_6 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -382,16 +382,16 @@ const puzzle_7 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -438,16 +438,16 @@ const puzzle_8 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -494,16 +494,16 @@ const puzzle_9 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -550,16 +550,16 @@ const puzzle_10 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -606,16 +606,16 @@ const puzzle_11 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);
@@ -662,16 +662,16 @@ const puzzle_12 =
         const black_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.BLACK, DIRECTIONS.NORTH)
 
         board.setSlot(9, 7, white_shooter)
-        board.setSlot(7, 8, white_king)
-        board.setSlot(6, 4, white_first_protector)
-        board.setSlot(5, 8, white_second_protector)
-        board.setSlot(5, 3, white_full_mirror)
+        board.setSlot(7, 4, white_king)
+        board.setSlot(6, 2, white_first_protector)
+        board.setSlot(5, 4, white_second_protector)
+        board.setSlot(5, 6, white_full_mirror)
 
-        board.setSlot(0, 4, black_shooter)
-        board.setSlot(2, 1, black_king)
-        board.setSlot(3, 5, black_first_protector)
-        board.setSlot(4, 1, black_second_protector)
-        board.setSlot(4, 6, black_full_mirror)
+        board.setSlot(0, 2, black_shooter)
+        board.setSlot(3, 5, black_king)
+        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(4, 5, black_second_protector)
+        board.setSlot(4, 3, black_full_mirror)
 
         const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 7);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 7);

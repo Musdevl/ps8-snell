@@ -1,7 +1,6 @@
 import { GATEWAY_URL } from "../../../env.js";
 import { COLORS } from "../../../enum/Colors.js";
 import * as uint16Utils from "../../../utils/Uint16Utils.js";
-import { TUTORIAL_STEPS } from "../../../utils/TutorialSteps.js";
 import { authFetch } from "../../../services/account-service.js";
 
 const params = new URLSearchParams(window.location.search);
@@ -20,16 +19,7 @@ let modal_message;
 let modal_confirm;
 let modal_cancel;
 
-let state_index = 0;
-let game_states = [];
-
-
-let tutorial_index = 0;
-let tutorial_steps = TUTORIAL_STEPS;
-let tutorial_container;
-let tutorial_message;
-let tutorial_next;
-let tutorial_previous;
+let puzzle_step_index = 0;
 
 let puzzle;
 
@@ -42,7 +32,7 @@ async function init() {
     await fetchPuzzle();
     await waitForBoard();
     await setupGame();
-    await startTutorial();
+    await startPuzzle();
 }
 
 async function fetchPuzzle() {
@@ -52,8 +42,9 @@ async function fetchPuzzle() {
     try {
         const response = await authFetch(`${GATEWAY_URL}/api/game/puzzles/${puzzle_id}`)
         const res = await response.json();
-        console.log(res);
+        puzzle = res.puzzle;
     } catch (error) {
+        window.location.replace(`/pages/puzzles`);
         console.log(error);
     }
 }
@@ -91,16 +82,16 @@ async function waitForBoard() {
 async function setupGame() {
 
     // Setup les composants
+    const puzzle_title = document.querySelector('.puzzle-title');
+    puzzle_title.innerHTML += puzzle.name;
 
     setupBoardComponentEvents(boardComponent);
 
-    await setupPlayerInfoForTutorial(whitePlayerInfoComponent, COLORS.WHITE);
+    await setupPlayerInfoForPuzzle(whitePlayerInfoComponent, COLORS.WHITE);
 
     whitePlayerInfoComponent.setPlayerColor(COLORS.WHITE);
     setupPlayerInfoEvents(whitePlayerInfoComponent);
-
-    await setupPlayerInfoForTutorial(blackPlayerInfoComponent, COLORS.BLACK);
-
+    await setupPlayerInfoForPuzzle(blackPlayerInfoComponent, COLORS.BLACK);
     boardComponent.setPlayerColor(COLORS.WHITE);
 
     leave_btn.addEventListener("click", () => {
@@ -113,83 +104,6 @@ async function setupGame() {
             }
         });
     });
-
-    const res = await fetch(`${GATEWAY_URL}/api/game/tutorial`);
-    const raw = await res.json();
-    game_states = raw.grid_states.map(state => uint16Utils.normalizeGameState(state));
-
-    tutorial_container = document.querySelector('.tutorial-container');
-    tutorial_message = document.querySelector('#tutorial-message');
-    tutorial_next = document.querySelector('.next-btn')
-    tutorial_previous = document.querySelector('.previous-btn');
-
-    tutorial_next.addEventListener('click', async () => await nextTutorielStep());
-
-    tutorial_previous.addEventListener('click', async () => await previousTutorielStep());
-
-}
-
-async function previousTutorielStep() {
-    if (tutorial_index <= 0) return;
-
-    const leavingStep = tutorial_steps[tutorial_index]; // step qu'on quitte
-    tutorial_index--;
-    await renderTutorialStep();
-
-    const landingStep = tutorial_steps[tutorial_index]; // step où on atterrit
-
-    const isLeavingBlack = leavingStep.color === COLORS.BLACK;
-    const isLandingOnWhiteAction = landingStep.expectedAction !== "NONE" && landingStep.color === COLORS.WHITE;
-
-    if (isLeavingBlack) {
-        state_index--;
-        await handleUpdate(game_states[state_index], true);
-    }
-
-    if (isLandingOnWhiteAction) {
-        state_index--;
-        await handleUpdate(game_states[state_index], true);
-    }
-
-    tutorial_next.disabled = landingStep.blocking;
-}
-
-async function nextTutorielStep() {
-    if (tutorial_index >= tutorial_steps.length - 1) {
-
-        showModal({
-            message: "Congratulations, you've completed the puzzle !",
-            confirmLabel: "Leave",
-            cancelLabel: "Cancel",
-            onConfirm: () => {
-                window.location.replace(`/`);
-            }
-        });
-
-        return;
-    }
-
-    const currentStep = tutorial_steps[tutorial_index];
-    tutorial_index++;
-    await renderTutorialStep();
-
-    const nextStep = tutorial_steps[tutorial_index];
-
-    const isWhiteAction = currentStep.expectedAction !== "NONE" && currentStep.color === COLORS.WHITE;
-    const isArrivingOnBlack = nextStep?.color === COLORS.BLACK;
-
-    if (isWhiteAction) {
-        state_index++;
-        await handleUpdate(game_states[state_index], true);
-    }
-
-    if (isArrivingOnBlack) {
-        state_index++;
-        await handleUpdate(game_states[state_index], true);
-    }
-
-    const step = tutorial_steps[tutorial_index];
-    tutorial_next.disabled = step.blocking;
 }
 
 
@@ -209,8 +123,8 @@ function setupBoardComponentEvents(boardComponent) {
         whitePlayerInfoComponent.clearRotationCell();
         blackPlayerInfoComponent.clearRotationCell();
 
-        if (action === tutorial_steps[tutorial_index].expectedAction) {
-            nextTutorielStep();
+        if (action === puzzle.steps[puzzle_step_index]) {
+            nextPuzzleStep();
             playSound(correct_action);
         }
         else {
@@ -241,11 +155,12 @@ function setupBoardComponentEvents(boardComponent) {
 }
 
 
-async function setupPlayerInfoForTutorial(playerInfo, color) {
+async function setupPlayerInfoForPuzzle(playerInfo, color) {
     await playerInfo.setColor(color);
     playerInfo.disableElo();
     playerInfo.disableProfilePicture();
     playerInfo.disableName();
+    playerInfo.disableTimer()
 }
 
 function setupPlayerInfoEvents(playerInfoComponent) {
@@ -289,7 +204,7 @@ function closeModal() {
 
 async function handleUpdate(data, isStarting = false) {
 
-    console.log("[GAME] - Update received: ");
+    console.log("[GAME] - Update received: ", data);
 
     await boardComponent.updateBoard(data);
 
@@ -307,18 +222,10 @@ async function updatePlayerInfo(playerInfo, colorTurn, inventory, time, isStarti
     }
 }
 
-async function startTutorial() {
+async function startPuzzle() {
     boardComponent.clear();
-    await handleUpdate(game_states[state_index], true);
-    await renderTutorialStep();
+    await handleUpdate(puzzle.game_states[puzzle_step_index], true);
 
-}
-
-async function renderTutorialStep() {
-    tutorial_message.classList.remove('slide-in');
-    void tutorial_message.offsetWidth;
-    tutorial_message.innerHTML = tutorial_steps[tutorial_index].message;
-    tutorial_message.classList.add('slide-in');
 }
 
 function playSound(sound) {

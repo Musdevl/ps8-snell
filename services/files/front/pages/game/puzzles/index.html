@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="/pages/game/shared/game.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/pages/game/tutorial/tutorial.css">
-    <script type="module" src="/pages/game/puzzles/game.js"></script>
+    <script type="module" src="/pages/game/puzzles/puzzle.js"></script>
     <script type="module" src="/components/board/board.js"></script>
     <script type="module" src="/components/player-info/player-info.js"></script>
     <script type="module" src="/components/notification/notification.js"></script>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-     <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@7.2.0/dist/capacitor.min.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@7.2.0/dist/capacitor.min.js"></script>
 </head>
 
 <body>
@@ -24,7 +24,7 @@
             <path d="M19 12H5"></path>
         </svg>
     </button>
-    
+    <h1 class="puzzle-title"></h1>
     <div class="game-container">
         <div class="game-box">
             <main>
@@ -44,19 +44,6 @@
             </div>
         </div>
     </div>
-
-    <section class="tutorial-container">
-        <div class="tutorial-wrapper">
-            <img src="/assets/coachmae.png" class="coachmae" alt="coachmae">
-            <div class="tutorial-content">
-                <p id="tutorial-message"></p>
-                <div class="tutorial-btn-container">
-                    <button class="previous-btn option-btn">Previous</button>
-                    <button class="next-btn option-btn">Next</button>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <notification-bar></notification-bar>
 
