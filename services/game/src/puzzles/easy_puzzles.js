@@ -30,7 +30,7 @@ const puzzle_1 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -54,7 +54,7 @@ const puzzle_1 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -111,7 +111,7 @@ const puzzle_2 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -143,7 +143,7 @@ const puzzle_3 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -167,7 +167,7 @@ const puzzle_3 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -199,7 +199,7 @@ const puzzle_4 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -223,7 +223,7 @@ const puzzle_4 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -279,7 +279,7 @@ const puzzle_5 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -311,7 +311,7 @@ const puzzle_6 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -335,7 +335,7 @@ const puzzle_6 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -367,7 +367,7 @@ const puzzle_7 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -391,7 +391,7 @@ const puzzle_7 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -423,7 +423,7 @@ const puzzle_8 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -447,7 +447,7 @@ const puzzle_8 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -479,7 +479,7 @@ const puzzle_9 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -503,7 +503,7 @@ const puzzle_9 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -535,7 +535,7 @@ const puzzle_10 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -559,7 +559,7 @@ const puzzle_10 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -591,7 +591,7 @@ const puzzle_11 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -615,7 +615,7 @@ const puzzle_11 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
@@ -647,7 +647,7 @@ const puzzle_12 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -671,7 +671,7 @@ const puzzle_12 =
         board.setSlot(5, 6, white_full_mirror)
 
         board.setSlot(0, 2, black_shooter)
-        board.setSlot(3, 5, black_king)
+        board.setSlot(2, 5, black_king)
         board.setSlot(3, 7, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
