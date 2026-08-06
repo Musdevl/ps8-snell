@@ -43,6 +43,8 @@ async function fetchPuzzle() {
         const response = await authFetch(`${GATEWAY_URL}/api/game/puzzles/${puzzle_id}`)
         const res = await response.json();
         puzzle = res.puzzle;
+        puzzle.game_states = puzzle.game_states.map(state => uint16Utils.normalizeGameState(state));
+        console.log(puzzle)
     } catch (error) {
         window.location.replace(`/pages/puzzles`);
         console.log(error);
@@ -210,7 +212,6 @@ async function handleUpdate(data, isStarting = false) {
 
     await updatePlayerInfo(whitePlayerInfoComponent, data.colorTurn, data.white_inventory, data.white_time, isStarting)
     await updatePlayerInfo(blackPlayerInfoComponent, data.colorTurn, data.black_inventory, data.black_time, isStarting)
-
 }
 
 async function updatePlayerInfo(playerInfo, colorTurn, inventory, time, isStarting = false) {
@@ -230,6 +231,35 @@ async function startPuzzle() {
 
 function playSound(sound) {
     sound.play().catch(() => { });
+}
+
+async function nextPuzzleStep() {
+
+    puzzle_step_index++;
+
+    await handleUpdate(puzzle.game_states[puzzle_step_index], false)
+
+    if (puzzle_step_index >= puzzle.steps.length - 1) {
+
+        showModal({
+            message: "Congratulations, you finished the puzzle !",
+            confirmLabel: "Leave",
+            cancelLabel: "Cancel",
+            onConfirm: () => {
+                window.location.replace(`/`);
+            }
+        });
+
+        return;
+    }
+
+    const nextColorTurn = puzzle.game_states[puzzle_step_index].colorTurn
+    console.log(nextColorTurn, puzzle.playerColor);
+
+    if (nextColorTurn !== puzzle.playerColor) {
+        puzzle_step_index++;
+        await handleUpdate(puzzle.game_states[puzzle_step_index], false)
+    }
 }
 
 // Lancer l'initialisation quand le DOM est prêt

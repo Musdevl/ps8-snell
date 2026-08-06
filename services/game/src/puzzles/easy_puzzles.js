@@ -17,6 +17,8 @@ const puzzle_1 =
 {
     initPuzzle: () => {
 
+        const playerColor = COLORS.WHITE
+
         const puzzle_steps = [
             "PLACE/91,0",  // WHITE
             "PLACE/71,16",  // BLACK
@@ -65,13 +67,14 @@ const puzzle_1 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(1, "Premier tir", game, puzzle_steps, PUZZLE_DIFFICULTY.EASY);
+        return new Puzzle(1, "Premier tir", game, puzzle_steps, PUZZLE_DIFFICULTY.EASY, playerColor);
     }
 }
 
 const puzzle_2 =
 {
     initPuzzle: () => {
+        const playerColor = COLORS.WHITE
 
         const puzzle_steps = [
             "PLACE/91,0",  // WHITE
@@ -84,7 +87,7 @@ const puzzle_2 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
 
         const board = new Board();
@@ -121,7 +124,7 @@ const puzzle_2 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(2, "Angle caché", game, puzzle_steps, PUZZLE_DIFFICULTY.EASY);
+        return new Puzzle(2, "Angle caché", game, puzzle_steps, PUZZLE_DIFFICULTY.EASY, playerColor);
     }
 }
 
@@ -289,7 +292,7 @@ const puzzle_5 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(5, "Faiscen croisé", game, puzzle_steps, PUZZLE_DIFFICULTY.EASY);
+        return new Puzzle(5, "Faisceau croisé", game, puzzle_steps, PUZZLE_DIFFICULTY.EASY);
     }
 }
 
