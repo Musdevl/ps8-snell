@@ -152,6 +152,25 @@ nav-bar {
     padding: 5em 0;
 }
 
+.puzzle-header-section {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 1em;
+}
+
+.leave-ico {
+    width: 1.5em;
+    height: 1.5em;
+    color: #fff;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        color: #808080;
+        transform: translateX(-5px);
+    }
+}
+
 .puzzle-item {
     display: flex;
     padding: 1em 2em;
@@ -260,6 +279,10 @@ nav-bar {
         height: 100%;
         overflow-y: auto;
         padding-bottom: 14vh;
+    }
+
+    .leave-ico{
+        display: none;
     }
 
     .mobile-logo-container {

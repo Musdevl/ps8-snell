@@ -77,7 +77,7 @@ async function loadPuzzles() {
                     </div>`
 
                 item.addEventListener("click", () => {
-                    window.location.replace(`/pages/game/puzzles/index.html?id=${puzzle.id}`);
+                    window.location.replace(`/pages/game/puzzle/index.html?id=${puzzle.id}`);
                 })
 
                 puzzle_list.appendChild(item);
@@ -90,5 +90,22 @@ async function loadPuzzles() {
     }
 }
 
+function setupBtns() {
 
+    try {
+        const mobile_logo = document.querySelector('.mobile-logo-ico');
+        mobile_logo.addEventListener('click', () => window.location.replace('/'))
+    } catch (error) {
+        console.error("Failed to setup leave btn", error);
+    }
+
+    try {
+        const leave = document.querySelector('.leave-ico');
+        leave.addEventListener("click", () => window.location.replace('/'));
+    } catch (error) {
+        console.error("Failed to setup leave btn", error);
+    }
+}
+
+setupBtns();
 await loadPuzzles();
