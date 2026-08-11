@@ -473,7 +473,7 @@ shop-component {
         position: absolute;
         bottom: 0;
         left: 0;
-        height: 12%;
+        height: 10%;
         width: 100%;
         z-index: 999;
     }
