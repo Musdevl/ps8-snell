@@ -61,6 +61,7 @@
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    scrollbar-color: #232220 #3a3734;
 }
 
 .item-normal {
@@ -400,12 +401,19 @@
     font-size: 2rem;
 }
 
+.modal-close-ico{
+    height: 2em;
+    width: 2em;
+    stroke: white;
+}
+
 @media (max-width: 60em) {
 
     #shop-wrapper {
         flex-direction: column;
         height: auto;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     .shop-section {
@@ -429,6 +437,7 @@
 
     #shop-list {
         height: auto;
+        scrollbar-color: #232220 #3a3734;
         overflow-y: auto;
         width: 90%;
     }
@@ -451,6 +460,7 @@
     .popup-content-list {
         overflow-x: auto;
         flex-wrap: nowrap;
+        scrollbar-color: #232220 #3a3734;
     }
 }
 
@@ -483,11 +493,13 @@
 
     .shop-popup {
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
         max-height: 70%;
     }
 
     .popup-header-content {
         overflow-x: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     #shop-list {
@@ -495,6 +507,7 @@
         height: 100%;
         width: 100%;
         overflow-x: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     .item-normal {
@@ -508,6 +521,7 @@
         min-height: 15em;
         width: 100%;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     .shop-section {
