@@ -1,0 +1,1 @@
+export const medium_puzzles = []

@@ -24,54 +24,54 @@ export class GameManager extends EventEmitter {
 
     async initGame(gameType, player_1_info, player_2_info, gameTime = 600) {
 
-            const game = gameService.createGame(gameType, gameTime);
+        const game = gameService.createGame(gameType, gameTime);
 
-            const white_player = PlayerService.createPlayer(COLORS.WHITE, player_1_info.webSocketId, player_1_info.userId)
+        const white_player = PlayerService.createPlayer(COLORS.WHITE, player_1_info.webSocketId, player_1_info.userId)
 
-            let black_player;
+        let black_player;
 
-            if (gameType === "AI") {
-                black_player = PlayerService.createPlayer(COLORS.BLACK, "NONE", "AI");
-            } else {
-                black_player = PlayerService.createPlayer(COLORS.BLACK, player_2_info.webSocketId, player_2_info.userId);
+        if (gameType === "AI") {
+            black_player = PlayerService.createPlayer(COLORS.BLACK, "NONE", "AI");
+        } else {
+            black_player = PlayerService.createPlayer(COLORS.BLACK, player_2_info.webSocketId, player_2_info.userId);
+        }
+
+        if (gameType === "MULTI") {
+            // Create a new chat
+            const res = await fetch(`${this.CHAT_SERVICE_URL}/api/chat/game`, {
+                method: "POST",
+                body: JSON.stringify({
+                    gameId: game.id
+                }),
+                headers: { "Content-type": "application/json; charset=UTF-8" }
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to create game chat at initialization")
             }
 
-            if (gameType === "MULTI") {
-                // Create a new chat
-                const res = await fetch(`${this.CHAT_SERVICE_URL}/api/chat/game`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        gameId: game.id
-                    }),
-                    headers: { "Content-type": "application/json; charset=UTF-8" }
-                });
+            let reqInfoWhite = await fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_1_info.userId}`, { method: "GET" });
+            let reqInfoBlack = await fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_2_info.userId}`, { method: "GET" });
 
-                if (!res.ok) {
-                    throw new Error("Failed to create game chat at initialization")
-                }
+            let userWhite = await reqInfoWhite.json();
+            let userBlack = await reqInfoBlack.json();
 
-                let reqInfoWhite = await fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_1_info.userId}`, { method: "GET" });
-                let reqInfoBlack = await fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_2_info.userId}`, { method: "GET" });
+            game.gain = this.getEloChanges(userWhite.elo, userBlack.elo);
+        }
 
-                let userWhite = await reqInfoWhite.json();
-                let userBlack = await reqInfoBlack.json();
+        game.on("TIMEOUT", () => {
+            this.handleTimeout(game)
+        })
 
-                game.gain = this.getEloChanges(userWhite.elo, userBlack.elo);
-            }
-
-            game.on("TIMEOUT", () => {
-                this.handleTimeout(game)
-            })
-
-            game.addPlayer(white_player);
-            game.addPlayer(black_player);
+        game.addPlayer(white_player);
+        game.addPlayer(black_player);
 
 
 
-            this.games.set(game.id, game);
-            gameService.launchGame(game);
+        this.games.set(game.id, game);
+        gameService.launchGame(game);
 
-            return { game: gameService.getCurrentGameStatus(game), players_web_sockets: gameService.getPlayerSockets(game) };
+        return { game: gameService.getCurrentGameStatus(game), players_web_sockets: gameService.getPlayerSockets(game) };
     }
 
     async getGameReview(gameId) {
@@ -138,8 +138,8 @@ export class GameManager extends EventEmitter {
         try {
 
             const req = await fetch(`${this.AI_SERVICE_URL}/api/ai/best-action`, {
-                method:'POST',
-                body:JSON.stringify({
+                method: 'POST',
+                body: JSON.stringify({
                     grid: game.board.grid,
                     players: game.players,
                     colorTurn: game.colorTurn
@@ -286,6 +286,14 @@ export class GameManager extends EventEmitter {
 
     getTutorialSteps() {
         return gameService.getTutorialSteps();
+    }
+
+    getPuzzles() {
+        return gameService.getPuzzles()
+    }
+
+    getPuzzleDetails(puzzleId) {
+        return gameService.getPuzzleDetails(puzzleId);
     }
 }
 

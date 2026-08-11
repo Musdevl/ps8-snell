@@ -16,7 +16,6 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-bottom: 1rem;
     border-bottom: 1px solid #35312d;
 }
 
@@ -479,7 +478,7 @@
     color: #5c574f;
     font-size: 0.95rem;
     font-weight: 700;
-    padding: 0.6rem 0;
+    padding: 1em 0;
     cursor: pointer;
     letter-spacing: 0.05em;
     text-transform: uppercase;
