@@ -69,10 +69,26 @@ docker compose up -d mail
 Les variables sont lues à la création du conteneur, il n'y a pas besoin de
 rebuild. `GET /api/mail/health` indique si le relais répond.
 
-Le VPS n'ayant pas de nom de domaine, auto-héberger un SMTP est exclu : sans
-domaine il n'y a ni SPF ni DKIM, et le port 25 sortant est bloqué chez la plupart
-des hébergeurs. Il faut donc un relais tiers — Brevo dans `.env.example`, mais
-n'importe quel SMTP fait l'affaire, le code n'en dépend pas.
+### Pourquoi Gmail
+
+Le VPS n'a pas de nom de domaine, ce qui ferme deux portes.
+
+Auto-héberger un SMTP est exclu : sans domaine, pas de SPF ni de DKIM, et le port
+25 sortant est bloqué chez la plupart des hébergeurs.
+
+Passer par un relais tiers (Brevo, Mailjet…) ne marche pas mieux. Depuis 2024,
+Google, Yahoo et Microsoft exigent un expéditeur aligné DMARC, et personne
+d'autre que Google ne peut signer en DKIM pour `gmail.com` : un relais tiers
+affichant une adresse `@gmail.com` échoue cet alignement, et les mails se font
+filtrer silencieusement.
+
+Envoyer via Gmail avec un mot de passe d'application contourne le problème au
+lieu de le combattre : on s'authentifie auprès de Google comme propriétaire réel
+de l'adresse, donc l'alignement est natif.
+
+Le code ne dépend d'aucun fournisseur — c'est du SMTP standard. Le jour où le
+projet aura un nom de domaine, n'importe quel relais redeviendra utilisable en
+changeant seulement le `.env`.
 
 ---
 
