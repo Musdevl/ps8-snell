@@ -16,6 +16,7 @@ const URLS = {
     chat: process.env.CHAT_SERVICE_URL || "http://localhost:8003",
     ai: process.env.AI_SERVICE_URL || "http://localhost:8020",
     shop: process.env.SHOP_SERVICE_URL || "http://localhost:8005",
+    mail: process.env.MAIL_SERVICE_URL || "http://localhost:8006",
 };
 
 const proxy = httpProxy.createProxyServer();
@@ -38,6 +39,10 @@ const PUBLIC_ROUTES = [
     '/api/user/hard-reset-password',
     '/api/chat/global',
     '/api/shop',
+
+    // Liens cliqués depuis un mail : l'utilisateur n'est pas connecté
+    '/api/mail/verification/confirm',
+    '/api/mail/password-reset',
     '/assets/',
     '/pages/home/',
     '/services/',
@@ -157,6 +162,16 @@ const requestHandler = (req, res) => {
                         err => {
                             res.statusCode = 502;
                             return res.end("Error: shop api unreachable");
+                        }
+                    );
+                }
+
+                if (parts[2] === "mail") {
+                    return proxy.web(req, res,
+                        { target: URLS.mail },
+                        err => {
+                            res.statusCode = 502;
+                            return res.end("Error: mail api unreachable");
                         }
                     );
                 }

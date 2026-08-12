@@ -13,6 +13,7 @@ services:
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
       - SHOP_SERVICE_URL=http://shop:8005
       - AI_SERVICE_URL=http://ai:8020
+      - MAIL_SERVICE_URL=http://mail:8006
       - ENV=${ENV:-dev} # Valeur par default "dev" sinon la valeur dans la var d'env ENV
       - GATEWAY_URL=http://gateway:8000
 
@@ -113,6 +114,42 @@ services:
       dockerfile: AI/Dockerfile
     environment:
       - GATEWAY_URL=http://gateway:8000
+    networks:
+      - app-network
+
+  mail:
+    build:
+      context: .
+      dockerfile: mail/Dockerfile
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      # Exposé en dev uniquement, pour atteindre la console d'envoi sans passer
+      # par la gateway (qui exigerait un JWT) : http://localhost:8006
+      - "8006:8006"
+    environment:
+      - MONGO_DB_URL=mongodb://mongodb:27017
+      - USER_SERVICE_URL=http://user:8010
+      # Base des liens envoyés par mail. Laissé vide, le service la déduit de
+      # l'hôte par lequel la requête est arrivée — ce qui marche tel quel sur un
+      # serveur distant. À renseigner dès qu'il y aura un nom de domaine.
+      - PUBLIC_GATEWAY_URL=${PUBLIC_GATEWAY_URL:-}
+      - ENV=${ENV:-dev}
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+      - SMTP_SECURE=false
+      - "MAIL_FROM=Snell <no-reply@snell.local>"
+    networks:
+      - app-network
+
+  # Faux serveur SMTP de dev : rien ne sort de la machine, tous les mails
+  # envoyés sont consultables dans l'interface web sur http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    ports:
+      - "8025:8025"
     networks:
       - app-network
 

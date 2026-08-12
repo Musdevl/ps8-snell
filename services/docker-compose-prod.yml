@@ -12,6 +12,7 @@ services:
       - CHAT_SERVICE_URL=http://chat:8003
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
       - SHOP_SERVICE_URL=http://shop:8005
+      - MAIL_SERVICE_URL=http://mail:8006
       - ENV=${ENV:-dev} # Valeur par default "dev" sinon la valeur dans la var d'env ENV
       - GATEWAY_URL=https://gateway:8000
 
@@ -113,6 +114,30 @@ services:
       dockerfile: AI/Dockerfile
     environment:
       - GATEWAY_URL=https://gateway:8000
+    networks:
+      - app-network
+
+  # Identifiants SMTP attendus dans services/.env (cf. .env.example).
+  # Aucune variable n'est obligatoire : sans elles le service démarre quand même
+  # et signale ce qui manque dans ses logs, plutôt que de bloquer toute la stack.
+  mail:
+    build:
+      context: .
+      dockerfile: mail/Dockerfile
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - MONGO_DB_URL=mongodb://mongodb:27017
+      - USER_SERVICE_URL=http://user:8010
+      - PUBLIC_GATEWAY_URL=${PUBLIC_GATEWAY_URL:-}
+      - ENV=${ENV:-dev}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - MAIL_FROM=${MAIL_FROM:-}
     networks:
       - app-network
 

@@ -1,0 +1,7 @@
+# Fichier chargé par défaut : `docker compose up` depuis services/ lance la stack
+# de dev, sans avoir à préciser `-f docker-compose-dev.yml`.
+#
+# La prod reste explicite : `docker compose -f docker-compose-prod.yml up -d`
+# (ou ./compose-prod.sh), pour qu'on ne la déclenche jamais par accident.
+include:
+  - docker-compose-dev.yml
