@@ -3,11 +3,13 @@ import * as gameService from "../../../services/game-service.js";
 import { COLORS } from "../../../enum/Colors.js";
 import * as accountService from "../../../services/account-service.js";
 import { notify } from "../../../services/notification-service.js";
+import * as notificationService from "../../../services/notification-service.js";
 
 // ─── State ───────────────────────────────────────────────────────────────
 
 let socket;
 let userId;
+let opponentId;
 let gameId;
 const GAME_TYPE = "MULTI";
 
@@ -27,8 +29,6 @@ let modal;
 let modal_message;
 let modal_confirm;
 let modal_cancel;
-
-console.log("ENV : gatewayurl = " + GATEWAY_URL);
 
 await accountService.checkAuth();
 
@@ -72,8 +72,6 @@ async function waitForBoard() {
         whitePlayerInfoComponent.readyPromise,
         blackPlayerInfoComponent.readyPromise,
     ]);
-
-    console.log('[Game] Board component ready');
 }
 
 async function setupGame() {
@@ -93,15 +91,22 @@ function setupSocketEvents() {
     socket.on('start', async (data) => {
         await onGameReady(data);
 
+        const whitePlayerInfo = await getUserInformation(data.white);
+        const blackPlayerInfo = await getUserInformation(data.black);
+
         if (accountService.getUserId() === data.white) {
+            userId = data.white;
+            opponentId = data.black;
             playStartAnimation(
-                await getUserInformation(data.white),
-                await getUserInformation(data.black)
+                whitePlayerInfo,
+                blackPlayerInfo
             );
         } else {
+            userId = data.black;
+            opponentId = data.white;
             playStartAnimation(
-                await getUserInformation(data.black),
-                await getUserInformation(data.white)
+                blackPlayerInfo,
+                whitePlayerInfo
             );
         }
 
@@ -113,9 +118,12 @@ function setupSocketEvents() {
         await onGameReady(data, whitePlayerInfo, blackPlayerInfo);
 
         if (accountService.getUserId() === data.white) {
+            userId = data.white;
+            opponentId = data.black;
             playStartAnimation(whitePlayerInfo, blackPlayerInfo);
         } else {
-
+            userId = data.black;
+            opponentId = data.white;
             playStartAnimation(blackPlayerInfo, whitePlayerInfo);
         }
 
@@ -161,6 +169,21 @@ async function onGameReady(data, whitePlayerInfo, blackPlayerInfo) {
     blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo);
 
     await handleUpdate(data);
+}
+
+async function rematch() {
+    try {
+        const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/challenge`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, opponentId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        notificationService.notify("Rematch request sent", 'success')
+    } catch (err) {
+        alert(`Error: ${err.message}`);
+    }
 }
 
 function setupBoardEvents() {
@@ -276,9 +299,10 @@ function setupPlayerInfoEvents(playerInfoComponent) {
 }
 
 function setupEndMessage(endMessage) {
-    endMessage.setGameType("AI");
+    endMessage.setGameType(GAME_TYPE);
     endMessage.addEventListener("play-again", () => startNewGame());
     endMessage.addEventListener("quit", () => window.location.replace(`/`));
+    endMessage.addEventListener("rematch", async () => rematch())
 }
 
 function playStartAnimation(whitePlayerInfo, blackPlayerInfo) {

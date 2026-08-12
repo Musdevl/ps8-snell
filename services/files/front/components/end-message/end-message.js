@@ -33,13 +33,17 @@ class EndMessage extends HTMLElement {
 
         this.message = this.shadowRoot.querySelector('#message');
 
-        this.shadowRoot.querySelector('.quit-btn').addEventListener("click", () => {
+        this.shadowRoot.querySelectorAll('.quit-btn').forEach(el => el.addEventListener("click", () => {
             this.dispatchEvent(new CustomEvent("quit", { bubbles: true, composed: true }));
-        })
+        }));
 
-        this.shadowRoot.querySelector('.play-again').addEventListener("click", () => {
+        this.shadowRoot.querySelectorAll('.play-again').forEach(el => el.addEventListener("click", () => {
             this.dispatchEvent(new CustomEvent("play-again", { bubbles: true, composed: true }));
-        })
+        }));
+
+        this.shadowRoot.querySelectorAll('.rematch').forEach(el => el.addEventListener("click", () => {
+            this.dispatchEvent(new CustomEvent("rematch", { bubbles: true, composed: true }));
+        }));
 
         this.overlay = this.shadowRoot.querySelector('.overlay');
 
@@ -71,6 +75,11 @@ class EndMessage extends HTMLElement {
             this.message.textContent = hasWon
                 ? "Congratulation, You won !"
                 : "You lost the game...";
+
+            if (this.gameType === "MULTI") {
+                this.shadowRoot.querySelector('.button-group').style.display = "none";
+                this.shadowRoot.querySelector('.button-group-multi').style.display = "flex";
+            }
         }
 
         this.overlay.style.display = "flex";

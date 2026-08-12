@@ -147,37 +147,38 @@ export async function forwardMessage(userIds, message) {
     return message;
 }
 
-export async function requestChallenge(userId, friendId) {
+export async function requestChallenge(userId, opponentId) {
 
-    if (userId === friendId) throw new Error("Cannot challenge yourself");
+    if (userId === opponentId) throw new Error("Cannot challenge yourself");
     const user = await userRepo.findUserById(userId);
+    console.log(opponentId);
     // Notifier si le destinataire est en ligne
-    const friendSocketId = userId_socketId_Map.get(friendId.toString());
+    const oppentSocketId = userId_socketId_Map.get(opponentId.toString());
 
-    if (friendSocketId && ioClient) {
-        ioClient.emit('user-ws-service', { webSocketIds: friendSocketId, event: 'challenge-request', data: { from: { username: user.username, userId: userId } } });
-        console.log(`Notification envoyée à ${friendId} (socket: ${friendSocketId})`);
+    if (oppentSocketId && ioClient) {
+        ioClient.emit('user-ws-service', { webSocketIds: oppentSocketId, event: 'challenge-request', data: { from: { username: user.username, userId: userId } } });
+        console.log(`Notification envoyée à ${opponentId} (socket: ${oppentSocketId})`);
     } else {
-        console.log("Amis hors ligne pas de WS");
+        console.log("Adversaire hors ligne pas de WS");
     }
 }
 
-export async function acceptChallenge(userId, friendId) {
-    if (userId === friendId) throw new Error("Cannot challenge yourself");
+export async function acceptChallenge(userId, opponentId) {
+    if (userId === opponentId) throw new Error("Cannot challenge yourself");
 
     const userSocketId = userId_socketId_Map.get(userId.toString());
-    const friendSocketId = userId_socketId_Map.get(friendId.toString());
+    const opponentSocketId = userId_socketId_Map.get(opponentId.toString());
 
     const res = await fetch(`${GAME_SERVICE_URL}/api/game`, {
         method: 'POST',
         body: JSON.stringify({
             gameType: "MULTI",
-            players: [userId, friendId]
+            players: [userId, opponentId]
         })
     })
 
-    if (userSocketId && friendSocketId && ioClient) {
-        ioClient.emit('user-ws-service', { webSocketIds: [userSocketId, friendSocketId], event: 'challenge-accepted' })
+    if (userSocketId && opponentSocketId && ioClient) {
+        ioClient.emit('user-ws-service', { webSocketIds: [userSocketId, opponentSocketId], event: 'challenge-accepted' })
     }
 
 }

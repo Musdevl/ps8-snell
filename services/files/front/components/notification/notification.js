@@ -53,14 +53,13 @@ class NotificationBar extends HTMLElement {
         this.container = this.shadowRoot.querySelector("#notification-container");
 
         window.addEventListener('notify', async (e) => {
-            await this.show(e.detail.message, e.detail.type, e.detail.data, e.detail.challenge, e.detail.duration);
+            await this.show(e.detail.message, e.detail.type, e.detail.data, e.detail.duration);
         });
 
         await requestNotificationPermission();
     }
 
     async show(message, type = 'info', data, duration = 3500) {
-
 
         const el = document.createElement('div');
         el.className = `notification ${type}`;
@@ -88,7 +87,7 @@ class NotificationBar extends HTMLElement {
 
             el.querySelector('.accept-challenge').addEventListener('click', async () => {
                 try {
-                    const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/friend/challenge/accept`,
+                    const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/challenge/accept`,
                         {
                             method: 'POST',
                             body: JSON.stringify(
