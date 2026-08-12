@@ -79,8 +79,30 @@ suffit de basculer la section `smtp` de `config.yaml` sur `mailpit:1025` — le 
 est déjà écrit en commentaire en bas du fichier. Rien ne sort alors de la machine
 et les mails s'affichent sur <http://localhost:8025>.
 
-Le port `8006` est publié en dev pour pouvoir déclencher un envoi au curl sans
-passer par un autre service.
+Le port `8006` est publié en dev pour pouvoir déclencher un envoi sans passer par
+un autre service.
+
+## Tester
+
+[`test-mail.py`](test-mail.py) vérifie le relais puis envoie un vrai mail. Il
+n'utilise que la bibliothèque standard, il n'y a donc rien à installer.
+
+```bash
+./test-mail.py --to cyrilinveb@gmail.com
+```
+
+```bash
+./test-mail.py --to cyrilinveb@gmail.com --type all
+```
+
+Il commence par interroger `/api/mail/health` et s'arrête net si le relais ne
+répond pas, en rappelant à quoi correspond l'erreur renvoyée — plutôt que
+d'enchaîner des envois qui échoueraient tous pareil. Il sort en code 1 dès qu'une
+étape échoue, donc il s'enchaîne dans un script.
+
+Options : `--type` (`verification`, `password-reset`, `all`), `--url` pour viser
+un autre hôte (`http://mail:8006` depuis un conteneur de la stack), `--username`
+et `--link` pour ce qui apparaît dans le mail.
 
 ### Pourquoi Gmail
 
