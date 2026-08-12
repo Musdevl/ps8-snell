@@ -114,8 +114,8 @@ function setupBtns() {
     }
 
     try {
-        const leave = document.querySelector('.leave-ico');
-        leave.addEventListener("click", () => window.location.replace('/'));
+        const leave = document.querySelectorAll('.leave-ico');
+        leave.forEach(l => l.addEventListener("click", () => window.location.replace('/')));
     } catch (error) {
         console.error("Failed to setup leave btn", error);
     }

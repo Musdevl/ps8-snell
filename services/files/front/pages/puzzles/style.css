@@ -149,6 +149,7 @@ nav-bar {
     flex-direction: column;
     gap: 1em;
     height: 100%;
+    scrollbar-color: #232220 #3a3734;
     overflow-y: auto;
 }
 
