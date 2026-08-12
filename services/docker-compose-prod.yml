@@ -125,6 +125,10 @@ services:
     build:
       context: .
       dockerfile: mail/Dockerfile
+    ports:
+      # Lié à 127.0.0.1 : joignable depuis le serveur pour test-mail.py et
+      # /api/mail/health, mais pas depuis Internet.
+      - "127.0.0.1:8006:8006"
     volumes:
       - ./mail/config.yaml:/app/mail/config.yaml:ro
     networks:
