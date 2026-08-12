@@ -117,6 +117,21 @@ configurer. Les avertissements de configuration sont affichés au démarrage :
 > ne sont publiés que par le compose de dev. Ne pas les laisser ouverts sur Internet
 > en dehors des tests.
 
+## Envoyer sur de vraies adresses
+
+Tant qu'il n'y a pas de `services/.env`, tout part dans Mailpit et rien ne sort de
+la machine. Pour brancher un vrai relais :
+
+```bash
+./setup-mail.sh
+```
+
+Le script demande le fournisseur et les identifiants, détecte l'adresse publique du
+serveur, écrit le `.env`, recrée le conteneur et vérifie que le relais répond. Il
+retire aussi les espaces du mot de passe d'application Google, qui sinon est refusé.
+
+Pour revenir à Mailpit : `mv .env .env.off && docker compose up -d mail`.
+
 ---
 
 ## Ce qu'il reste à faire côté user (prochaine passe)
