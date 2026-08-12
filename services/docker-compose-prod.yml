@@ -12,15 +12,18 @@ services:
       - CHAT_SERVICE_URL=http://chat:8003
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
       - SHOP_SERVICE_URL=http://shop:8005
-      - ENV=${ENV:-dev} # Valeur par default "dev" sinon la valeur dans la var d'env ENV
-      - GATEWAY_URL=https://gateway:8000
+      - AI_SERVICE_URL=http://ai:8020
+      # HTTPS desactive : la gateway ne lit ses certificats que si ENV vaut
+      # "prod". Sans nom de domaine on ne peut pas obtenir de certificat valide,
+      # et un certificat auto-signe sur une IP fait echouer le WebSocket.
+      # Repasser a "prod" et remonter le volume ../secrets/https le jour ou le
+      # projet aura un domaine.
+      - ENV=${ENV:-dev}
+      - GATEWAY_URL=http://gateway:8000
 
-    volumes:
-      - ../secrets/https:/app/https:ro # ro veut dire readonly
     networks:
       - app-network
-      - proxy
-      
+
 
   game:
     build:
@@ -28,7 +31,7 @@ services:
       dockerfile: game/Dockerfile
 
     environment:
-      - GATEWAY_URL=https://gateway:8000
+      - GATEWAY_URL=http://gateway:8000
       - USER_SERVICE_URL=http://user:8010
       - CHAT_SERVICE_URL=http://chat:8003
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
@@ -47,8 +50,8 @@ services:
         condition: service_healthy
     environment:
       - MONGO_DB_URL=mongodb://mongodb:27017
-      - GATEWAY_URL=https://gateway:8000
-      - PUBLIC_GATEWAY_URL=https://localhost:8000
+      - GATEWAY_URL=http://gateway:8000
+      - PUBLIC_GATEWAY_URL=${PUBLIC_URL:-http://217.160.64.31:8000}
       - GAME_SERVICE_URL=http://game:8002
       - CHAT_SERVICE_URL=http://chat:8003
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
@@ -73,7 +76,7 @@ services:
         condition: service_healthy
     environment:
       - MONGO_DB_URL=mongodb://mongodb:27017
-      - GATEWAY_URL=https://gateway:8000
+      - GATEWAY_URL=http://gateway:8000
       - USER_SERVICE_URL=http://user:8010
       - GAME_SERVICE_URL=http://game:8002
     networks:
@@ -88,7 +91,7 @@ services:
         condition: service_healthy
     environment:
       - MONGO_DB_URL=mongodb://mongodb:27017
-      - GATEWAY_URL=https://gateway:8000
+      - GATEWAY_URL=http://gateway:8000
       - USER_SERVICE_URL=http://user:8010
     networks:
       - app-network
@@ -102,7 +105,7 @@ services:
         condition: service_healthy
     environment:
       - MONGO_DB_URL=mongodb://mongodb:27017
-      - GATEWAY_URL=https://gateway:8000
+      - GATEWAY_URL=http://gateway:8000
       - USER_SERVICE_URL=http://user:8010
     networks:
       - app-network
@@ -113,7 +116,7 @@ services:
       context: .
       dockerfile: AI/Dockerfile
     environment:
-      - GATEWAY_URL=https://gateway:8000
+      - GATEWAY_URL=http://gateway:8000
     networks:
       - app-network
 
@@ -145,5 +148,3 @@ services:
 networks:
   app-network:
     driver: bridge
-  proxy:
-    external: true
