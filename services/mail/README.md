@@ -20,16 +20,16 @@ Dépendances : **Express** et **Nodemailer**.
 | Méthode | Route | Corps |
 |---|---|---|
 | `GET` | `/api/mail/health` | — |
-| `POST` | `/api/mail/verification` | `{ to, username?, link }` |
+| `POST` | `/api/mail/welcome` | `{ to, username? }` |
 | `POST` | `/api/mail/password-reset` | `{ to, username?, link }` |
 
 `link` est l'URL complète sur laquelle l'utilisateur doit cliquer. C'est
 l'appelant qui la fabrique, token compris.
 
 ```bash
-curl -X POST http://localhost:8006/api/mail/verification \
+curl -X POST http://localhost:8006/api/mail/welcome \
   -H 'Content-Type: application/json' \
-  -d '{"to":"test@exemple.fr","username":"Musdevl","link":"http://localhost:8000/api/user/verify?token=abc"}'
+  -d '{"to":"test@exemple.fr","username":"Musdevl"}'
 ```
 
 ---
@@ -123,20 +123,22 @@ de l'adresse, donc l'alignement est natif.
 
 Le code ne dépend d'aucun fournisseur — c'est du SMTP standard. Le jour où le
 projet aura un nom de domaine, n'importe quel relais redeviendra utilisable en
-changeant seulement le `.env`.
+changeant seulement `config.yaml`.
 
 ---
 
-## Ce qu'il reste à faire côté user
+## Qui appelle ce service
 
-Rien n'est encore branché ; l'ancien système de code de récupération reste en
-place. Pour l'inscription, le user service devra générer un token, le stocker sur
-l'utilisateur avec une date d'expiration, puis appeler :
+Le user service, et lui seul.
 
-```
-POST http://mail:8006/api/mail/verification
-{ "to": email, "username": username, "link": "<PUBLIC_GATEWAY_URL>/api/user/verify-email?token=<token>" }
-```
+**À l'inscription** — `createUser` envoie le mail de bienvenue sans attendre la
+réponse : un service mail indisponible ne doit pas faire échouer une inscription
+par ailleurs réussie.
 
-`MAIL_SERVICE_URL` est déjà présent dans l'environnement du service `user` des
-deux compose.
+**Au mot de passe oublié** — `POST /api/user/forgot-password` génère un token
+aléatoire, n'en stocke que l'empreinte SHA-256 sur l'utilisateur avec une
+expiration à 1 h, construit le lien et le passe ici. Le lien est bâti sur
+l'en-tête `Origin` de la requête, donc il pointe vers le serveur par lequel le
+joueur est arrivé, sans configuration par déploiement.
+
+Le token en clair ne vit que dans le mail, et il est effacé dès qu'il a servi.

@@ -33,8 +33,8 @@ function escapeHtml(value) {
  * @param {string} content.preheader  Texte d'aperçu dans la boîte de réception
  * @param {string} content.heading    Titre principal
  * @param {string[]} content.body     Paragraphes
- * @param {string} content.buttonLabel
- * @param {string} content.buttonUrl
+ * @param {string} [content.buttonLabel]
+ * @param {string} [content.buttonUrl]  Sans lui, le mail n'a pas de bouton
  * @param {string} content.footnote   Mention de fin (expiration, non-demandé...)
  */
 export function renderHtml({ preheader, heading, body, buttonLabel, buttonUrl, footnote }) {
@@ -44,6 +44,20 @@ export function renderHtml({ preheader, heading, body, buttonLabel, buttonUrl, f
                 `<p style="margin:0 0 16px 0;font-size:15px;line-height:24px;color:${COLORS.text};">${paragraph}</p>`
         )
         .join("");
+
+    // Un mail purement informatif, comme la bienvenue, n'a rien sur quoi cliquer.
+    const button = !buttonUrl ? "" : `
+        <tr>
+          <td style="padding:8px 32px 24px 32px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="background-color:${COLORS.accent};border-radius:8px;">
+                  <a href="${escapeHtml(buttonUrl)}" target="_blank" style="display:inline-block;padding:13px 28px;font-family:${FONT};font-size:15px;font-weight:600;color:${COLORS.accentText};text-decoration:none;">${escapeHtml(buttonLabel)}</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>`;
 
     return `<!DOCTYPE html>
 <html lang="fr">
@@ -66,17 +80,7 @@ export function renderHtml({ preheader, heading, body, buttonLabel, buttonUrl, f
             ${paragraphs}
           </td>
         </tr>
-        <tr>
-          <td style="padding:8px 32px 24px 32px;">
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td align="center" style="background-color:${COLORS.accent};border-radius:8px;">
-                  <a href="${escapeHtml(buttonUrl)}" target="_blank" style="display:inline-block;padding:13px 28px;font-family:${FONT};font-size:15px;font-weight:600;color:${COLORS.accentText};text-decoration:none;">${escapeHtml(buttonLabel)}</a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+${button}
         <tr>
           <td style="padding:0 32px 32px 32px;font-family:${FONT};">
             <hr style="border:none;border-top:1px solid ${COLORS.border};margin:0 0 16px 0;">
@@ -96,6 +100,9 @@ export function renderHtml({ preheader, heading, body, buttonLabel, buttonUrl, f
 export function renderText({ heading, body, buttonLabel, buttonUrl, footnote }) {
     const stripped = body.map((paragraph) => paragraph.replace(/<[^>]+>/g, ""));
 
+    // La version texte n'a pas de bouton : l'URL en clair y est le seul moyen d'agir.
+    const action = buttonUrl ? [`${buttonLabel} :`, buttonUrl, ""] : [];
+
     return [
         "SNELL",
         "",
@@ -103,9 +110,7 @@ export function renderText({ heading, body, buttonLabel, buttonUrl, footnote }) 
         "",
         ...stripped,
         "",
-        `${buttonLabel} :`,
-        buttonUrl,
-        "",
+        ...action,
         footnote,
         "",
         "Mail automatique, merci de ne pas y répondre.",

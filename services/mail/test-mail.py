@@ -24,8 +24,9 @@ import urllib.request
 
 TIMEOUT = 20
 
+# Le mail de bienvenue n'a pas de bouton, donc pas de lien à passer.
 TYPES = {
-    "verification": "/api/mail/verification",
+    "welcome": "/api/mail/welcome",
     "password-reset": "/api/mail/password-reset",
 }
 
@@ -74,7 +75,11 @@ def check_health(base_url):
 
 def send(base_url, kind, to, username, link):
     """Envoie un mail et affiche le résultat."""
-    status, body = call(f"{base_url}{TYPES[kind]}", {"to": to, "username": username, "link": link})
+    payload = {"to": to, "username": username}
+    if kind != "welcome":
+        payload["link"] = link
+
+    status, body = call(f"{base_url}{TYPES[kind]}", payload)
 
     if status == 200 and body.get("success"):
         print(f"✓ {kind:15} accepté par le relais, à destination de {to}")
@@ -94,11 +99,11 @@ def main():
     )
     parser.add_argument("--to", required=True, help="adresse du destinataire")
     parser.add_argument("--url", default="http://localhost:8006", help="URL du service (défaut : %(default)s)")
-    parser.add_argument("--type", choices=[*TYPES, "all"], default="verification",
+    parser.add_argument("--type", choices=[*TYPES, "all"], default="welcome",
                         help="type de mail à envoyer (défaut : %(default)s)")
     parser.add_argument("--username", default="Testeur", help="pseudo affiché dans le mail")
     parser.add_argument("--link", default="http://localhost:8000/",
-                        help="lien placé derrière le bouton (défaut : %(default)s)")
+                        help="lien du bouton, pour password-reset (défaut : %(default)s)")
 
     args = parser.parse_args()
     base_url = args.url.rstrip("/")

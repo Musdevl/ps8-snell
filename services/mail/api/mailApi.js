@@ -1,7 +1,7 @@
 import express from "express";
 
 import * as mailService from "../services/mailService.js";
-import { verifyAccountMail } from "../templates/verify-account.js";
+import { welcomeMail } from "../templates/welcome.js";
 import { resetPasswordMail } from "../templates/reset-password.js";
 
 const app = express();
@@ -14,21 +14,21 @@ app.get("/api/mail/health", async (req, res) => {
     res.json({ status: "ok", smtp: { target: mailService.target, ...smtp } });
 });
 
-// POST /api/mail/verification
-app.post("/api/mail/verification", async (req, res) => {
+// POST /api/mail/welcome
+app.post("/api/mail/welcome", async (req, res) => {
     try {
-        const { to, username, link } = req.body || {};
+        const { to, username } = req.body || {};
 
-        if (!to || !link) {
-            return res.status(400).json({ error: "to et link sont requis" });
+        if (!to) {
+            return res.status(400).json({ error: "to est requis" });
         }
 
-        await mailService.send(to, verifyAccountMail({ username, link }));
+        await mailService.send(to, welcomeMail({ username }));
 
         res.json({ success: true });
     } catch (error) {
-        console.error("[MAIL API] - Échec de l'envoi du mail de validation:", error);
-        res.status(500).json({ error: "Échec de l'envoi du mail de validation", message: error.message });
+        console.error("[MAIL API] - Échec de l'envoi du mail de bienvenue:", error);
+        res.status(500).json({ error: "Échec de l'envoi du mail de bienvenue", message: error.message });
     }
 });
 

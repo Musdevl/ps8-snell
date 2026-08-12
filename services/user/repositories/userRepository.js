@@ -297,3 +297,20 @@ export async function getUserRank(userId) {
     const rank = await usersCollection.countDocuments({ elo: { $gt: user.elo } });
     return rank + 1;
 }
+
+// ── Réinitialisation de mot de passe ─────────────────────────────────────────
+
+export async function saveResetToken(userId, tokenHash, expiresAt) {
+    await updateUser(userId, { $set: { reset_token: tokenHash, reset_token_expires: expiresAt } });
+}
+
+export async function findByResetToken(tokenHash) {
+    return await usersCollection.findOne({ reset_token: tokenHash });
+}
+
+export async function setPasswordAndClearToken(userId, hashedPassword) {
+    await updateUser(userId, {
+        $set: { password: hashedPassword },
+        $unset: { reset_token: "", reset_token_expires: "" },
+    });
+}
