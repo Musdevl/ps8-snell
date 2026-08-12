@@ -5,7 +5,6 @@ import { userId_socketId_Map, ioClient } from './state.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { GATEWAY_URL } from '../env.js';
 import { default_theme, default_profile_picture, default_emotes, ppList } from "./default_values.js";
 
 

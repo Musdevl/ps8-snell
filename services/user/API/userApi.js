@@ -2,7 +2,6 @@
 import { badExpress } from '../../helpers/badExpress.js';
 import * as UserApiHandler from "./userApiHandler.js";
 import { env } from "../../helpers/env.js"
-import { GATEWAY_URL } from '../env.js';
 
 const app = new badExpress();
 

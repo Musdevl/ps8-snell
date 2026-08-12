@@ -123,8 +123,16 @@ notification-bar {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
     width: 90%;
+    max-width: 24rem;
+}
+
+/* Le formulaire ne contient qu'une adresse et un bouton : l'écart de 2rem de
+   .input-section les éloigne inutilement du texte d'explication. */
+.reset-form .input-section {
+    width: 100%;
+    gap: 1.25rem;
 }
 
 .reset-title {
@@ -235,9 +243,20 @@ notification-bar {
 }
 
 
-#choice-code-btn,
+#choice-mail-btn,
 #choice-quiz-btn {
     padding: 7px 15px 7px 15px;
+}
+
+/* Le panneau de droite n'hérite pas du `span { color: white }` imbriqué dans
+   .left-container : sans cette règle, le texte d'aide du formulaire de reset
+   s'affiche en noir sur fond sombre. */
+.helper-message {
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: center;
 }
 
 .back-btn {
@@ -367,8 +386,15 @@ notification-bar {
         width: 100%;
     }
 
-    #reset-form.input-section {
+    /* Selecteur de descendance : #reset-form est le conteneur, .input-section
+       son enfant. Colles l'un a l'autre, la regle ne matchait rien. */
+    #reset-form .input-section {
         width: 100%;
+    }
+
+    .reset-form {
+        max-width: none;
+        width: 80%;
     }
 
     .forgot-choice {

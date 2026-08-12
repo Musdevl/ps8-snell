@@ -37,7 +37,7 @@ function escapeHtml(value) {
  * @param {string} [content.buttonUrl]  Sans lui, le mail n'a pas de bouton
  * @param {string} content.footnote   Mention de fin (expiration, non-demandé...)
  */
-export function renderHtml({ preheader, heading, body, buttonLabel, buttonUrl, footnote }) {
+function renderHtml({ preheader, heading, body, buttonLabel, buttonUrl, footnote }) {
     const paragraphs = body
         .map(
             (paragraph) =>
@@ -97,7 +97,7 @@ ${button}
 }
 
 /** Version texte, obligatoire : sans elle les filtres anti-spam pénalisent le mail. */
-export function renderText({ heading, body, buttonLabel, buttonUrl, footnote }) {
+function renderText({ heading, body, buttonLabel, buttonUrl, footnote }) {
     const stripped = body.map((paragraph) => paragraph.replace(/<[^>]+>/g, ""));
 
     // La version texte n'a pas de bouton : l'URL en clair y est le seul moyen d'agir.
