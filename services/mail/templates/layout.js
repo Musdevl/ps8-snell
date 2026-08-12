@@ -79,8 +79,6 @@ export function renderHtml({ preheader, heading, body, buttonLabel, buttonUrl, f
         </tr>
         <tr>
           <td style="padding:0 32px 32px 32px;font-family:${FONT};">
-            <p style="margin:0 0 8px 0;font-size:13px;line-height:20px;color:${COLORS.muted};">Si le bouton ne fonctionne pas, copie ce lien dans ton navigateur :</p>
-            <p style="margin:0 0 24px 0;font-size:13px;line-height:20px;word-break:break-all;"><a href="${escapeHtml(buttonUrl)}" style="color:${COLORS.accent};">${escapeHtml(buttonUrl)}</a></p>
             <hr style="border:none;border-top:1px solid ${COLORS.border};margin:0 0 16px 0;">
             <p style="margin:0;font-size:12px;line-height:19px;color:${COLORS.muted};">${escapeHtml(footnote)}</p>
           </td>
