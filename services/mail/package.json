@@ -1,7 +1,7 @@
 {
   "name": "mail",
   "version": "1.0.0",
-  "description": "Service d'envoi de mails transactionnels (validation de compte, reset de mot de passe)",
+  "description": "Envoi des mails transactionnels (validation de compte, reset de mot de passe)",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -12,7 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "express": "^5.2.1",
-    "mongodb": "^7.5.0",
     "nodemailer": "^9.0.5"
   }
 }

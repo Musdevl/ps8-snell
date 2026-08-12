@@ -1,6 +1,6 @@
 import { render, escapeHtml } from "./layout.js";
 
-export function verifyAccountMail({ username, url }) {
+export function verifyAccountMail({ username, link }) {
     const content = {
         preheader: "Confirme ton adresse pour activer ton compte Snell.",
         heading: `Bienvenue${username ? ` ${escapeHtml(username)}` : ""} !`,
@@ -9,9 +9,8 @@ export function verifyAccountMail({ username, url }) {
             "Un seul clic suffit :",
         ],
         buttonLabel: "Confirmer mon adresse",
-        buttonUrl: url,
+        buttonUrl: link,
         footnote:
-            "Ce lien expire dans 24 heures et ne peut être utilisé qu'une fois. " +
             "Si tu n'as pas créé de compte Snell, ignore ce message : aucun compte ne sera activé.",
     };
 

@@ -13,7 +13,6 @@ services:
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
       - SHOP_SERVICE_URL=http://shop:8005
       - AI_SERVICE_URL=http://ai:8020
-      - MAIL_SERVICE_URL=http://mail:8006
       - ENV=${ENV:-dev} # Valeur par default "dev" sinon la valeur dans la var d'env ENV
       - GATEWAY_URL=http://gateway:8000
 
@@ -53,6 +52,7 @@ services:
       - GAME_SERVICE_URL=http://game:8002
       - CHAT_SERVICE_URL=http://chat:8003
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
+      - MAIL_SERVICE_URL=http://mail:8006
       # - STRIPE_SECRET_KEY=private
 
     networks:
@@ -121,21 +121,11 @@ services:
     build:
       context: .
       dockerfile: mail/Dockerfile
-    depends_on:
-      mongodb:
-        condition: service_healthy
     ports:
-      # Exposé en dev uniquement, pour atteindre la console d'envoi sans passer
-      # par la gateway (qui exigerait un JWT) : http://localhost:8006
+      # Exposé en dev uniquement, pour tester un envoi sans passer par un autre
+      # service : http://localhost:8006/api/mail/health
       - "8006:8006"
     environment:
-      - MONGO_DB_URL=mongodb://mongodb:27017
-      - USER_SERVICE_URL=http://user:8010
-      # Base des liens envoyés par mail. Laissé vide, le service la déduit de
-      # l'hôte par lequel la requête est arrivée — ce qui marche tel quel sur un
-      # serveur distant. À renseigner dès qu'il y aura un nom de domaine.
-      - PUBLIC_GATEWAY_URL=${PUBLIC_GATEWAY_URL:-}
-      - ENV=${ENV:-dev}
       # Par défaut tout part dans Mailpit. Renseigner ces variables dans
       # services/.env (cf. .env.example) pour envoyer sur de vraies adresses.
       - SMTP_HOST=${SMTP_HOST:-mailpit}
