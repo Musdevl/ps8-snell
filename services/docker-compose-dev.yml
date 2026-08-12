@@ -136,10 +136,14 @@ services:
       # serveur distant. À renseigner dès qu'il y aura un nom de domaine.
       - PUBLIC_GATEWAY_URL=${PUBLIC_GATEWAY_URL:-}
       - ENV=${ENV:-dev}
-      - SMTP_HOST=mailpit
-      - SMTP_PORT=1025
-      - SMTP_SECURE=false
-      - "MAIL_FROM=Snell <no-reply@snell.local>"
+      # Par défaut tout part dans Mailpit. Renseigner ces variables dans
+      # services/.env (cf. .env.example) pour envoyer sur de vraies adresses.
+      - SMTP_HOST=${SMTP_HOST:-mailpit}
+      - SMTP_PORT=${SMTP_PORT:-1025}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - "MAIL_FROM=${MAIL_FROM:-Snell <no-reply@snell.local>}"
     networks:
       - app-network
 
