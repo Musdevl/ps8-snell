@@ -125,15 +125,10 @@ services:
       # Exposé en dev uniquement, pour tester un envoi sans passer par un autre
       # service : http://localhost:8006/api/mail/health
       - "8006:8006"
-    environment:
-      # Par défaut tout part dans Mailpit. Renseigner ces variables dans
-      # services/.env (cf. .env.example) pour envoyer sur de vraies adresses.
-      - SMTP_HOST=${SMTP_HOST:-mailpit}
-      - SMTP_PORT=${SMTP_PORT:-1025}
-      - SMTP_SECURE=${SMTP_SECURE:-false}
-      - SMTP_USER=${SMTP_USER:-}
-      - SMTP_PASS=${SMTP_PASS:-}
-      - "MAIL_FROM=${MAIL_FROM:-Snell <no-reply@snell.local>}"
+    volumes:
+      # Monté plutôt que seulement copié dans l'image : modifier config.yaml puis
+      # `docker compose restart mail` suffit, sans reconstruction.
+      - ./mail/config.yaml:/app/mail/config.yaml:ro
     networks:
       - app-network
 

@@ -1,27 +1,21 @@
 import nodemailer from "nodemailer";
 
-const SMTP_HOST = process.env.SMTP_HOST || "mailpit";
-const SMTP_PORT = Number(process.env.SMTP_PORT) || 1025;
-// true pour du TLS direct (port 465), false pour du STARTTLS (ports 587, 2525, 1025)
-const SMTP_SECURE = process.env.SMTP_SECURE === "true";
-const SMTP_USER = process.env.SMTP_USER || "";
-const SMTP_PASS = process.env.SMTP_PASS || "";
-const MAIL_FROM = process.env.MAIL_FROM || "Snell <no-reply@snell.local>";
+import { config } from "../config.js";
 
 // Sans identifiants on ne passe pas d'auth du tout : c'est ce qu'attend Mailpit,
-// le faux SMTP de dev, qui accepte les connexions anonymes.
+// le faux SMTP de développement, qui accepte les connexions anonymes.
 const transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_SECURE,
-    auth: SMTP_USER ? { user: SMTP_USER, pass: SMTP_PASS } : undefined,
+    host: config.smtp.host,
+    port: config.smtp.port,
+    secure: config.smtp.secure,
+    auth: config.smtp.user ? { user: config.smtp.user, pass: config.smtp.pass } : undefined,
 });
 
-export const target = `${SMTP_HOST}:${SMTP_PORT}`;
+export const target = `${config.smtp.host}:${config.smtp.port}`;
 
 export async function send(to, mail) {
     const info = await transporter.sendMail({
-        from: MAIL_FROM,
+        from: config.from,
         to,
         subject: mail.subject,
         html: mail.html,
@@ -32,6 +26,7 @@ export async function send(to, mail) {
     return info;
 }
 
+// Teste la connexion au relais sans envoyer de mail. Utilisé par /api/mail/health.
 export async function checkTransport() {
     try {
         await transporter.verify();

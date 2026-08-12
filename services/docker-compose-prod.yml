@@ -117,20 +117,13 @@ services:
     networks:
       - app-network
 
-  # Identifiants SMTP attendus dans services/.env (cf. .env.example).
-  # Aucune variable n'est obligatoire : sans elles le service démarre quand même
-  # et signale ce qui manque dans ses logs, plutôt que de bloquer toute la stack.
+  # Réglages SMTP dans mail/config.yaml.
   mail:
     build:
       context: .
       dockerfile: mail/Dockerfile
-    environment:
-      - SMTP_HOST=${SMTP_HOST:-}
-      - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_SECURE=${SMTP_SECURE:-false}
-      - SMTP_USER=${SMTP_USER:-}
-      - SMTP_PASS=${SMTP_PASS:-}
-      - MAIL_FROM=${MAIL_FROM:-}
+    volumes:
+      - ./mail/config.yaml:/app/mail/config.yaml:ro
     networks:
       - app-network
 

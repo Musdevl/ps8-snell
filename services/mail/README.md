@@ -36,15 +36,35 @@ curl -X POST http://localhost:8006/api/mail/verification \
 
 ## Configuration
 
-Tout passe par l'environnement, avec des valeurs par défaut qui visent Mailpit.
+Tout est dans [`config.yaml`](config.yaml) — c'est le seul fichier à toucher pour
+déployer ailleurs, et il n'y a aucune variable d'environnement à gérer.
 
-| Variable | Défaut | Rôle |
-|---|---|---|
-| `SMTP_HOST` | `mailpit` | hôte du relais |
-| `SMTP_PORT` | `1025` | port du relais |
-| `SMTP_SECURE` | `false` | `true` = TLS direct (465), `false` = STARTTLS (587, 2525) |
-| `SMTP_USER` / `SMTP_PASS` | vides | omis si vides, ce qu'attend Mailpit |
-| `MAIL_FROM` | `Snell <no-reply@snell.local>` | expéditeur affiché |
+```yaml
+from: "Snell <cyrilinveb@gmail.com>"
+
+smtp:
+  host: smtp.gmail.com
+  port: 587
+  secure: false
+  user: cyrilinveb@gmail.com
+  pass: "..."
+```
+
+| Clé | Rôle |
+|---|---|
+| `from` | expéditeur affiché ; le nom est libre, l'adresse doit être celle du compte SMTP |
+| `smtp.host` / `smtp.port` | le relais |
+| `smtp.secure` | `true` seulement pour le port 465 (TLS direct) ; `false` pour 587 et 1025 (STARTTLS) |
+| `smtp.user` / `smtp.pass` | laissés vides, aucune authentification n'est tentée — ce qu'attend Mailpit |
+
+Le fichier est **monté** dans le conteneur, pas seulement copié dans l'image :
+
+```bash
+docker compose restart mail
+```
+
+suffit après une modification, il n'y a pas d'image à reconstruire.
+`GET /api/mail/health` indique ensuite si le relais répond.
 
 ---
 
@@ -54,20 +74,13 @@ Tout passe par l'environnement, avec des valeurs par défaut qui visent Mailpit.
 docker compose up --build
 ```
 
-Le compose de dev lance **Mailpit**, un faux serveur SMTP : rien ne sort de la
-machine et les mails s'affichent sur <http://localhost:8025>. Le port `8006` est
-publié pour pouvoir déclencher un envoi au curl.
+Le compose de dev lance **Mailpit**, un faux serveur SMTP. Pour l'utiliser, il
+suffit de basculer la section `smtp` de `config.yaml` sur `mailpit:1025` — le bloc
+est déjà écrit en commentaire en bas du fichier. Rien ne sort alors de la machine
+et les mails s'affichent sur <http://localhost:8025>.
 
-## Envoyer sur de vraies adresses
-
-Remplir `services/.env` à partir de [`.env.example`](../.env.example), puis :
-
-```bash
-docker compose up -d mail
-```
-
-Les variables sont lues à la création du conteneur, il n'y a pas besoin de
-rebuild. `GET /api/mail/health` indique si le relais répond.
+Le port `8006` est publié en dev pour pouvoir déclencher un envoi au curl sans
+passer par un autre service.
 
 ### Pourquoi Gmail
 
