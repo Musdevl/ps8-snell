@@ -27,8 +27,6 @@ export async function postFriendMessage(message) {
         })
 
         message = await req.json();
-
-        console.log("edited", message);
         friendChatRepo.addMessageToChat(message.message);
     } catch (error) {
         throw new Error("Failed to send the message");

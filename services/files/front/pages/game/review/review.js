@@ -312,7 +312,7 @@ async function evaluatePosition(data) {
             ]
         };
 
-        const res = await accountService.authFetch(`${GATEWAY_URL}/api/ai/evaluate`, {
+        const res = await accountService.authFetch(`${GATEWAY_URL}/api/ais/evaluate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)

@@ -2,6 +2,7 @@ import { GATEWAY_URL } from "../../../env.js";
 import * as accountService from "../../../services/account-service.js";
 import { COLORS } from "../../../enum/Colors.js";
 
+
 let socket;
 let boardComponent;
 let whitePlayerInfoComponent;
@@ -18,7 +19,8 @@ let modal_message;
 let modal_confirm;
 let modal_cancel;
 
-console.log("ENV : gatewayurl = " + GATEWAY_URL);
+const params = new URLSearchParams(window.location.search);
+const aiId = params.get("id") ?? 1;
 
 await accountService.checkAuth();
 
@@ -85,29 +87,39 @@ async function setupGame() {
 
     // Setup les composants
 
-    whitePlayerInfoComponent.setPlayerName(accountService.getUserName())
-    whitePlayerInfoComponent.setPlayerAvatar(accountService.getProfilePicture().picture)
-    whitePlayerInfoComponent.disableElo();
-    whitePlayerInfoComponent.disableTimer();
-    await whitePlayerInfoComponent.setColor(COLORS.WHITE);
+    try {
+        whitePlayerInfoComponent.setPlayerName(accountService.getUserName())
+        whitePlayerInfoComponent.setPlayerAvatar(accountService.getProfilePicture().picture)
+        whitePlayerInfoComponent.disableElo();
+        whitePlayerInfoComponent.disableTimer();
+        await whitePlayerInfoComponent.setColor(COLORS.WHITE);
+
+        const response = await accountService.authFetch(`${GATEWAY_URL}/api/ais/${aiId}`);
+
+        const { ai } = await response.json();
 
 
-    blackPlayerInfoComponent.setPlayerName("AI");
-    blackPlayerInfoComponent.setPlayerAvatar(`/assets/bot.svg`);
-    blackPlayerInfoComponent.disableElo();
-    blackPlayerInfoComponent.disableTimer();
-    await blackPlayerInfoComponent.setColor(COLORS.BLACK);
+        blackPlayerInfoComponent.setPlayerName(ai.name);
+        blackPlayerInfoComponent.setPlayerAvatar(ai.path);
+        blackPlayerInfoComponent.disableElo();
+        blackPlayerInfoComponent.disableTimer();
+        await blackPlayerInfoComponent.setColor(COLORS.BLACK);
 
-    leave_btn.addEventListener("click", () => {
-        showModal({
-            message: "Leave the game?",
-            confirmLabel: "Leave",
-            onConfirm: () => {
-                socket.emit("leave", { gameType: GAME_TYPE, userId, gameId });
-                window.location.replace(`/`);
-            }
+        leave_btn.addEventListener("click", () => {
+            showModal({
+                message: "Leave the game?",
+                confirmLabel: "Leave",
+                onConfirm: () => {
+                    socket.emit("leave", { gameType: GAME_TYPE, userId, gameId });
+                    window.location.replace(`/`);
+                }
+            });
         });
-    });
+    } catch (error) {
+        console.log("Failed to configure playinfo component");
+    }
+
+
 
     // Setting up 
     setupPlayerInfoEvents(whitePlayerInfoComponent);
@@ -218,8 +230,6 @@ async function handleUpdate(data) {
 
 
     if (data.status !== "CONTINUE") {
-        console.log("[GAME] - Game Over: ", data.status);
-
         endMessage.loadMessage(data.status);
     };
 }
@@ -233,8 +243,7 @@ async function updatePlayerInfo(playerInfo, colorTurn, inventory, time) {
 function startNewGame() {
     const params = new URLSearchParams(window.location.search);
     const gameMode = parseInt(params.get('time')) || 600;
-
-    socket.emit("join", { gameType: GAME_TYPE, userId: userId, gameMode: gameMode });
+    socket.emit("join", { gameType: GAME_TYPE, userId: userId, gameMode: gameMode, aiId: aiId });
     boardComponent.clearSelection();
     endMessage.clear();
 }

@@ -141,7 +141,7 @@ const requestHandler = (req, res) => {
                     );
                 }
 
-                if (parts[2] === "ai") {
+                if (parts[2] === "ais") {
                     return proxy.web(req, res,
                         { target: URLS.ai },
                         err => {

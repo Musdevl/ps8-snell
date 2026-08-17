@@ -137,7 +137,7 @@ export class GameManager extends EventEmitter {
     async processAiAction(game) {
         try {
 
-            const req = await fetch(`${this.AI_SERVICE_URL}/api/ai/best-action`, {
+            const req = await fetch(`${this.AI_SERVICE_URL}/api/ais/best-action`, {
                 method: 'POST',
                 body: JSON.stringify({
                     grid: game.board.grid,
