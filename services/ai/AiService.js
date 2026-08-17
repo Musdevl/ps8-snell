@@ -1,12 +1,20 @@
 // import { ai } from "./ai.js";
-import { BasicAi } from "./model/BasicAi.js";
-import { MediumAi } from "./model/MediumAi.js";
-import { HardAi } from "./model/HardAi.js";
+import { MathiasHellal } from "./model/MathiasHellal.js";
+import { DeyannKoperecz } from "./model/DeyannKoperecz.js";
+import { BotBizot } from "./model/BotBizot.js";
+import { PatrickLaChine } from "./model/PatrickLaChine.js";
+import { PatrickBizcotos } from "./model/PatrickBizcotos.js";
+import { PatrickTemplier } from "./model/PatrickTemplier.js";
+import { PatrickBizot } from "./model/PatrickBizot.js";
 
 const all_ais = [
-    new BasicAi(1),
-    new MediumAi(2),
-    new HardAi(3),
+    new PatrickLaChine(1),
+    new MathiasHellal(2),
+    new PatrickBizot(3),
+    new PatrickTemplier(4),
+    new PatrickBizcotos(5),
+    new DeyannKoperecz(6),
+    new BotBizot(7),
 ];
 
 export function getAiDtos() {
@@ -14,23 +22,11 @@ export function getAiDtos() {
 }
 
 export function getAiDto(aiId) {
-    const ai = all_ais.find((ai) => ai.id === Number(aiId));
-    if (!ai) {
-        throw new Error(`AI with id ${aiId} not found`);
-    }
-    return ai.toDto();
+    return findAi(aiId).toDto();
 }
 
 export function getBestAction(aiId) {
-    try {
-        const ai = all_ais.find(ai => ai.id === Number(aiId));
-        if (ai) {
-            return ai.getBestAction();
-        }
-        throw new Error(`Ai not found : ${aiId}`)
-    } catch (error) {
-        console.log("Failed to find best ai action :", error);
-    }
+    return findAi(aiId).getBestAction();
 }
 
 export function deserializeGame(body) {
@@ -54,4 +50,12 @@ export function deserializeGame(body) {
     });
 
     return game;
+}
+
+function findAi(aiId) {
+    const ai = all_ais.find((ai) => ai.id === Number(aiId));
+    if (!ai) {
+        throw new Error(`AI with id ${aiId} not found`);
+    }
+    return ai;
 }

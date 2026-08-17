@@ -1,9 +1,9 @@
 import { AbstractAi } from "./AbstractAi.js";
 
-export class HardAi extends AbstractAi {
+export class BotBizot extends AbstractAi {
 
-    constructor(id) {
-        super(id, "Patrick Bizot", 1500, "/assets/ais/hard-ai.png");
+    constructor(id, name = "Bot Bizot", elo = 1500, path = "/assets/ais/bot-bizot-ai.png") {
+        super(id, "Bot Bizot", 1500, "/assets/ais/bot-bizot-ai.png");
     }
 
     getBestAction(game) {

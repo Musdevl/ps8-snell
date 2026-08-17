@@ -54,15 +54,20 @@ app.post('/api/ais/evaluate', (req, res) => {
     }
 });
 
-app.post('/api/ais/best-action', (req, res) => {
+app.post('/api/ais/{aiId}/best-action', (req, res) => {
     try {
-        const { aiId, grid, colorTurn, players } = req.body || {};
+
+        const aiId = req.params.AiId;
+
+
+        const { grid, colorTurn, players } = req.body || {};
 
         if (!grid || colorTurn === undefined || !players)
             return res.json({ error: 'Bad request' }, 400);
 
         const game = aiService.deserializeGame(req.body);
-        const action = ai.getBestAction(game, 2);
+
+        const action = aiService.getBestAction(game, aiId);
 
         res.json({ action }, 200);
     } catch (error) {

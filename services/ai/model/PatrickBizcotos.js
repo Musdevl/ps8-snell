@@ -1,9 +1,9 @@
 import { AbstractAi } from "./AbstractAi.js";
 
-export class BasicAi extends AbstractAi {
+export class PatrickBizcotos extends AbstractAi {
 
     constructor(id) {
-        super(id, "Mathias Hellal", 100, "/assets/ais/basic-ai.png");
+        super(id, "Patrick Bizcotos", 1000, "/assets/ais/patrick-bizcotos-ai.png");
     }
 
     getNextAction(game) {
@@ -11,5 +11,4 @@ export class BasicAi extends AbstractAi {
         const random_idx = Math.random() * all_action.length
         return all_action[random_idx];
     }
-
 }

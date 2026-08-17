@@ -61,12 +61,12 @@ function setupBtns() {
 
     try {
         const search_btn = document.querySelector('.search-ai-btn');
-        search_btn.addEventListener('click', () => search_puzzles())
+        search_btn.addEventListener('click', () => search_ais())
 
         const search_bar = document.querySelector('.search-ais');
         search_bar.addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
-                search_puzzles()
+                search_ais()
             }
         })
 
@@ -84,8 +84,8 @@ function setupBtns() {
 
 }
 
-function search_puzzles() {
-    const query = document.querySelector('.search-puzzles').value ?? ""
+function search_ais() {
+    const query = document.querySelector('.search-ais').value ?? ""
     loadAis(query);
 }
 

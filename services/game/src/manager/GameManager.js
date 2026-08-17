@@ -31,7 +31,7 @@ export class GameManager extends EventEmitter {
         let black_player;
 
         if (gameType === "AI") {
-            black_player = PlayerService.createPlayer(COLORS.BLACK, "NONE", "AI");
+            black_player = PlayerService.createPlayer(COLORS.BLACK, "NONE", player_2_info.userId);
         } else {
             black_player = PlayerService.createPlayer(COLORS.BLACK, player_2_info.webSocketId, player_2_info.userId);
         }
@@ -136,8 +136,7 @@ export class GameManager extends EventEmitter {
 
     async processAiAction(game) {
         try {
-
-            const req = await fetch(`${this.AI_SERVICE_URL}/api/ais/best-action`, {
+            const req = await fetch(`${this.AI_SERVICE_URL}/api/ais/${aiId}/best-action`, {
                 method: 'POST',
                 body: JSON.stringify({
                     grid: game.board.grid,

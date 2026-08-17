@@ -151,7 +151,10 @@ async function handleJoin(data) {
         switch (data.gameType) {
             case "LOCAL":
             case "AI":
-                res = await handleSinglePlayerGame(playerInfo, data.gameType);
+                const aiInfo = {
+                    userId: data.aiId
+                }
+                res = await handleAiGame(playerInfo, aiInfo);
                 break;
             case "MULTI":
                 res = await handleMultiplayerGame(playerInfo);
@@ -172,9 +175,19 @@ async function handleSinglePlayerGame(playerInfo, gameType) {
         return formatToSend([game.players_web_sockets[0]], "start", game.game);
     } catch (error) {
         console.log(error)
+        throw error;
     }
 }
 
+async function handleAiGame(playerInfo, aiInfo) {
+    try {
+        const game = await gameManager.initGame("AI", playerInfo, aiInfo, playerInfo.gameMode);
+        return formatToSend([game.players_web_sockets[0]], "start", game.game);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
 
 
 async function handleMultiplayerGame(playerInfo) {
@@ -219,12 +232,12 @@ function handleAction(data) {
 
             gatewayConnection.emit("game-ws-service", res);
 
-        if (game.gameType === "AI" && res.data.status === "CONTINUE") {
-            setTimeout(async () => {
-                res = await handleAiAction(game);
-                gatewayConnection.emit("game-ws-service", res);
-            }, 1000);
-        }
+            if (game.gameType === "AI" && res.data.status === "CONTINUE") {
+                setTimeout(async () => {
+                    res = await handleAiAction(game);
+                    gatewayConnection.emit("game-ws-service", res);
+                }, 1000);
+            }
 
         } else {
             console.log("No Game Found")
