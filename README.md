@@ -49,9 +49,12 @@ All services communicate through a central **API Gateway** over an internal Dock
                           │   MongoDB   │     │   AI    │
                           └─────────────┘     └─────────┘
 
-   ┌──────────────┐
-   │  Files (CDN) │  Static frontend + Android (Capacitor)
-   └──────────────┘
+   ┌──────────────┐        ┌──────────────┐
+   │  Files (CDN) │        │     Mail     │  Called by User only, never routed
+   └──────────────┘        │    :8006     │  through the gateway
+   Static frontend +       └──────┬───────┘
+   Android (Capacitor)            │
+                             SMTP (Gmail)
 ```
 
 ---
@@ -60,7 +63,7 @@ All services communicate through a central **API Gateway** over an internal Dock
 
 | Service | Technology | Port | Description |
 |---|---|---|---|
-| `gateway` | Node.js / Express | `8000` | API Gateway, auth middleware, HTTPS termination |
+| `gateway` | Node.js / Express | `8000` | API Gateway, auth middleware, TLS termination (off by default) |
 | `game` | Node.js / Socket.IO | `8002` | Game engine, matchmaking, AI, real-time state |
 | `user` | Node.js / Express | `8010` | Auth, profiles, friends, Stripe payments |
 | `files` | Node.js / Express | `8001` | Static frontend serving + Capacitor Android app |
@@ -68,6 +71,7 @@ All services communicate through a central **API Gateway** over an internal Dock
 | `achievement` | Node.js / Express | `8004` | In-game achievement tracking |
 | `shop` | Node.js / Express | `8005` | Themes, emotes, profile pictures |
 | `ai` | Node.js | — | Heuristic AI opponent engine |
+| `mail` | Node.js / Nodemailer | `8006` | Transactional emails (welcome, password reset) |
 | `mongodb` | MongoDB | `27017` | Shared NoSQL database |
 
 ---
@@ -75,9 +79,12 @@ All services communicate through a central **API Gateway** over an internal Dock
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) ≥ 24
-- [Docker Compose](https://docs.docker.com/compose/) ≥ 2.x
-- (For production/AWS) SSL certificates in `../../secrets/https`
+- [Docker Compose](https://docs.docker.com/compose/) ≥ 2.20 (the `include:` key)
 - (For Stripe) A valid Stripe secret key
+
+The stack currently runs over plain HTTP: there is no domain name, so no valid
+certificate is obtainable. The gateway still supports HTTPS — set `ENV=prod` and
+mount certificates into `/app/https` — see the comment in `docker-compose-prod.yml`.
 
 ---
 
@@ -93,23 +100,33 @@ cd ps8-26-snell/services
 ### 2. Local development
 
 ```bash
+docker compose up --build
+```
+
+Emails go to **Mailpit**, a fake SMTP server bundled with the dev stack: nothing
+leaves the machine and messages show up on <http://localhost:8025>.
+
+To run the services on the host instead of in containers:
+
+```bash
 ./launch-dev-mode.sh
 ```
 
-Or manually with the dev compose file:
-
-```bash
-./local_env_updater.sh
-docker compose -f docker-compose-dev.yml up --build
-```
-
-### 3. Production / AWS deployment
+### 3. Production deployment
 
 ```bash
 ./compose-prod.sh
 ```
 
-This will update environment variables for AWS, build all images, and start the stack in detached mode.
+Builds every image and starts the stack detached. The public URL written into the
+frontend defaults to the current server and is overridable:
+
+```bash
+PUBLIC_URL=http://my-server:8000 ./compose-prod.sh
+```
+
+That URL runs in the visitor's browser — if it points at `localhost`, every API
+call goes to their own machine and nothing works.
 
 ### 4. Reset the database
 
@@ -161,7 +178,9 @@ services/
 ├── achievement/    # Achievement system
 ├── shop/           # In-game store (themes, emotes, avatars)
 ├── ai/             # Heuristic AI (snell_heuristique.js)
+├── mail/           # Transactional emails (welcome, password reset)
 ├── helpers/        # Shared utilities (CORS, env, express helpers)
+├── docker-compose.yml       # dev by default: `docker compose up`
 ├── docker-compose-dev.yml
 ├── docker-compose-prod.yml
 └── compose-prod.sh

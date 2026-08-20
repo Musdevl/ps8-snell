@@ -3,7 +3,11 @@
 ## Pages
 
 ### Auth
-Two pages: **login** and **register**. The forgot password is a multi-step flow to test their honesty.
+Three pages: **login**, **register** and **reset-password**.
+
+Forgot password offers two routes. **By email** sends a one-time link that lands on
+the reset-password page, which reads the token from the URL. The **honesty quiz** is
+the original multi-step flow, kept as is.
 
 ### Home
 The home page is the main hub after login. The **shop** lives here directly, so users can browse themes and buy Snell Coins without leaving. The **social bar** is also embedded here, letting users interact with friends and check the leaderboard without navigating away.

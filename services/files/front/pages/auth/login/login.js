@@ -108,7 +108,7 @@ document.getElementById('forgot-btn').addEventListener('click', (e) => {
     });
 });
 
-document.getElementById('choice-code-btn').addEventListener('click', () => {
+document.getElementById('choice-mail-btn').addEventListener('click', () => {
     currentStep += 1;
     forgotChoice.classList.add('hidden');
     hideRight();
@@ -131,9 +131,7 @@ document.getElementById('choice-quiz-btn').addEventListener('click', () => {
 
 document.getElementById('reset-btn').addEventListener('click', async () => {
     const email = document.getElementById('reset-email').value;
-    const code = document.getElementById('reset-code').value;
-    const new_password = document.getElementById('reset-password').value;
-    await accountService.resetPassword(email, code, new_password);
+    await accountService.requestPasswordReset(email);
 });
 
 document.getElementById('quiz-next-btn').addEventListener('click', () => {

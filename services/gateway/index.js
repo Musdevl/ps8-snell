@@ -34,6 +34,7 @@ const PUBLIC_ROUTES = [
     '/api/user/login',
     '/api/user/register',
     '/api/user/verify',
+    '/api/user/forgot-password',
     '/api/user/reset-password',
     '/api/user/hard-reset-password',
     '/api/chat/global',

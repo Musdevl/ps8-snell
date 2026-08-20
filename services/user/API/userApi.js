@@ -2,7 +2,6 @@
 import { badExpress } from '../../helpers/badExpress.js';
 import * as UserApiHandler from "./userApiHandler.js";
 import { env } from "../../helpers/env.js"
-import { GATEWAY_URL } from '../env.js';
 
 const app = new badExpress();
 
@@ -308,32 +307,35 @@ app.post('/api/user/challenge/accept', async (req, res) => {
     }
 })
 
-// POST api/user/reset-password
+// POST /api/user/forgot-password
+// Envoie le lien de réinitialisation par mail.
+app.post('/api/user/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body || {};
+        if (!email) return res.json({ error: 'Email requis' }, 400);
+
+        // Le lien doit pointer vers le site tel que l'utilisateur l'a atteint,
+        // pour rester valable quel que soit le serveur qui héberge le jeu.
+        const origin = req.headers.origin || process.env.PUBLIC_GATEWAY_URL || 'http://localhost:8000';
+
+        await UserApiHandler.requestPasswordReset(email, origin);
+
+        res.json({ message: "Si un compte existe pour cette adresse, un mail vient d'être envoyé" }, 200);
+    }
+    catch (e) {
+        console.error(e);
+        res.json({ error: "Impossible d'envoyer le mail" }, 400);
+    }
+})
+
+// POST /api/user/reset-password
+// Applique le nouveau mot de passe à partir du token reçu par mail.
 app.post('/api/user/reset-password', async (req, res) => {
     try {
-        let { email, verification_code, new_password } = req.body;
-        await UserApiHandler.resetPassword(email, verification_code, new_password);
+        const { token, new_password } = req.body || {};
+        await UserApiHandler.resetPassword(token, new_password);
 
-        const user = await UserApiHandler.findUser(email, new_password);
-        const jwt_token = UserApiHandler.createToken(user._id.toString(), env.jwt_key, env.jwt_access_expiration || '15m');
-        const jwt_refresh_token = UserApiHandler.createToken(user._id.toString(), env.jwt_refresh_key, env.jwt_refresh_expiration || '7d');
-
-
-        res.cookie('jwt_refresh_token', jwt_refresh_token, {
-            httpOnly: true,
-            sameSite: 'Strict',
-            maxAge: 60 * 60 * 24 * 7, // 7 jours en secondes
-
-        });
-
-        res.cookie('jwt_token', jwt_token, {
-            httpOnly: true,
-            sameSite: 'Strict',
-            maxAge: 15 * 60, // 15 minutes
-            secure: true,    // HTTPS uniquement (en prod)
-        });
-
-        res.json({ message: "Reset success", jwt_token, jwt_refresh_token }, 200);
+        res.json({ message: "Reset success" }, 200);
     }
     catch (e) {
         console.error(e);

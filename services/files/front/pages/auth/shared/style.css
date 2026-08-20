@@ -119,67 +119,20 @@ notification-bar {
     display: none !important;
 }
 
-.recovery-popup {
-    font-family: 'Courier New', Courier, monospace;
-
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    animation: fadeIn 0.3s;
-}
-
-.recovery-box {
-    background: #262522;
-    border: 1px solid #3a3632;
-    border-radius: 8px;
-    padding: 2.5rem 3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-    width: 22rem;
-}
-
-.recovery-label {
-    color: white;
-    font-size: 26px;
-    text-align: center;
-    font-weight: bold;
-}
-
-.recovery-code {
-    font-size: 2.2rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    color: #c8a84b;
-    background: #312e2b;
-    border: 1px solid #3a3632;
-    border-radius: 6px;
-    padding: 0.8rem 1.5rem;
-}
-
-.recovery-warn {
-    color: white;
-    font-size: 1.1rem;
-    text-align: center;
-}
-
-#recovery-ok {
-    padding-left: 10px;
-    font-weight: 700;
-    padding-right: 10px;
-}
-
 .reset-form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
     width: 90%;
+    max-width: 24rem;
+}
+
+/* Le formulaire ne contient qu'une adresse et un bouton : l'écart de 2rem de
+   .input-section les éloigne inutilement du texte d'explication. */
+.reset-form .input-section {
+    width: 100%;
+    gap: 1.25rem;
 }
 
 .reset-title {
@@ -290,9 +243,20 @@ notification-bar {
 }
 
 
-#choice-code-btn,
+#choice-mail-btn,
 #choice-quiz-btn {
     padding: 7px 15px 7px 15px;
+}
+
+/* Le panneau de droite n'hérite pas du `span { color: white }` imbriqué dans
+   .left-container : sans cette règle, le texte d'aide du formulaire de reset
+   s'affiche en noir sur fond sombre. */
+.helper-message {
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: center;
 }
 
 .back-btn {
@@ -422,8 +386,15 @@ notification-bar {
         width: 100%;
     }
 
-    #reset-form.input-section {
+    /* Selecteur de descendance : #reset-form est le conteneur, .input-section
+       son enfant. Colles l'un a l'autre, la regle ne matchait rien. */
+    #reset-form .input-section {
         width: 100%;
+    }
+
+    .reset-form {
+        max-width: none;
+        width: 80%;
     }
 
     .forgot-choice {
@@ -436,17 +407,6 @@ notification-bar {
 
 
 @media (max-width:40em) {
-
-
-    .recovery-box {
-        padding: 1em 2em;
-        gap: 1rem;
-        width: 60%;
-    }
-
-    .recovery-code {
-        font-size: 1.75rem;
-    }
 
 
     .logo {

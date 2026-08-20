@@ -1,0 +1,31 @@
+# Configuration du service mail.
+#
+# Ce fichier est monté dans le conteneur : le modifier puis lancer
+# `docker compose restart mail` suffit, il n'y a pas d'image à reconstruire.
+
+# Expéditeur affiché dans la boîte de réception.
+# Le nom est libre, mais l'adresse doit être celle du compte SMTP ci-dessous :
+# Gmail refuse d'expédier au nom d'une autre adresse.
+from: "Snell <game.snell.ps8@gmail.com>"
+
+smtp:
+  host: smtp.gmail.com
+  port: 587
+  # true uniquement pour le port 465 (TLS direct).
+  # Les ports 587 et 1025 utilisent STARTTLS, donc false.
+  secure: false
+  user: game.snell.ps8@gmail.com
+  # Mot de passe d'application Google, 16 caractères sans espaces.
+  # Se génère sur https://myaccount.google.com/apppasswords
+  pass: "rmvpjgwqwpyoxgdq"
+
+# ── Pour développer sans rien envoyer ────────────────────────────────────────
+# Remplacer la section smtp par celle-ci : tous les mails partent alors dans
+# Mailpit, rien ne sort de la machine, et ils s'affichent sur le port 8025.
+#
+# smtp:
+#   host: mailpit
+#   port: 1025
+#   secure: false
+#   user: ""
+#   pass: ""
