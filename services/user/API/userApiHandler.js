@@ -151,7 +151,6 @@ export async function requestChallenge(userId, opponentId) {
 
     if (userId === opponentId) throw new Error("Cannot challenge yourself");
     const user = await userRepo.findUserById(userId);
-    console.log(opponentId);
     // Notifier si le destinataire est en ligne
     const oppentSocketId = userId_socketId_Map.get(opponentId.toString());
 

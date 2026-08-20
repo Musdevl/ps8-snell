@@ -19,9 +19,6 @@ let modal_message;
 let modal_confirm;
 let modal_cancel;
 
-const params = new URLSearchParams(window.location.search);
-const aiId = params.get("id") ?? 1;
-
 await accountService.checkAuth();
 
 // Initialisation
@@ -68,58 +65,25 @@ async function waitForBoard() {
 
 async function setupGame() {
     // Écouter les événements du serveur
-    socket.on('start', async (data) => {
-
-        gameId = data.gameId;
-        await setPlayerColor(data.white, data.black, boardComponent);
-        await handleUpdate(data);
-    })
-
-    socket.on('reconnect', async (data) => {
-
-        gameId = data.gameId;
-        await setPlayerColor(data.white, data.black, boardComponent);
-        await handleUpdate(data);
-
-    })
-
-    socket.on('update', async (data) => await handleUpdate(data));
+    setupSocketEvents();
 
     // Setup les composants
 
-    try {
-        whitePlayerInfoComponent.setPlayerName(accountService.getUserName())
-        whitePlayerInfoComponent.setPlayerAvatar(accountService.getProfilePicture().picture)
-        whitePlayerInfoComponent.disableElo();
-        whitePlayerInfoComponent.disableTimer();
-        await whitePlayerInfoComponent.setColor(COLORS.WHITE);
 
-        const response = await accountService.authFetch(`${GATEWAY_URL}/api/ais/${aiId}`);
+    await whitePlayerInfoComponent.setColor(COLORS.WHITE);
 
-        const { ai } = await response.json();
+    await blackPlayerInfoComponent.setColor(COLORS.BLACK);
 
-
-        blackPlayerInfoComponent.setPlayerName(ai.name);
-        blackPlayerInfoComponent.setPlayerAvatar(ai.path);
-        blackPlayerInfoComponent.disableElo();
-        blackPlayerInfoComponent.disableTimer();
-        await blackPlayerInfoComponent.setColor(COLORS.BLACK);
-
-        leave_btn.addEventListener("click", () => {
-            showModal({
-                message: "Leave the game?",
-                confirmLabel: "Leave",
-                onConfirm: () => {
-                    socket.emit("leave", { gameType: GAME_TYPE, userId, gameId });
-                    window.location.replace(`/`);
-                }
-            });
+    leave_btn.addEventListener("click", () => {
+        showModal({
+            message: "Leave the game?",
+            confirmLabel: "Leave",
+            onConfirm: () => {
+                socket.emit("leave", { gameType: GAME_TYPE, userId, gameId });
+                window.location.replace(`/pages/ais/index.html`);
+            }
         });
-    } catch (error) {
-        console.log("Failed to configure playinfo component");
-    }
-
-
+    });
 
     // Setting up 
     setupPlayerInfoEvents(whitePlayerInfoComponent);
@@ -129,6 +93,80 @@ async function setupGame() {
 
     // Démarrer une nouvelle partie
     startNewGame();
+}
+
+
+function setupSocketEvents() {
+    socket.on('start', async (data) => {
+
+        gameId = data.gameId;
+        await onGameReady(data)
+    })
+
+    socket.on('reconnect', async (data) => {
+
+        gameId = data.gameId;
+        await onGameReady(data)
+
+    })
+
+    socket.on('update', async (data) => await handleUpdate(data));
+}
+
+async function getUserInformation(userId) {
+    try {
+        const response = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${userId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error(`Error while getting user information: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch user information:', error);
+    }
+}
+
+async function getAiInformation(aiId) {
+    try {
+        const response = await accountService.authFetch(`${GATEWAY_URL}/api/ais/${aiId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error(`Error while getting user information: ${response.status}`);
+        const res = await response.json();
+        console.log(res);
+        return {
+            _id: res.ai.id,
+            username: res.ai.name,
+            picture: { picture: res.ai.path }
+        }
+    } catch (error) {
+        console.error('Failed to fetch user information:', error);
+    }
+}
+
+async function onGameReady(data, whitePlayerInfo, blackPlayerInfo) {
+    gameId = data.gameId;
+
+    await setPlayerColor(data.white, data.black);
+
+    if (userId === data.white) {
+        whitePlayerInfo ??= await getUserInformation(data.white);
+        blackPlayerInfo ??= await getAiInformation(data.black);
+    } else {
+        blackPlayerInfo ??= await getUserInformation(data.black);
+        whitePlayerInfo ??= await getAiInformation(data.white);
+    }
+
+    whitePlayerInfoComponent.setPlayerInfo(whitePlayerInfo);
+    whitePlayerInfoComponent.disableElo();
+    whitePlayerInfoComponent.disableTimer();
+
+    blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo);
+    blackPlayerInfoComponent.disableElo();
+    blackPlayerInfoComponent.disableTimer();
+
+    handleUpdate(data);
 }
 
 function showModal({ message, confirmLabel, onConfirm }) {
@@ -241,9 +279,12 @@ async function updatePlayerInfo(playerInfo, colorTurn, inventory, time) {
 }
 
 function startNewGame() {
+
     const params = new URLSearchParams(window.location.search);
-    const gameMode = parseInt(params.get('time')) || 600;
-    socket.emit("join", { gameType: GAME_TYPE, userId: userId, gameMode: gameMode, aiId: aiId });
+    const aiId = params.get("id") ?? 1;
+    const playerColor = params.get("color") ?? "white";
+
+    socket.emit("join", { gameType: GAME_TYPE, userId: userId, aiId: aiId, playerColor: playerColor });
     boardComponent.clearSelection();
     endMessage.clear();
 }

@@ -247,7 +247,6 @@ export async function register(email, username, password) {
         switch (res.status) {
             case 200:
                 const data = await res.json();
-                console.log(data)
                 setTokens(data.jwt_token, data.jwt_refresh_token);
                 setAccount(data.user);
                 return data.user;

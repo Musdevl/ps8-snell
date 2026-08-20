@@ -375,9 +375,9 @@ app.post("/api/user/history", async (req, res) => {
         console.log("History posted successfully", userId, JSON.stringify(game));
         res.json({ message: 'History posted successfully' }, 200);
     }
-    catch (e) {
-        console.log(e);
-        res.json({ error: 'Error posting history', message: e.message }, 400);
+    catch (error) {
+        console.log(error);
+        res.json({ error: 'Error posting history', message: error.message }, 400);
     }
 })
 

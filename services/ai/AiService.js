@@ -6,6 +6,7 @@ import { PatrickLaChine } from "./model/PatrickLaChine.js";
 import { PatrickBizcotos } from "./model/PatrickBizcotos.js";
 import { PatrickTemplier } from "./model/PatrickTemplier.js";
 import { PatrickBizot } from "./model/PatrickBizot.js";
+import * as engine from "./engine.js";
 
 const all_ais = [
     new PatrickLaChine(1),
@@ -25,8 +26,8 @@ export function getAiDto(aiId) {
     return findAi(aiId).toDto();
 }
 
-export function getBestAction(aiId) {
-    return findAi(aiId).getBestAction();
+export function getBestAction(game, aiId) {
+    return findAi(aiId).getNextAction(game);
 }
 
 export function deserializeGame(body) {

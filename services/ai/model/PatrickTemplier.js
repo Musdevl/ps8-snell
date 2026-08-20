@@ -1,4 +1,5 @@
 import { AbstractAi } from "./AbstractAi.js";
+import * as engine from "../engine.js";
 
 export class PatrickTemplier extends AbstractAi {
 
@@ -6,9 +7,9 @@ export class PatrickTemplier extends AbstractAi {
         super(id, "Patrick Templier", 900, "/assets/ais/patrick-templier-ai.png");
     }
 
-    getBestAction(game) {
+    getNextAction(game) {
         const all_action = engine.getAllActions(game);
-        const random_idx = Math.random() * all_action.length
+        const random_idx = Math.floor(Math.random() * all_action.length)
         return all_action[random_idx];
     }
 }

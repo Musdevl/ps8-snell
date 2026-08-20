@@ -98,7 +98,6 @@ async function setupGame() {
 
     const res = await fetch(`${GATEWAY_URL}/api/game/tutorial`);
     const raw = await res.json();
-    console.log("States", raw);
     game_states = raw.grid_states.map(state => uint16Utils.normalizeGameState(state));
 
     tutorial_container = document.querySelector('.tutorial-container');

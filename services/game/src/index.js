@@ -135,6 +135,7 @@ async function handleJoin(data) {
             webSocketId: data.clientId,
             userId: data.userId,
             gameMode: data.gameMode || 600,
+            playerColor: data.playerColor
         };
 
         let res;
@@ -163,7 +164,12 @@ async function handleJoin(data) {
                 throw new Error("Unknown Game Type");
         }
 
-        gatewayConnection.emit("game-ws-service", res)
+        gatewayConnection.emit("game-ws-service", res);
+        if (data.gameType === "AI" && data.playerColor === "black") {
+            const game = gameManager.findGame(res.data.gameId);
+            res = await handleAiAction(game);
+            gatewayConnection.emit("game-ws-service", res);
+        }
     } catch (error) {
         console.log(error);
     }
@@ -182,7 +188,7 @@ async function handleSinglePlayerGame(playerInfo, gameType) {
 async function handleAiGame(playerInfo, aiInfo) {
     try {
         const game = await gameManager.initGame("AI", playerInfo, aiInfo, playerInfo.gameMode);
-        return formatToSend([game.players_web_sockets[0]], "start", game.game);
+        return game.players_web_sockets[0] === "NONE" ? formatToSend([game.players_web_sockets[1]], "start", game.game) : formatToSend([game.players_web_sockets[0]], "start", game.game);
     } catch (error) {
         console.log(error);
         throw error;
@@ -261,7 +267,6 @@ function handlePlayerAction(gameType, game, action, player_web_socket_id) {
 async function handleAiAction(game) {
     try {
         const game_buffer = await gameManager.processAiAction(game);
-
         return formatToSend(game_buffer.players_web_sockets, "update", game_buffer.game);
     } catch (error) {
         console.log(error);

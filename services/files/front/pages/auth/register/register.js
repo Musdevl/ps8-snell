@@ -11,7 +11,6 @@ async function register() {
 }
 
 function showRecoveryPopup(code) {
-    console.log(code)
     codeEl.textContent = code.slice(0, 3) + ' ' + code.slice(3);
     overlay.classList.remove('hidden');
 }

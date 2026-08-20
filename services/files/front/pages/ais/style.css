@@ -144,10 +144,22 @@ nav-bar {
     }
 }
 
+.wave {
+    position: absolute;
+    top: 0;
+    object-fit: cover;
+    rotate: 180deg;
+    z-index: -1;
+    height: 10em;
+    width: 100%;
+}
+
 .ais {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-content: start;
     gap: 1em;
+    height: 100%;
     scrollbar-color: #232220 #3a3734;
     overflow-y: auto;
 }
@@ -190,9 +202,12 @@ nav-bar {
 }
 
 .ai-item {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
     background-color: var(--bg-dark);
-    width: 15rem;
-    height: 5rem;
+    width: 100%;
+    height: 7rem;
     border: none;
     border-bottom: 3px solid #0000008b;
     border-radius: var(--radius);
@@ -203,6 +218,7 @@ nav-bar {
     text-decoration: none;
     font-weight: 700;
     transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
 
     &:hover {
         cursor: pointer;
@@ -210,6 +226,7 @@ nav-bar {
         transform: translateY(-5px);
     }
 }
+
 
 .ai-info {
     display: flex;
@@ -228,6 +245,11 @@ nav-bar {
     align-items: flex-end;
 }
 
+.king-color {
+    height: 2em;
+    width: 2em;
+}
+
 .ai-number {
     font-size: 1.3em;
     font-weight: 600;
@@ -240,6 +262,9 @@ nav-bar {
     color: #fff;
     font-size: 1.3em;
     font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 
@@ -283,6 +308,41 @@ nav-bar {
     align-items: center;
 }
 
+.hidden {
+    display: none !important;
+}
+
+.color-selector {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    min-width: 100%;
+    background-color: var(--bg-dark);
+    border-radius: var(--radius);
+    border-bottom: 3px solid #0000008b;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.color-select-btn {
+    color: white;
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: background-color 0.2s;
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+
+.color-select-btn:hover {
+    background-color: rgba(210, 210, 210, 0.104);
+}
+
 @media (max-width: 60em) {
 
     body {
@@ -300,6 +360,12 @@ nav-bar {
         width: 100%;
         overflow-y: auto;
     }
+
+    .ais {
+        grid-template-columns: repeat(2, 1fr);
+
+    }
+
 
 }
 
@@ -332,7 +398,7 @@ nav-bar {
     main {
         height: 100%;
         overflow-y: auto;
-        padding-bottom: 14vh;
+        padding-bottom: 12vh;
     }
 
     .ai-header-section {
@@ -360,6 +426,10 @@ nav-bar {
         border-bottom: 1px solid #808080;
     }
 
+    .ais {
+        grid-template-columns: repeat(1, 1fr);
+
+    }
 
     .snell-coins-container {
         display: flex;
@@ -422,4 +492,7 @@ nav-bar {
     }
 
 
+    .ai-item {
+        width: 100%;
+    }
 }

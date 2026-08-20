@@ -54,11 +54,10 @@ app.post('/api/ais/evaluate', (req, res) => {
     }
 });
 
-app.post('/api/ais/{aiId}/best-action', (req, res) => {
+app.post('/api/ais/{id}/best-action', (req, res) => {
     try {
 
-        const aiId = req.params.AiId;
-
+        const aiId = req.params.id;
 
         const { grid, colorTurn, players } = req.body || {};
 
@@ -66,9 +65,7 @@ app.post('/api/ais/{aiId}/best-action', (req, res) => {
             return res.json({ error: 'Bad request' }, 400);
 
         const game = aiService.deserializeGame(req.body);
-
         const action = aiService.getBestAction(game, aiId);
-
         res.json({ action }, 200);
     } catch (error) {
         console.error('Error getting best action:', error);
@@ -80,7 +77,7 @@ app.post('/api/ais/{aiId}/best-action', (req, res) => {
 export function startHttpServer() {
     const PORT = 8020;
     const server = app.listen(PORT, () => {
-        console.log(`[AI] Server listening on port ${PORT}`);
+        console.log(`[AI SERVICE] Server listening on port ${PORT}`);
     });
 
     process.on('SIGTERM', () => { app.close(() => { process.exit(0); }); });

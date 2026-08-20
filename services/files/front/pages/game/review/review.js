@@ -104,7 +104,6 @@ async function setupGame() {
 
     review_analytics.addEventListener("next", async () => {
         const next_index = getNextIndex();
-        console.log("new", next_index);
         review_analytics.highlight_cell(next_index);
         await handleUpdate(game_states[next_index + 1]);
     })
@@ -223,7 +222,6 @@ function getNextIndex() {
     let next = state_index + 1;
     if (next >= game_states.length - 1) {
         setTimeout(() => {
-            console.log("bvlablad");
             showModal({
                 message: "Game Over ?",
                 confirmLabel: "Leave",
@@ -236,7 +234,6 @@ function getNextIndex() {
     } else {
         state_index = next;
     }
-    console.log(state_index)
     return state_index;
 }
 

@@ -32,6 +32,16 @@ social-bar {
     height: 100%;
 }
 
+.wave {
+    position: absolute;
+    top: 0;
+    object-fit: cover;
+    rotate: 180deg;
+    z-index: -1;
+    height: 10em;
+}
+
+
 main {
     display: flex;
     justify-content: center;
@@ -171,7 +181,7 @@ nav-bar {
     padding: 1em;
 }
 
-.puzzle-header-section{
+.puzzle-header-section {
     display: flex;
     gap: 1em;
     align-items: center;
@@ -310,10 +320,10 @@ nav-bar {
     main {
         height: 100%;
         overflow-y: auto;
-        padding-bottom: 14vh;
+        padding-bottom: 12vh;
     }
 
-    .puzzle-header-section{
+    .puzzle-header-section {
         display: none;
     }
 

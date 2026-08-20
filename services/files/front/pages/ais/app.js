@@ -35,6 +35,7 @@ function loadAis(ais, query = "") {
         displayed_ai.forEach(ai => {
             const item = document.createElement('div');
             item.classList.add('ai-item');
+            item.id = `ai-${ai.id}-btn`
             item.innerHTML += `
                         <div class="ai-ico-container">
                             <img class="ai-ico" src="${ai.path}">
@@ -44,9 +45,22 @@ function loadAis(ais, query = "") {
                         <span class="ai-elo">${ai.elo}</span>
                         </div>
                         `
-            item.addEventListener("click", () => {
-                window.location.replace(`/pages/game/ai-game/index.html?id=${ai.id}`);
-            })
+            const selector = generateSelector(ai.id);
+            item.appendChild(selector);
+
+            item.addEventListener('click', () => {
+                const isOpening = selector.classList.contains('hidden');
+                selector.classList.toggle('hidden');
+                item.style.zIndex = isOpening ? 10 : 1;
+            });
+
+            document.addEventListener('click', (e) => {
+                const clickedOutside = !item.contains(e.target) && !selector.contains(e.target);
+                if (clickedOutside) {
+                    selector.classList.add('hidden');
+                    item.style.zIndex = 1;
+                }
+            });
 
             ai_list.appendChild(item);
 
@@ -55,6 +69,27 @@ function loadAis(ais, query = "") {
         console.error("An Error occured while loading ais", error);
     }
 
+}
+
+function generateSelector(aiId) {
+    const item = document.createElement('div');
+    item.classList.add("color-selector", "hidden");
+    item.id = `ai-${aiId}-selector`
+    item.innerHTML += `
+                       <a href="/pages/game/ai-game/index.html?id=${aiId}&color=white" class="color-select-btn">
+                            <img class="king-color" src="/assets/ais/white-king.svg" alt="white-king">
+                            <span class="color-label">White</span>
+                        </a>
+                        <a href="/pages/game/ai-game/index.html?id=${aiId}&color=random" class="color-select-btn">
+                            <img class="king-color" src="/assets/ais/random-king.svg" alt="random">
+                            <span class="color-label">Random</span>
+                        </a>
+                        <a href="/pages/game/ai-game/index.html?id=${aiId}&color=black" class="color-select-btn">
+                            <img class="king-color" src="/assets/ais/black-king.svg" alt="black-king">
+                            <span class="color-label">Black</span>
+                        </a>
+                        `
+    return item;
 }
 
 function setupBtns() {

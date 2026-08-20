@@ -66,7 +66,6 @@ app.get('/api/game/puzzles/{puzzleId}', async (req, res) => {
 
     const puzzleId = req.params.puzzleId;
 
-    console.log(puzzleId);
     try {
         const puzzle = gameManager.getPuzzleDetails(puzzleId);
         if (puzzle) {

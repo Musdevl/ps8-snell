@@ -1,5 +1,5 @@
 import { AbstractAi } from "./AbstractAi.js";
-
+import * as engine from "../engine.js";
 export class MathiasHellal extends AbstractAi {
 
     constructor(id) {
@@ -8,7 +8,7 @@ export class MathiasHellal extends AbstractAi {
 
     getNextAction(game) {
         const all_action = engine.getAllActions(game);
-        const random_idx = Math.random() * all_action.length
+        const random_idx = Math.floor(Math.random() * all_action.length)
         return all_action[random_idx];
     }
 
