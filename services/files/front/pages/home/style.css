@@ -404,7 +404,7 @@ shop-component {
         height: 100%;
         overflow-y: auto;
         scrollbar-color: #232220 #3a3734;
-        padding-bottom: 14vh;
+        padding-bottom: 12vh;
     }
 
     .middle-section {

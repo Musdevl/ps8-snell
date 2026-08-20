@@ -44,7 +44,6 @@ async function fetchPuzzle() {
         const res = await response.json();
         puzzle = res.puzzle;
         puzzle.game_states = puzzle.game_states.map(state => uint16Utils.normalizeGameState(state));
-        console.log(puzzle)
     } catch (error) {
         window.location.replace(`/pages/puzzles`);
         console.log(error);
@@ -254,7 +253,6 @@ async function nextPuzzleStep() {
     }
 
     const nextColorTurn = puzzle.game_states[puzzle_step_index].colorTurn
-    console.log(nextColorTurn, puzzle.playerColor);
 
     if (nextColorTurn !== puzzle.playerColor) {
         puzzle_step_index++;

@@ -70,8 +70,6 @@ export async function addFriend(userId, friendId) {
         throw new Error("Users already friends");
     }
 
-    console.log(userId, friendId)
-
     try {
         const reqChat = await fetch(CHAT_URL + "/api/chat/friend", {
             method: "POST",
@@ -80,7 +78,6 @@ export async function addFriend(userId, friendId) {
         });
 
         const chatJson = await reqChat.json();
-        console.log(chatJson);
         const chatId = chatJson.id;
 
         user.friends.push({ friendId, chatId });

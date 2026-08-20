@@ -4,8 +4,6 @@ import { DIRECTIONS, DIRECTION_ORDER } from "../enum/Directions.js";
 
 export function parseBytesGrid(gridBuffers) {
 
-    console.log("buffer", gridBuffers);
-
     const grid = gridBuffers.map(buffer => new Uint8Array(buffer));
 
     let newBoard = BoardUtils.createEmptyBoard();
@@ -16,8 +14,6 @@ export function parseBytesGrid(gridBuffers) {
             newBoard[row][col] = composePiece(piece);
         }
     }
-
-    console.log(grid);
 
     return newBoard;
 }

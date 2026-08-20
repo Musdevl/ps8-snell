@@ -37,7 +37,8 @@
     border-color: #5c8fd6;
 }
 
-.notification.success, .notification.challenge {
+.notification.success,
+.notification.challenge {
     border-color: #68b844;
 }
 
@@ -102,4 +103,18 @@
     width: 5rem;
     height: 5rem;
     object-fit: cover;
+}
+
+@media (max-width:32em) {
+    #notification-container {
+        position: fixed;
+        top: 1.5rem;
+        right: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        z-index: 1000;
+        width: fit-content;
+    }
+
 }

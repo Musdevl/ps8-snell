@@ -143,8 +143,6 @@ class ReviewAnalytics extends HTMLElement {
     }
 
     render_all_actions(actions) {
-        console.log(actions);
-
         const rendered_actions = actions.slice(1, -1); // enlève premier et dernier
 
         for (let i = 0; i < rendered_actions.length; i++) {

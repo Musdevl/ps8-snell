@@ -388,7 +388,7 @@ async function updateSelectedEmotes() {
         renderSelectedEmotes();
         notificationService.notify("Selected emotes saved successfuly", "success")
     } catch (error) {
-        console.log("Error", error)
+        console.log(error)
         notificationService.notify("Failed to save emotes", "error");
     }
 }
@@ -489,7 +489,6 @@ function bindChatEvents() {
     });
 
     UserService.getSocketConnection().on('friend-message', (data) => {
-        console.log(data);
         chat.addNewMessage(data);
     });
 }

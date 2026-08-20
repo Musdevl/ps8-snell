@@ -461,10 +461,10 @@ class SocialBar extends HTMLElement {
 
     async challengeFriend(friendId) {
         try {
-            const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/friend/challenge`, {
+            const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/challenge`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: accountService.getUserId(), friendId })
+                body: JSON.stringify({ userId: accountService.getUserId(), opponentId:friendId })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);

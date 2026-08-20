@@ -2,6 +2,7 @@ import { GATEWAY_URL } from "../../../env.js";
 import * as accountService from "../../../services/account-service.js";
 import { COLORS } from "../../../enum/Colors.js";
 
+
 let socket;
 let boardComponent;
 let whitePlayerInfoComponent;
@@ -17,8 +18,6 @@ let modal;
 let modal_message;
 let modal_confirm;
 let modal_cancel;
-
-console.log("ENV : gatewayurl = " + GATEWAY_URL);
 
 await accountService.checkAuth();
 
@@ -66,36 +65,13 @@ async function waitForBoard() {
 
 async function setupGame() {
     // Écouter les événements du serveur
-    socket.on('start', async (data) => {
-
-        gameId = data.gameId;
-        await setPlayerColor(data.white, data.black, boardComponent);
-        await handleUpdate(data);
-    })
-
-    socket.on('reconnect', async (data) => {
-
-        gameId = data.gameId;
-        await setPlayerColor(data.white, data.black, boardComponent);
-        await handleUpdate(data);
-
-    })
-
-    socket.on('update', async (data) => await handleUpdate(data));
+    setupSocketEvents();
 
     // Setup les composants
 
-    whitePlayerInfoComponent.setPlayerName(accountService.getUserName())
-    whitePlayerInfoComponent.setPlayerAvatar(accountService.getProfilePicture().picture)
-    whitePlayerInfoComponent.disableElo();
-    whitePlayerInfoComponent.disableTimer();
+
     await whitePlayerInfoComponent.setColor(COLORS.WHITE);
 
-
-    blackPlayerInfoComponent.setPlayerName("AI");
-    blackPlayerInfoComponent.setPlayerAvatar(`/assets/bot.svg`);
-    blackPlayerInfoComponent.disableElo();
-    blackPlayerInfoComponent.disableTimer();
     await blackPlayerInfoComponent.setColor(COLORS.BLACK);
 
     leave_btn.addEventListener("click", () => {
@@ -104,7 +80,7 @@ async function setupGame() {
             confirmLabel: "Leave",
             onConfirm: () => {
                 socket.emit("leave", { gameType: GAME_TYPE, userId, gameId });
-                window.location.replace(`/`);
+                window.location.replace(`/pages/ais/index.html`);
             }
         });
     });
@@ -117,6 +93,80 @@ async function setupGame() {
 
     // Démarrer une nouvelle partie
     startNewGame();
+}
+
+
+function setupSocketEvents() {
+    socket.on('start', async (data) => {
+
+        gameId = data.gameId;
+        await onGameReady(data)
+    })
+
+    socket.on('reconnect', async (data) => {
+
+        gameId = data.gameId;
+        await onGameReady(data)
+
+    })
+
+    socket.on('update', async (data) => await handleUpdate(data));
+}
+
+async function getUserInformation(userId) {
+    try {
+        const response = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${userId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error(`Error while getting user information: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch user information:', error);
+    }
+}
+
+async function getAiInformation(aiId) {
+    try {
+        const response = await accountService.authFetch(`${GATEWAY_URL}/api/ais/${aiId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error(`Error while getting user information: ${response.status}`);
+        const res = await response.json();
+        console.log(res);
+        return {
+            _id: res.ai.id,
+            username: res.ai.name,
+            picture: { picture: res.ai.path }
+        }
+    } catch (error) {
+        console.error('Failed to fetch user information:', error);
+    }
+}
+
+async function onGameReady(data, whitePlayerInfo, blackPlayerInfo) {
+    gameId = data.gameId;
+
+    await setPlayerColor(data.white, data.black);
+
+    if (userId === data.white) {
+        whitePlayerInfo ??= await getUserInformation(data.white);
+        blackPlayerInfo ??= await getAiInformation(data.black);
+    } else {
+        blackPlayerInfo ??= await getUserInformation(data.black);
+        whitePlayerInfo ??= await getAiInformation(data.white);
+    }
+
+    whitePlayerInfoComponent.setPlayerInfo(whitePlayerInfo);
+    whitePlayerInfoComponent.disableElo();
+    whitePlayerInfoComponent.disableTimer();
+
+    blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo);
+    blackPlayerInfoComponent.disableElo();
+    blackPlayerInfoComponent.disableTimer();
+
+    handleUpdate(data);
 }
 
 function showModal({ message, confirmLabel, onConfirm }) {
@@ -218,8 +268,6 @@ async function handleUpdate(data) {
 
 
     if (data.status !== "CONTINUE") {
-        console.log("[GAME] - Game Over: ", data.status);
-
         endMessage.loadMessage(data.status);
     };
 }
@@ -231,10 +279,12 @@ async function updatePlayerInfo(playerInfo, colorTurn, inventory, time) {
 }
 
 function startNewGame() {
-    const params = new URLSearchParams(window.location.search);
-    const gameMode = parseInt(params.get('time')) || 600;
 
-    socket.emit("join", { gameType: GAME_TYPE, userId: userId, gameMode: gameMode });
+    const params = new URLSearchParams(window.location.search);
+    const aiId = params.get("id") ?? 1;
+    const playerColor = params.get("color") ?? "white";
+
+    socket.emit("join", { gameType: GAME_TYPE, userId: userId, aiId: aiId, playerColor: playerColor });
     boardComponent.clearSelection();
     endMessage.clear();
 }

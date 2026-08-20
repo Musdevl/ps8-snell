@@ -34,7 +34,6 @@ function slideOut() {
 // ── Bouton retour (mobile) ────────────────────────────────────────────────────
 
 document.querySelector('.back-btn')?.addEventListener('click', () => {
-    console.log(currentStep);
     switch (currentStep) {
         case 1:
             forgotChoice.classList.remove('hidden');

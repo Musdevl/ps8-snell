@@ -355,3 +355,7 @@ function computeGameSteps(game, actions, review = false) {
     // return all the computed game states
     return game_states;
 }
+
+export function findPlayerByColor(game, color) {
+    return game.players.find(p => p.color === color);
+}

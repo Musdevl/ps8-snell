@@ -26,7 +26,7 @@ run_service "gateway" "gateway"
 run_service "chat" "chat"
 run_service "achievement" "achievement"
 run_service "shop" "shop"
-run_service "ai" "AI"
+run_service "ai" "ai"
 
 echo ""
 echo "Tous les services sont lancés."

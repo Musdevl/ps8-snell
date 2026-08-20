@@ -263,11 +263,11 @@ app.post('/api/user/logout', (req, res) => {
 
     res.clearCookie('jwt_token', {
         httpOnly: true
-        // , sameSite: 'Strict' 
+        , sameSite: 'Strict' 
     });
     res.clearCookie('jwt_refresh_token', {
         httpOnly: true
-        // , sameSite: 'Strict' 
+        , sameSite: 'Strict' 
     });
 
     res.json({ succes: true });
@@ -285,23 +285,22 @@ app.get('/api/user/getId/{username}', async (req, res) => {
 })
 
 
-app.post('/api/user/friend/challenge', async (req, res) => {
+app.post('/api/user/challenge', async (req, res) => {
     try {
-        const { userId, friendId } = req.body;
-        await UserApiHandler.requestChallenge(userId, friendId);
-        res.json({ message: 'Friend request sent successfully' }, 200);
+        const { userId, opponentId } = req.body;
+        await UserApiHandler.requestChallenge(userId, opponentId);
+        res.json({ message: 'Challenge request sent successfully' }, 200);
     } catch (error) {
         console.error('Error challenging friend:', error);
         res.json({ error: 'Error challenging friend', message: error.message }, 400);
     }
 })
 
-app.post('/api/user/friend/challenge/accept', async (req, res) => {
+app.post('/api/user/challenge/accept', async (req, res) => {
     try {
         const players = req.body;
-        console.log(players)
         await UserApiHandler.acceptChallenge(players[0], players[1]);
-        res.json({ message: 'Friend request accepted' });
+        res.json({ message: 'Challenge request accepted' });
     } catch (error) {
         console.log('Error challenging failed: ', error);
         res.json({ error: 'Error: challenging failed', message: error.message }, 502)
@@ -378,9 +377,9 @@ app.post("/api/user/history", async (req, res) => {
         console.log("History posted successfully", userId, JSON.stringify(game));
         res.json({ message: 'History posted successfully' }, 200);
     }
-    catch (e) {
-        console.log(e);
-        res.json({ error: 'Error posting history', message: e.message }, 400);
+    catch (error) {
+        console.log(error);
+        res.json({ error: 'Error posting history', message: error.message }, 400);
     }
 })
 

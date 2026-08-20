@@ -335,6 +335,7 @@ class PlayerInfo extends HTMLElement {
     }
 
     setPlayerInfo(player_info) {
+        console.log(player_info)
         this.username.textContent = player_info.username;
         this.elo.textContent = player_info.elo;
         this.player_avatar.src = player_info.picture.picture;

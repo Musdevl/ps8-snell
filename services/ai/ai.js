@@ -115,7 +115,7 @@ export function getBestAction(game) {
     }
 
     const elapsed = performance.now() - start;
-    console.log(`[AI] Score: ${bestScore} | Temps: ${elapsed.toFixed(2)} ms`);
+    console.log(`[AI SERVICE] Score: ${bestScore} | Temps: ${elapsed.toFixed(2)} ms`);
 
     return bestAction;
 }

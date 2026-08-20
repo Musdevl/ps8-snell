@@ -80,7 +80,6 @@ async function setupGame() {
     await blackPlayerInfoComponent.setColor(COLORS.BLACK);
 
     leave_btn.addEventListener("click", () => {
-        console.log("click leave")
         showModal({
             message: "Leave the game?",
             confirmLabel: "Leave",
@@ -160,10 +159,8 @@ function setupBoardComponentEvents(boardComponent) {
         blackPlayerInfoComponent.clearRotationCell();
 
         // Emit the final action
-        console.log("ACTION - ", e.detail.action)
 
         socket.emit("action", e.detail);
-        console.log("socketId", socket.id);
     });
 
 
