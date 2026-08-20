@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reset password</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script type="module" src="/pages/auth/reset-password/reset-password.js"></script>
+    <script type="module" src="/components/notification/notification.js"></script>
+    <link rel="stylesheet" href="/pages/auth/shared/style.css">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+</head>
+
+<body>
+
+    <main class="left-container">
+        <a href="/pages/home/index.html" class="logo-link"><img src="/assets/logo.png" alt="logo" class="logo"></a>
+        <h1 class="login-title">New password</h1>
+
+        <section class="input-section" id="form">
+            <input class="field" id="password" type="password" placeholder="New password">
+            <input class="field" id="confirm" type="password" placeholder="Confirm password">
+            <button class="submit" id="reset-btn">Reset</button>
+        </section>
+
+        <span class="helper-message hidden" id="invalid-link">
+            This link is invalid or has expired.
+            <a href="/pages/auth/login/index.html" class="register-link">Ask for a new one</a>
+        </span>
+    </main>
+
+    <section class="right-container">
+        <div class="game" id="game">
+            <img src="https://images-ext-1.discordapp.net/external/NogOB_WFXGgXDKKyqUGKZbODu3QOktClgonrRPUkp_E/https/assets-configurator.chess.com/image/configurator/chessboard_1768166350728.gif?width=963&height=963"
+                alt="game">
+        </div>
+    </section>
+
+    <notification-bar></notification-bar>
+
+</body>
+
+</html>

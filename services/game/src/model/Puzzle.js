@@ -1,4 +1,7 @@
-import { COLORS } from "../../../files/front/enum/Colors.js";
+// Le service game embarque ses propres enums : pointer vers ceux du front
+// fonctionne avec launch-dev-mode.sh mais pas en conteneur, ou /app/files
+// n'existe pas (game/Dockerfile ne copie que helpers et game).
+import { COLORS } from "../enum/Colors.js";
 
 export class Puzzle {
 

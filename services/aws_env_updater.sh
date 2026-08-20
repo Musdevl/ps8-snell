@@ -1,23 +1,24 @@
 #!/bin/bash
 
-# Chemin du fichier
-FRONT_ENV_FILE="./files/front/env.js"
+# Ecrit l'URL publique du jeu dans les fichiers lus par le front et le user
+# service. Cette valeur est executee dans le navigateur du visiteur : si elle
+# pointe sur localhost, tous les appels API partent vers la machine du visiteur
+# et rien ne fonctionne.
+#
+# Surchargeable pour deployer ailleurs :
+#   PUBLIC_URL=http://mon-serveur:8000 ./aws_env_updater.sh
 
+PUBLIC_URL="${PUBLIC_URL:-http://217.160.64.31:8000}"
+
+FRONT_ENV_FILE="./files/front/env.js"
 USER_ENV_FILE="./user/env.js"
 
-# Nouvelle valeur
-GATEWAY_URL="https://snell.super-pi.fr"
-
-# Créer le contenu
 cat > "$FRONT_ENV_FILE" << EOF
-export const GATEWAY_URL = '$GATEWAY_URL';
+export const GATEWAY_URL = '$PUBLIC_URL';
 EOF
 
-echo "✅ Fichier $FRONT_ENV_FILE mis à jour avec GATEWAY_URL = $GATEWAY_URL"
-
-# Créer le contenu
 cat > "$USER_ENV_FILE" << EOF
-export const GATEWAY_URL = '$GATEWAY_URL';
+export const GATEWAY_URL = '$PUBLIC_URL';
 EOF
 
-echo "✅ Fichier $USER_ENV_FILE mis à jour avec GATEWAY_URL = $GATEWAY_URL"
+echo "✅ URL publique : $PUBLIC_URL"
