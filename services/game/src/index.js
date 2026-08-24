@@ -151,6 +151,8 @@ async function handleJoin(data) {
 
         switch (data.gameType) {
             case "LOCAL":
+                res = await handleSinglePlayerGame(playerInfo, data.gameType);
+                break;
             case "AI":
                 const aiInfo = {
                     userId: data.aiId
