@@ -294,8 +294,11 @@ class PlayerInfo extends HTMLElement {
     }
 
     setColorTurn(newColorTurn) {
+
+        console.log("Upadted received", newColorTurn);
         this.colorTurn = newColorTurn;
         const isMyTurn = this.color === this.colorTurn;
+
         this.timerEl?.classList.toggle('timer--active', isMyTurn);
         this.timerEl?.classList.toggle('timer--inactive', !isMyTurn);
         this.classList.toggle('inactive', !isMyTurn);

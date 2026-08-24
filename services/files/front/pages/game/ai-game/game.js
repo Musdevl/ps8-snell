@@ -166,6 +166,8 @@ async function onGameReady(data, whitePlayerInfo, blackPlayerInfo) {
     blackPlayerInfoComponent.disableElo();
     blackPlayerInfoComponent.disableTimer();
 
+    console.log("data", data);
+
     handleUpdate(data);
 }
 

@@ -1,8 +1,5 @@
 import * as accountService from '../../services/account-service.js';
 import { GATEWAY_URL } from '../../env.js';
-
-let ais_ = [];
-
 // Puzzles
 
 async function fetchAis() {

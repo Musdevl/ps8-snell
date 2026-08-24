@@ -68,7 +68,7 @@ function loadPuzzles(query = "") {
             item.innerHTML += `
                     <div class="puzzle-item-left">
                         <div class="puzzle-ico-container">
-                            <img class="puzzle-ico" src="/assets/puzzle-piece-silver.svg">
+                            <img class="puzzle-ico" src="/assets/puzzle-piece-${puzzle.difficulty}.svg">
                             <span class="puzzle-number">${puzzle.id}</span>
                         </div>
                         <div class="puzzle-name">

@@ -2,7 +2,6 @@ import * as gameService from "../service/GameService.js";
 import { COLORS } from "../enum/Colors.js";
 import { Logger } from "../utils/Logger.js"
 import * as PlayerService from "../service/PlayerService.js";
-import * as AiService from "../service/AiService.js";
 import { EventEmitter } from "events";
 import * as gameRepository from "../../repositories/game-repository.js"
 
@@ -123,6 +122,12 @@ export class GameManager extends EventEmitter {
         this.emit("timeout", { game: gameService.getCurrentGameStatus(game), players_web_sockets: gameService.getPlayerSockets(game) });
     }
 
+    isAiBegining(game) {
+        const white_player = gameService.findPlayerByColor(game, COLORS.WHITE);
+        console.log(white_player);
+        return white_player.webSocketId === "NONE";
+    }
+
     processAction(game, action, player_socket_id) {
         try {
             gameService.checkPlayerTurn(game, player_socket_id);
@@ -138,7 +143,7 @@ export class GameManager extends EventEmitter {
 
         try {
             const ai = gameService.findPlayerByColor(game, game.colorTurn);
-            
+
             const req = await fetch(`${this.AI_SERVICE_URL}/api/ais/${ai.userId}/best-action`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -149,7 +154,7 @@ export class GameManager extends EventEmitter {
             })
             let resp = await req.json()
             let action = resp.action
-            
+
             gameService.decrementPiecesCD(game);
 
             return {
