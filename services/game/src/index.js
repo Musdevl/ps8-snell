@@ -167,10 +167,12 @@ async function handleJoin(data) {
         }
 
         gatewayConnection.emit("game-ws-service", res);
-        if (data.gameType === "AI" && data.playerColor === "black") {
+        if (data.gameType === "AI") {
             const game = gameManager.findGame(res.data.gameId);
-            res = await handleAiAction(game);
-            gatewayConnection.emit("game-ws-service", res);
+            if (gameManager.isAiBegining(game)) {
+                res = await handleAiAction(game);
+                gatewayConnection.emit("game-ws-service", res);
+            }
         }
     } catch (error) {
         console.log(error);
@@ -269,6 +271,7 @@ function handlePlayerAction(gameType, game, action, player_web_socket_id) {
 async function handleAiAction(game) {
     try {
         const game_buffer = await gameManager.processAiAction(game);
+        console.log(game_buffer);
         return formatToSend(game_buffer.players_web_sockets, "update", game_buffer.game);
     } catch (error) {
         console.log(error);
