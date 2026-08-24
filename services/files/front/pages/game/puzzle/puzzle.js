@@ -84,7 +84,16 @@ async function setupGame() {
 
     // Setup les composants
     const puzzle_title = document.querySelector('.puzzle-title');
-    puzzle_title.innerHTML += puzzle.name;
+    puzzle_title.innerHTML += `
+    <div class="puzzle-ico-container">
+                            <img class="puzzle-ico" src="/assets/puzzle-piece-${puzzle.difficulty}.svg">
+                            <span class="puzzle-number">${puzzle.id}</span>
+                        </div>
+                        <div class="puzzle-name">
+                        ${puzzle.name}
+                        </div>
+    </div>
+    `;
 
     setupBoardComponentEvents(boardComponent);
 
@@ -239,13 +248,15 @@ async function nextPuzzleStep() {
     await handleUpdate(puzzle.game_states[puzzle_step_index], false)
 
     if (puzzle_step_index >= puzzle.steps.length - 1) {
-
         showModal({
             message: "Congratulations, you finished the puzzle !",
             confirmLabel: "Leave",
-            cancelLabel: "Cancel",
+            cancelLabel: "Next",
             onConfirm: () => {
                 window.location.replace(`/`);
+            },
+            onCancel: () => {
+                window.location.replace(`/pages/game/puzzle/index.html?id=${++puzzle.id}`)
             }
         });
 
