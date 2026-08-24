@@ -12,6 +12,7 @@ import { COLORS } from "../enum/Colors.js";
 import * as tutorialService from "./TutorialService.js"
 
 import * as gameRepository from "../../repositories/game-repository.js";
+import * as puzzleService from "./PuzzleService.js";
 
 const MIN_NB_PLAYER_REQUIRED = 2;
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL || "http://localhost:8010";
@@ -324,6 +325,22 @@ function initTutorial() {
     tutorial_steps = computeGameSteps(tutorial_init, tutorialService.tutorial_actions);
 }
 
+export function getPuzzles() {
+    return puzzleService.get_puzzle_list_items();
+}
+
+export function getPuzzleDetails(puzzleId) {
+    const puzzle = puzzleService.findPuzzleById(puzzleId);
+    if (puzzle) {
+        if (puzzle.game_states.length === 0) {
+            puzzle.game_states = computeGameSteps(puzzle.game, puzzle.steps);
+        }
+        return puzzle;
+    } else {
+        throw new Error(`Puzzle not found with id: ${puzzleId}`);
+    }
+}
+
 function computeGameSteps(game, actions, review = false) {
     const game_states = [];
 
@@ -337,4 +354,8 @@ function computeGameSteps(game, actions, review = false) {
 
     // return all the computed game states
     return game_states;
+}
+
+export function findPlayerByColor(game, color) {
+    return game.players.find(p => p.color === color);
 }

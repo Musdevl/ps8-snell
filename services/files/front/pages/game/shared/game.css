@@ -10,7 +10,6 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5vh;
     height: 100vh;
     color: white;
     font-family: 'Segoe UI', sans-serif;
@@ -441,11 +440,47 @@ end-message {
     }
 }
 
+.puzzle-ico-container {
+    display: flex;
+    align-items: flex-end;
+}
+
+
+.puzzle-number {
+    font-size: 1.3em;
+    font-weight: 600;
+    text-shadow: 3px 0 #000, -3px 0 #000, 0 3px #000, 0 -3px #000,
+        2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000;
+    color: #fff;
+}
+
+.puzzle-name {
+    color: #fff;
+    font-size: 1em;
+}
+
+
+.puzzle-ico {
+    height: 2.5em;
+    width: 2.5em;
+}
+
+.puzzle-title {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+
 /* ───────────────────────────────────────────────────────────────────────
    Mobile
    ─────────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 64em) {
+
+    .puzzle-title {
+        font-size: 1em;
+    }
 
     html,
     body {
@@ -461,7 +496,6 @@ end-message {
         height: 90%;
         flex-direction: column;
         gap: 1em;
-        padding-top: 2em;
         justify-content: flex-end;
     }
 
@@ -506,6 +540,7 @@ end-message {
         z-index: 1109;
         padding-top: 10%;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     /* Buttons */
@@ -673,5 +708,9 @@ end-message {
         text-transform: uppercase;
         font-family: 'Rajdhani', sans-serif;
         letter-spacing: 1px;
+    }
+
+    .puzzle-title {
+        font-size: 1em;
     }
 }

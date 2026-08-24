@@ -136,7 +136,6 @@ class Chat extends HTMLElement {
 
 
     addNewMessage(message) {
-        console.log(message);
         this.message_list.push(message);
         this.renderMessage(message);
     }

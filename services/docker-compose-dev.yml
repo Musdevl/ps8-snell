@@ -52,6 +52,7 @@ services:
       - GAME_SERVICE_URL=http://game:8002
       - CHAT_SERVICE_URL=http://chat:8003
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
+      - MAIL_SERVICE_URL=http://mail:8006
       # - STRIPE_SECRET_KEY=private
 
     networks:
@@ -110,9 +111,34 @@ services:
   ai:
     build:
       context: .
-      dockerfile: AI/Dockerfile
+      dockerfile: ai/Dockerfile
     environment:
       - GATEWAY_URL=http://gateway:8000
+    networks:
+      - app-network
+
+  mail:
+    build:
+      context: .
+      dockerfile: mail/Dockerfile
+    ports:
+      # Exposé en dev uniquement, pour tester un envoi sans passer par un autre
+      # service : http://localhost:8006/api/mail/health
+      - "8006:8006"
+    volumes:
+      # Monté plutôt que seulement copié dans l'image : modifier config.yaml puis
+      # `docker compose restart mail` suffit, sans reconstruction.
+      - ./mail/config.yaml:/app/mail/config.yaml:ro
+    networks:
+      - app-network
+
+  # Faux serveur SMTP de dev : rien ne sort de la machine, tous les mails
+  # envoyés sont consultables dans l'interface web sur http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    ports:
+      - "8025:8025"
     networks:
       - app-network
 

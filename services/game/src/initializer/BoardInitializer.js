@@ -130,8 +130,6 @@ function findRandomColumnIndex(row, board) {
         col_index = Math.floor(Math.random() * board[0].length - 1);
     } while (board[row][col_index] !== 0);
 
-    console.log(col_index);
-
     return col_index;
 }
 

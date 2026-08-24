@@ -70,8 +70,6 @@ export async function addFriend(userId, friendId) {
         throw new Error("Users already friends");
     }
 
-    console.log(userId, friendId)
-
     try {
         const reqChat = await fetch(CHAT_URL + "/api/chat/friend", {
             method: "POST",
@@ -80,7 +78,6 @@ export async function addFriend(userId, friendId) {
         });
 
         const chatJson = await reqChat.json();
-        console.log(chatJson);
         const chatId = chatJson.id;
 
         user.friends.push({ friendId, chatId });
@@ -296,4 +293,21 @@ export async function getUserRank(userId) {
     const user = await findUserById(userId);
     const rank = await usersCollection.countDocuments({ elo: { $gt: user.elo } });
     return rank + 1;
+}
+
+// ── Réinitialisation de mot de passe ─────────────────────────────────────────
+
+export async function saveResetToken(userId, tokenHash, expiresAt) {
+    await updateUser(userId, { $set: { reset_token: tokenHash, reset_token_expires: expiresAt } });
+}
+
+export async function findByResetToken(tokenHash) {
+    return await usersCollection.findOne({ reset_token: tokenHash });
+}
+
+export async function setPasswordAndClearToken(userId, hashedPassword) {
+    await updateUser(userId, {
+        $set: { password: hashedPassword },
+        $unset: { reset_token: "", reset_token_expires: "" },
+    });
 }

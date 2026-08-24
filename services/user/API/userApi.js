@@ -2,7 +2,6 @@
 import { badExpress } from '../../helpers/badExpress.js';
 import * as UserApiHandler from "./userApiHandler.js";
 import { env } from "../../helpers/env.js"
-import { GATEWAY_URL } from '../env.js';
 
 const app = new badExpress();
 
@@ -264,11 +263,11 @@ app.post('/api/user/logout', (req, res) => {
 
     res.clearCookie('jwt_token', {
         httpOnly: true
-        // , sameSite: 'Strict' 
+        , sameSite: 'Strict' 
     });
     res.clearCookie('jwt_refresh_token', {
         httpOnly: true
-        // , sameSite: 'Strict' 
+        , sameSite: 'Strict' 
     });
 
     res.json({ succes: true });
@@ -286,55 +285,57 @@ app.get('/api/user/getId/{username}', async (req, res) => {
 })
 
 
-app.post('/api/user/friend/challenge', async (req, res) => {
+app.post('/api/user/challenge', async (req, res) => {
     try {
-        const { userId, friendId } = req.body;
-        await UserApiHandler.requestChallenge(userId, friendId);
-        res.json({ message: 'Friend request sent successfully' }, 200);
+        const { userId, opponentId } = req.body;
+        await UserApiHandler.requestChallenge(userId, opponentId);
+        res.json({ message: 'Challenge request sent successfully' }, 200);
     } catch (error) {
         console.error('Error challenging friend:', error);
         res.json({ error: 'Error challenging friend', message: error.message }, 400);
     }
 })
 
-app.post('/api/user/friend/challenge/accept', async (req, res) => {
+app.post('/api/user/challenge/accept', async (req, res) => {
     try {
         const players = req.body;
-        console.log(players)
         await UserApiHandler.acceptChallenge(players[0], players[1]);
-        res.json({ message: 'Friend request accepted' });
+        res.json({ message: 'Challenge request accepted' });
     } catch (error) {
         console.log('Error challenging failed: ', error);
         res.json({ error: 'Error: challenging failed', message: error.message }, 502)
     }
 })
 
-// POST api/user/reset-password
+// POST /api/user/forgot-password
+// Envoie le lien de réinitialisation par mail.
+app.post('/api/user/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body || {};
+        if (!email) return res.json({ error: 'Email requis' }, 400);
+
+        // Le lien doit pointer vers le site tel que l'utilisateur l'a atteint,
+        // pour rester valable quel que soit le serveur qui héberge le jeu.
+        const origin = req.headers.origin || process.env.PUBLIC_GATEWAY_URL || 'http://localhost:8000';
+
+        await UserApiHandler.requestPasswordReset(email, origin);
+
+        res.json({ message: "Si un compte existe pour cette adresse, un mail vient d'être envoyé" }, 200);
+    }
+    catch (e) {
+        console.error(e);
+        res.json({ error: "Impossible d'envoyer le mail" }, 400);
+    }
+})
+
+// POST /api/user/reset-password
+// Applique le nouveau mot de passe à partir du token reçu par mail.
 app.post('/api/user/reset-password', async (req, res) => {
     try {
-        let { email, verification_code, new_password } = req.body;
-        await UserApiHandler.resetPassword(email, verification_code, new_password);
+        const { token, new_password } = req.body || {};
+        await UserApiHandler.resetPassword(token, new_password);
 
-        const user = await UserApiHandler.findUser(email, new_password);
-        const jwt_token = UserApiHandler.createToken(user._id.toString(), env.jwt_key, env.jwt_access_expiration || '15m');
-        const jwt_refresh_token = UserApiHandler.createToken(user._id.toString(), env.jwt_refresh_key, env.jwt_refresh_expiration || '7d');
-
-
-        res.cookie('jwt_refresh_token', jwt_refresh_token, {
-            httpOnly: true,
-            // sameSite: 'Strict',
-            maxAge: 60 * 60 * 24 * 7, // 7 jours en secondes
-
-        });
-
-        res.cookie('jwt_token', jwt_token, {
-            httpOnly: true,
-            // sameSite: 'Strict',
-            maxAge: 15 * 60, // 15 minutes
-            //secure: true,    // HTTPS uniquement (en prod)
-        });
-
-        res.json({ message: "Reset success", jwt_token, jwt_refresh_token }, 200);
+        res.json({ message: "Reset success" }, 200);
     }
     catch (e) {
         console.error(e);
@@ -376,9 +377,9 @@ app.post("/api/user/history", async (req, res) => {
         console.log("History posted successfully", userId, JSON.stringify(game));
         res.json({ message: 'History posted successfully' }, 200);
     }
-    catch (e) {
-        console.log(e);
-        res.json({ error: 'Error posting history', message: e.message }, 400);
+    catch (error) {
+        console.log(error);
+        res.json({ error: 'Error posting history', message: error.message }, 400);
     }
 })
 

@@ -18,6 +18,7 @@
 .modal {
     background-color: #262421;
     padding: 35px;
+    min-width: 20em;
     border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     text-align: center;
@@ -49,20 +50,24 @@ button {
     font-weight: 800;
     text-transform: uppercase;
     transition: transform 0.1s, filter 0.2s;
+    font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif;
 }
 
-.play-again {
+.play-again,
+.rematch {
     background-color: #68b844;
     color: white;
     box-shadow: 0 4px 0 #5b8a32;
 
 }
 
-.play-again:hover {
+.play-again:hover,
+.rematch:hover {
     filter: brightness(1.05);
 }
 
-.play-again:active {
+.play-again:active,
+.rematch:active {
     transform: translateY(2px);
     box-shadow: 0 2px 0 #5b8a32;
 }
@@ -84,6 +89,27 @@ button {
     box-shadow: 0 2px 0 #2a2825;
 }
 
+.button-group-multi {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1em;
+
+    .play-btns {
+        display: flex;
+        gap: 1em;
+        width: 100%;
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    .quit-btn {
+        width: 100%;
+    }
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -97,7 +123,7 @@ button {
 .button-group {
     display: flex;
     justify-content: center;
-    gap: 2vw;
+    gap: 1em;
 }
 
 
@@ -111,9 +137,17 @@ button {
         margin-bottom: 12px;
     }
 
+    .button-group{
+        flex-direction: column;
+    }
+
+    .quit-btn {
+        width: 100%;
+    }
+
     button {
         padding: 14px;
-        max-width: 9em;
+        width: 100%;
         font-size: 12px;
         font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif;
     }

@@ -247,7 +247,6 @@ export async function register(email, username, password) {
         switch (res.status) {
             case 200:
                 const data = await res.json();
-                console.log(data)
                 setTokens(data.jwt_token, data.jwt_refresh_token);
                 setAccount(data.user);
                 return data.user;
@@ -277,27 +276,41 @@ export function isLoggedIn() {
     return !!accountData.userId;
 }
 
-export async function resetPassword(email, verification_code, new_password) {
+// Demande l'envoi du lien de réinitialisation. La réponse est volontairement la
+// même que l'adresse existe ou non.
+export async function requestPasswordReset(email) {
+    const res = await fetch(`${GATEWAY_URL}/api/user/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+
+    if (res.status === 200) {
+        notify("If an account exists for this address, an email has been sent", 'success');
+        return true;
+    }
+
+    notify("Could not send the email", 'error');
+    return false;
+}
+
+// Applique le nouveau mot de passe à partir du token reçu par mail.
+export async function resetPassword(token, new_password) {
     const res = await fetch(`${GATEWAY_URL}/api/user/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, verification_code, new_password })
+        body: JSON.stringify({ token, new_password })
     });
 
-    let data = await res.json();
+    const data = await res.json();
 
-    switch (res.status) {
-        case 200:
-            if (data.jwt_token) setTokens(data.jwt_token, data.jwt_refresh_token);
-            notify("Password reset successfully", 'success');
-            setTimeout(async () => await login(email, new_password), 800);
-            break;
-        case 400:
-            notify(data.message, 'error');
-            break;
-        default:
-            notify("Unknown error", 'error');
+    if (res.status === 200) {
+        notify("Password reset successfully", 'success');
+        return true;
     }
+
+    notify(data.message || "This link is invalid or has expired", 'error');
+    return false;
 }
 
 export async function hardResetPassword(email, new_password) {

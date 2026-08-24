@@ -294,8 +294,11 @@ class PlayerInfo extends HTMLElement {
     }
 
     setColorTurn(newColorTurn) {
+
+        console.log("Upadted received", newColorTurn);
         this.colorTurn = newColorTurn;
         const isMyTurn = this.color === this.colorTurn;
+
         this.timerEl?.classList.toggle('timer--active', isMyTurn);
         this.timerEl?.classList.toggle('timer--inactive', !isMyTurn);
         this.classList.toggle('inactive', !isMyTurn);
@@ -335,6 +338,7 @@ class PlayerInfo extends HTMLElement {
     }
 
     setPlayerInfo(player_info) {
+        console.log(player_info)
         this.username.textContent = player_info.username;
         this.elo.textContent = player_info.elo;
         this.player_avatar.src = player_info.picture.picture;

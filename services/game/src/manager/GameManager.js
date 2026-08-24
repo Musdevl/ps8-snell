@@ -2,7 +2,6 @@ import * as gameService from "../service/GameService.js";
 import { COLORS } from "../enum/Colors.js";
 import { Logger } from "../utils/Logger.js"
 import * as PlayerService from "../service/PlayerService.js";
-import * as AiService from "../service/AiService.js";
 import { EventEmitter } from "events";
 import * as gameRepository from "../../repositories/game-repository.js"
 
@@ -23,55 +22,55 @@ export class GameManager extends EventEmitter {
     }
 
     async initGame(gameType, player_1_info, player_2_info, gameTime = 600) {
+        let white_player;
+        let black_player;
 
-            const game = gameService.createGame(gameType, gameTime);
+        if (gameType === "AI") {
+            ({ white_player, black_player } = this._createAiGamePlayers(player_1_info, player_2_info));
+        } else {
+            white_player = PlayerService.createPlayer(COLORS.WHITE, player_1_info.webSocketId, player_1_info.userId);
+            black_player = PlayerService.createPlayer(COLORS.BLACK, player_2_info.webSocketId, player_2_info.userId);
+        }
 
-            const white_player = PlayerService.createPlayer(COLORS.WHITE, player_1_info.webSocketId, player_1_info.userId)
+        const game = gameService.createGame(gameType, gameTime);
 
-            let black_player;
+        if (gameType === "MULTI") {
+            const res = await fetch(`${this.CHAT_SERVICE_URL}/api/chat/game`, {
+                method: "POST",
+                body: JSON.stringify({ gameId: game.id }),
+                headers: { "Content-type": "application/json; charset=UTF-8" }
+            });
 
-            if (gameType === "AI") {
-                black_player = PlayerService.createPlayer(COLORS.BLACK, "NONE", "AI");
-            } else {
-                black_player = PlayerService.createPlayer(COLORS.BLACK, player_2_info.webSocketId, player_2_info.userId);
+            if (!res.ok) {
+                throw new Error("Failed to create game chat at initialization");
             }
 
-            if (gameType === "MULTI") {
-                // Create a new chat
-                const res = await fetch(`${this.CHAT_SERVICE_URL}/api/chat/game`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        gameId: game.id
-                    }),
-                    headers: { "Content-type": "application/json; charset=UTF-8" }
-                });
+            const [reqInfoWhite, reqInfoBlack] = await Promise.all([
+                fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_1_info.userId}`, { method: "GET" }),
+                fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_2_info.userId}`, { method: "GET" })
+            ]);
 
-                if (!res.ok) {
-                    throw new Error("Failed to create game chat at initialization")
-                }
+            const [userWhite, userBlack] = await Promise.all([reqInfoWhite.json(), reqInfoBlack.json()]);
 
-                let reqInfoWhite = await fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_1_info.userId}`, { method: "GET" });
-                let reqInfoBlack = await fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_2_info.userId}`, { method: "GET" });
+            game.gain = this.getEloChanges(userWhite.elo, userBlack.elo);
+        }
 
-                let userWhite = await reqInfoWhite.json();
-                let userBlack = await reqInfoBlack.json();
+        game.on("TIMEOUT", () => {
+            this.handleTimeout(game);
+        });
 
-                game.gain = this.getEloChanges(userWhite.elo, userBlack.elo);
-            }
+        game.addPlayer(white_player);
+        game.addPlayer(black_player);
 
-            game.on("TIMEOUT", () => {
-                this.handleTimeout(game)
-            })
+        this.games.set(game.id, game);
+        gameService.launchGame(game);
 
-            game.addPlayer(white_player);
-            game.addPlayer(black_player);
+        const result = {
+            game: gameService.getCurrentGameStatus(game),
+            players_web_sockets: gameService.getPlayerSockets(game)
+        };
 
-
-
-            this.games.set(game.id, game);
-            gameService.launchGame(game);
-
-            return { game: gameService.getCurrentGameStatus(game), players_web_sockets: gameService.getPlayerSockets(game) };
+        return result;
     }
 
     async getGameReview(gameId) {
@@ -123,6 +122,12 @@ export class GameManager extends EventEmitter {
         this.emit("timeout", { game: gameService.getCurrentGameStatus(game), players_web_sockets: gameService.getPlayerSockets(game) });
     }
 
+    isAiBegining(game) {
+        const white_player = gameService.findPlayerByColor(game, COLORS.WHITE);
+        console.log(white_player);
+        return white_player.webSocketId === "NONE";
+    }
+
     processAction(game, action, player_socket_id) {
         try {
             gameService.checkPlayerTurn(game, player_socket_id);
@@ -135,11 +140,13 @@ export class GameManager extends EventEmitter {
     }
 
     async processAiAction(game) {
-        try {
 
-            const req = await fetch(`${this.AI_SERVICE_URL}/api/ai/best-action`, {
-                method:'POST',
-                body:JSON.stringify({
+        try {
+            const ai = gameService.findPlayerByColor(game, game.colorTurn);
+
+            const req = await fetch(`${this.AI_SERVICE_URL}/api/ais/${ai.userId}/best-action`, {
+                method: 'POST',
+                body: JSON.stringify({
                     grid: game.board.grid,
                     players: game.players,
                     colorTurn: game.colorTurn
@@ -147,16 +154,15 @@ export class GameManager extends EventEmitter {
             })
             let resp = await req.json()
             let action = resp.action
-            gameService.decrementPiecesCD(game);
 
-            console.log("AI ACTION: ", action)
+            gameService.decrementPiecesCD(game);
 
             return {
                 game: gameService.placeAction(game, action, game.colorTurn),
-                players_web_sockets: gameService.getPlayerSockets(game)[0]
+                players_web_sockets: gameService.getPlayerSockets(game)
             };
 
-        } catch (error) { Logger.error(error); }
+        } catch (error) { console.log(error); }
     }
 
     findGame(gameId) {
@@ -286,6 +292,32 @@ export class GameManager extends EventEmitter {
 
     getTutorialSteps() {
         return gameService.getTutorialSteps();
+    }
+
+    getPuzzles() {
+        return gameService.getPuzzles()
+    }
+
+    getPuzzleDetails(puzzleId) {
+        return gameService.getPuzzleDetails(puzzleId);
+    }
+
+    _resolvePlayerColor(requestedColor) {
+        if (requestedColor === "white") return COLORS.WHITE;
+        if (requestedColor === "black") return COLORS.BLACK;
+        return Math.random() < 0.5 ? COLORS.WHITE : COLORS.BLACK;
+    }
+
+    _createAiGamePlayers(player_1_info, player_2_info) {
+        const player_1_color = this._resolvePlayerColor(player_1_info.playerColor);
+        const player_2_color = player_1_color === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+
+        const player_1 = PlayerService.createPlayer(player_1_color, player_1_info.webSocketId, player_1_info.userId);
+        const player_2 = PlayerService.createPlayer(player_2_color, "NONE", player_2_info.userId);
+
+        return player_1_color === COLORS.WHITE
+            ? { white_player: player_1, black_player: player_2 }
+            : { white_player: player_2, black_player: player_1 };
     }
 }
 

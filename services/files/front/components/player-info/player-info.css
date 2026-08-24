@@ -37,6 +37,7 @@
 .player-avatar-picture {
     width: 44px;
     height: 44px;
+    object-fit: cover;
     border-radius: 50%;
     background: #3a3734;
     color: #EEEED2;
@@ -145,11 +146,11 @@
     }
 
 
-    .black{
+    .black {
         justify-content: flex-end;
     }
 
-    .white{
+    .white {
         justify-content: flex-start;
     }
 

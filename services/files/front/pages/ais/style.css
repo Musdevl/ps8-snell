@@ -1,0 +1,498 @@
+@font-face {
+    font-family: 'fortnite';
+    src: url('/assets/font/fortnite.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --bg-body: #312e2b;
+    --bg-dark: #262522;
+    --bg-darker: #010012;
+    --bg-shop: rgba(65, 84, 143, 0.8);
+    --bg-shop-full: rgba(65, 84, 143, 1);
+    --font-game: 'fortnite', sans-serif;
+    --radius: 5px;
+}
+
+/* ── Layout général ── */
+body {
+    margin: 0;
+    display: grid;
+    height: 100vh;
+    grid-template-columns: 20% 1fr;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-body);
+}
+
+social-bar {
+    background-color: var(--bg-dark);
+    width: 100%;
+    height: 100%;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+.global-container {
+    width: 95%;
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    padding: 2em 0 0em 0;
+}
+
+notification-bar {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 1000;
+}
+
+.section-title-mobile {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #5c574f;
+}
+
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #5c574f;
+    margin-left: 10px;
+}
+
+
+.hidden {
+    display: none !important;
+}
+
+
+
+nav-bar {
+    display: none;
+    box-sizing: border-box;
+}
+
+
+.mobile-logo-container {
+    display: none;
+    align-items: center;
+}
+
+.mobile-logo-ico {
+    width: 30%;
+    height: auto;
+}
+
+.search-ais {
+    width: 100%;
+    height: 3rem;
+    padding: 0 0.8rem;
+    font-size: 1rem;
+    color: white;
+    background: #1e1c1a;
+    border: 1px solid #35312d;
+    border-radius: 6px;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif;
+}
+
+.search-section {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+
+.search-ai-btn {
+    background: #68b844;
+    border: none;
+    border-bottom: 3px solid #3d6e28;
+    text-decoration: none;
+    color: white;
+    width: 10%;
+    cursor: pointer;
+    height: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: opacity 0.15s;
+
+    &:hover {
+        opacity: 0.85;
+    }
+
+    &:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 0 #3d6e28;
+    }
+}
+
+.wave {
+    position: absolute;
+    top: 0;
+    object-fit: cover;
+    rotate: 180deg;
+    z-index: -1;
+    height: 10em;
+    width: 100%;
+}
+
+.ais {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-content: start;
+    gap: 1em;
+    height: 100%;
+    scrollbar-color: #232220 #3a3734;
+    overflow-y: auto;
+}
+
+.no-ais-container {
+    display: flex;
+    justify-content: center;
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #fff;
+    padding: 5em 0;
+}
+
+.ai-header-section-mobile {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 1em;
+    padding: 1em;
+}
+
+.ai-header-section {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+.leave-ico {
+    width: 1.5em;
+    height: 1.5em;
+    color: #fff;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        color: #808080;
+        transform: translateX(-5px);
+        cursor: pointer;
+    }
+}
+
+.ai-item {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    background-color: var(--bg-dark);
+    width: 100%;
+    height: 7rem;
+    border: none;
+    border-bottom: 3px solid #0000008b;
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    gap: 2em;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
+
+    &:hover {
+        cursor: pointer;
+        background-color: rgba(210, 210, 210, 0.104);
+        transform: translateY(-5px);
+    }
+}
+
+
+.ai-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+}
+
+.see-more-ico {
+    width: 1.5em;
+    height: 1.5em;
+    color: #808080;
+}
+
+.ai-ico-container {
+    display: flex;
+    align-items: flex-end;
+}
+
+.king-color {
+    height: 2em;
+    width: 2em;
+}
+
+.ai-number {
+    font-size: 1.3em;
+    font-weight: 600;
+    text-shadow: 3px 0 #000, -3px 0 #000, 0 3px #000, 0 -3px #000,
+        2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000;
+    color: #fff;
+}
+
+.ai-name {
+    color: #fff;
+    font-size: 1.3em;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.ai-elo {
+    color: #808080;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+
+.ai-item-left {
+    display: flex;
+    gap: 2em;
+    align-items: center;
+}
+
+
+.ai-ico {
+    height: 5em;
+    width: 5em;
+    object-fit: cover;
+
+}
+
+
+.ai-header-ico {
+    height: 4em;
+    width: 4em;
+}
+
+
+.search-ico {
+    display: none;
+}
+
+
+
+.ai-mobile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.color-selector {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    min-width: 100%;
+    background-color: var(--bg-dark);
+    border-radius: var(--radius);
+    border-bottom: 3px solid #0000008b;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.color-select-btn {
+    color: white;
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: background-color 0.2s;
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+
+.color-select-btn:hover {
+    background-color: rgba(210, 210, 210, 0.104);
+}
+
+@media (max-width: 60em) {
+
+    body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 2em 0;
+    }
+
+    social-bar {
+        display: none;
+    }
+
+    main {
+        width: 100%;
+        overflow-y: auto;
+    }
+
+    .ais {
+        grid-template-columns: repeat(2, 1fr);
+
+    }
+
+
+}
+
+
+
+@media (max-width: 40em) {
+
+    body {
+        padding: 0;
+        height: 100vh;
+    }
+
+    .btn-label {
+        display: none;
+    }
+
+    social-bar {
+        display: none;
+    }
+
+    .search-ico {
+        display: flex;
+        align-items: center;
+        height: 2em;
+        width: 2em;
+        stroke-width: 5px;
+    }
+
+
+    main {
+        height: 100%;
+        overflow-y: auto;
+        padding-bottom: 12vh;
+    }
+
+    .ai-header-section {
+        display: none;
+    }
+
+    .ai-header-section-mobile {
+        display: flex;
+    }
+
+    .leave-ico {
+        position: absolute;
+        top: 2em;
+        left: 2em;
+    }
+
+    .mobile-logo-container {
+        display: flex;
+        justify-content: space-around;
+        height: auto;
+        width: 100%;
+        padding: 1em 0;
+        height: 10%;
+        object-fit: cover;
+        border-bottom: 1px solid #808080;
+    }
+
+    .ais {
+        grid-template-columns: repeat(1, 1fr);
+
+    }
+
+    .snell-coins-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        gap: 0.5rem;
+        border: 3px solid #3a3632;
+        padding: 0.5rem;
+        border-radius: 6px;
+        width: fit-content;
+        height: fit-content;
+        font-size: 1.2rem;
+        background-color: #1e1c1a;
+    }
+
+    .global-container {
+        margin: 0;
+        height: 100%;
+        padding: 0;
+        gap: 0.5em;
+    }
+
+    .snell-coin-picture {
+        height: 2.2rem;
+        width: 2.1rem;
+        object-fit: cover;
+    }
+
+    #snell-coins {
+        font-weight: 700;
+        color: white;
+    }
+
+    #buy-coins-btn {
+        margin: 0;
+        border: 2px solid white;
+        border-radius: 5px;
+        width: 1rem;
+        height: 1rem;
+        font-size: 1.3rem;
+        font-weight: 600;
+        padding: 1rem 1rem;
+        background-color: #252320;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    nav-bar {
+        display: flex;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 10%;
+        width: 100%;
+        z-index: 999;
+    }
+
+
+    .ai-item {
+        width: 100%;
+    }
+}

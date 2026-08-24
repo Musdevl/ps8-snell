@@ -34,6 +34,7 @@ const PUBLIC_ROUTES = [
     '/api/user/login',
     '/api/user/register',
     '/api/user/verify',
+    '/api/user/forgot-password',
     '/api/user/reset-password',
     '/api/user/hard-reset-password',
     '/api/chat/global',
@@ -141,7 +142,7 @@ const requestHandler = (req, res) => {
                     );
                 }
 
-                if (parts[2] === "ai") {
+                if (parts[2] === "ais") {
                     return proxy.web(req, res,
                         { target: URLS.ai },
                         err => {

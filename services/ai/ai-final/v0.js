@@ -642,11 +642,11 @@ function getBestActionWithDeadline(game, deadline) {
             }
 
             currentBestMove = bestAction;
-            console.log(`[AI] depth ${depth} done, best: ${bestAction} (${bestScore})`);
+            console.log(`[AI SERVICE] depth ${depth} done, best: ${bestAction} (${bestScore})`);
 
         } catch (e) {
             if (e.message === 'TIMEOUT') {
-                console.log(`[AI] Timeout at depth ${depth}, using best from depth ${depth-1}`);
+                console.log(`[AI SERVICE] Timeout at depth ${depth}, using best from depth ${depth-1}`);
                 break;
             }
             throw e;

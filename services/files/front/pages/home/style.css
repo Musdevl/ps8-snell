@@ -24,6 +24,7 @@ body {
     grid-template-columns: 20% 1fr;
     font-family: 'Roboto', sans-serif;
     background-color: var(--bg-body);
+
 }
 
 social-bar {
@@ -36,6 +37,7 @@ main {
     display: flex;
     justify-content: center;
     overflow-y: auto;
+    scrollbar-color: #232220 #3a3734;
 }
 
 .global-container {
@@ -193,10 +195,14 @@ nav-bar {
 #shop-section {
     flex: 2;
     width: 100%;
-    display: flex;        /* ajout */
-    flex-direction: column; /* ajout */
-    min-height: 0;        /* ajout */
-    height: 100%;         /* ajout */
+    display: flex;
+    /* ajout */
+    flex-direction: column;
+    /* ajout */
+    min-height: 0;
+    /* ajout */
+    height: 100%;
+    /* ajout */
 }
 
 shop-component {
@@ -229,6 +235,7 @@ shop-component {
     main {
         width: 100%;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     .global-container {
@@ -245,6 +252,7 @@ shop-component {
         flex-direction: column;
         height: auto;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     .shop-section {
@@ -269,6 +277,7 @@ shop-component {
     #shop-list {
         height: auto;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
         width: 90%;
     }
 
@@ -289,6 +298,7 @@ shop-component {
 
     .popup-content-list {
         overflow-x: auto;
+        scrollbar-color: #232220 #3a3734;
         flex-wrap: nowrap;
     }
 
@@ -338,11 +348,13 @@ shop-component {
 
     .shop-popup {
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
         max-height: 70%;
     }
 
     .popup-header-content {
         overflow-x: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
 
@@ -351,6 +363,7 @@ shop-component {
         height: 100%;
         width: 100%;
         overflow-x: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     .item-normal {
@@ -364,6 +377,7 @@ shop-component {
         min-height: 15em;
         width: 100%;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
     chat-component {
@@ -382,13 +396,15 @@ shop-component {
         width: 100%;
         height: calc(100% - 12%);
         z-index: 100;
+        scrollbar-color: #232220 #3a3734;
         overflow-y: auto;
     }
 
     main {
         height: 100%;
         overflow-y: auto;
-        padding-bottom: 14vh;
+        scrollbar-color: #232220 #3a3734;
+        padding-bottom: 12vh;
     }
 
     .middle-section {
@@ -396,6 +412,7 @@ shop-component {
         flex-direction: column;
         height: 100%;
         overflow-y: auto;
+        scrollbar-color: #232220 #3a3734;
     }
 
 
@@ -473,7 +490,7 @@ shop-component {
         position: absolute;
         bottom: 0;
         left: 0;
-        height: 12%;
+        height: 10%;
         width: 100%;
         z-index: 999;
     }
@@ -522,7 +539,7 @@ shop-component {
         display: none !important;
     }
 
-    #chat-section{
+    #chat-section {
         display: none;
     }
 

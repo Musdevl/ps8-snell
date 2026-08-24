@@ -4,23 +4,24 @@ import { env } from "../../helpers/env.js";
 import { userId_socketId_Map, ioClient } from './state.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from "bcrypt";
-import { GATEWAY_URL } from '../env.js';
+import crypto from "crypto";
 import { default_theme, default_profile_picture, default_emotes, ppList } from "./default_values.js";
 
 
 const GAME_SERVICE_URL = process.env.GAME_SERVICE_URL || "http://localhost:8002";
 const CHAT_SERVICE_URL = process.env.CHAT_SERVICE_URL || 'http://localhost:8003';
 const ACHIEVEMENT_SERVICE_URL = process.env.ACHIEVEMENT_SERVICE_URL || 'http://localhost:8004';
-
+const MAIL_SERVICE_URL = process.env.MAIL_SERVICE_URL || 'http://localhost:8006';
 
 const saltRounds = 10;
+
+// Durée de validité d'un lien de réinitialisation.
+const RESET_TOKEN_DURATION = 60 * 60 * 1000; // 1 heure
 
 export async function createUser(email, username, password) {
     const alreadyTaken = await userRepo.areUserInformationsValid(email, username);
 
     if (alreadyTaken) throw new Error("User informations already taken");
-
-    let random_code = generateCode()
 
     const hashed_password = await bcrypt.hash(password, saltRounds);
 
@@ -46,20 +47,20 @@ export async function createUser(email, username, password) {
         achievements: JSON.parse(content).achievements,
         selected_theme: default_theme,
         themes: [default_theme],
-        verification_code: random_code,
         snell_coins: 2500
     });
 
-    return random_code;
+    sendWelcomeMail(email, username);
 }
 
-function generateCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
-    for (let i = 0; i < 6; i++) {
-        result += chars[Math.floor(Math.random() * chars.length)];
-    }
-    return result;
+// Volontairement pas attendu : un service mail indisponible ne doit pas faire
+// échouer une inscription par ailleurs réussie.
+function sendWelcomeMail(email, username) {
+    fetch(`${MAIL_SERVICE_URL}/api/mail/welcome`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: email, username })
+    }).catch(error => console.log("[USER] - Mail de bienvenue non envoyé :", error.message));
 }
 
 
@@ -67,16 +68,57 @@ export async function getUserFriendRequests(userId) {
     return await friendRequestRepo.getFriendRequests(userId);
 }
 
-export async function resetPassword(email, verification_code, newPassword) {
+// ── Mot de passe oublié ──────────────────────────────────────────────────────
+
+// On ne stocke que l'empreinte du token : le token en clair ne vit que dans le
+// lien envoyé par mail.
+function hashToken(token) {
+    return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+/**
+ * Envoie le lien de réinitialisation.
+ * `origin` est l'adresse par laquelle le navigateur a joint le site, pour que le
+ * lien reste valable quel que soit le serveur qui héberge le jeu.
+ */
+export async function requestPasswordReset(email, origin) {
     const user = await userRepo.getUserByEmail(email);
 
-    verification_code = verification_code.replace(/\s+/g, '');
+    // Silence volontaire si l'adresse est inconnue : répondre différemment
+    // permettrait de savoir quelles adresses sont inscrites.
+    if (!user) {
+        console.log("[USER] - Demande de reset pour une adresse inconnue, aucun mail envoyé");
+        return;
+    }
 
-    if (!user) throw new Error("User not found");
-    if (user.verification_code !== verification_code) throw new Error("Invalid verification code");
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + RESET_TOKEN_DURATION);
+
+    await userRepo.saveResetToken(user._id, hashToken(token), expiresAt);
+
+    const link = `${origin}/pages/auth/reset-password/index.html?token=${token}`;
+
+    const res = await fetch(`${MAIL_SERVICE_URL}/api/mail/password-reset`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: email, username: user.username, link })
+    });
+
+    if (!res.ok) throw new Error("Le service mail n'a pas pu envoyer le lien");
+}
+
+export async function resetPassword(token, newPassword) {
+    if (!token || !newPassword) throw new Error("Lien ou mot de passe manquant");
+
+    const user = await userRepo.findByResetToken(hashToken(token));
+
+    if (!user) throw new Error("Lien invalide");
+    if (user.reset_token_expires < new Date()) throw new Error("Lien expiré");
+
     const hashed_password = await bcrypt.hash(newPassword, saltRounds);
-    await userRepo.saveUser({ ...user, password: hashed_password });
-    return "Password reset successfully";
+
+    // Le token est effacé au passage : un lien ne sert qu'une fois.
+    await userRepo.setPasswordAndClearToken(user._id, hashed_password);
 }
 
 
@@ -147,37 +189,37 @@ export async function forwardMessage(userIds, message) {
     return message;
 }
 
-export async function requestChallenge(userId, friendId) {
+export async function requestChallenge(userId, opponentId) {
 
-    if (userId === friendId) throw new Error("Cannot challenge yourself");
+    if (userId === opponentId) throw new Error("Cannot challenge yourself");
     const user = await userRepo.findUserById(userId);
     // Notifier si le destinataire est en ligne
-    const friendSocketId = userId_socketId_Map.get(friendId.toString());
+    const oppentSocketId = userId_socketId_Map.get(opponentId.toString());
 
-    if (friendSocketId && ioClient) {
-        ioClient.emit('user-ws-service', { webSocketIds: friendSocketId, event: 'challenge-request', data: { from: { username: user.username, userId: userId } } });
-        console.log(`Notification envoyée à ${friendId} (socket: ${friendSocketId})`);
+    if (oppentSocketId && ioClient) {
+        ioClient.emit('user-ws-service', { webSocketIds: oppentSocketId, event: 'challenge-request', data: { from: { username: user.username, userId: userId } } });
+        console.log(`Notification envoyée à ${opponentId} (socket: ${oppentSocketId})`);
     } else {
-        console.log("Amis hors ligne pas de WS");
+        console.log("Adversaire hors ligne pas de WS");
     }
 }
 
-export async function acceptChallenge(userId, friendId) {
-    if (userId === friendId) throw new Error("Cannot challenge yourself");
+export async function acceptChallenge(userId, opponentId) {
+    if (userId === opponentId) throw new Error("Cannot challenge yourself");
 
     const userSocketId = userId_socketId_Map.get(userId.toString());
-    const friendSocketId = userId_socketId_Map.get(friendId.toString());
+    const opponentSocketId = userId_socketId_Map.get(opponentId.toString());
 
     const res = await fetch(`${GAME_SERVICE_URL}/api/game`, {
         method: 'POST',
         body: JSON.stringify({
             gameType: "MULTI",
-            players: [userId, friendId]
+            players: [userId, opponentId]
         })
     })
 
-    if (userSocketId && friendSocketId && ioClient) {
-        ioClient.emit('user-ws-service', { webSocketIds: [userSocketId, friendSocketId], event: 'challenge-accepted' })
+    if (userSocketId && opponentSocketId && ioClient) {
+        ioClient.emit('user-ws-service', { webSocketIds: [userSocketId, opponentSocketId], event: 'challenge-accepted' })
     }
 
 }
