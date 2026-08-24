@@ -56,7 +56,7 @@ services:
       - CHAT_SERVICE_URL=http://chat:8003
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
       - MAIL_SERVICE_URL=http://mail:8006
-      # - STRIPE_SECRET_KEY=private
+      - STRIPE_SECRET_KEY=sk_test_51TJA0ZPcFZdexsww9mwlRsG0fkopYeZUAxWmZ8cS0wkmrMQkxVPWt39ypfUMGvmVcSH8482MHZNPfKQ2e6NPgXUt00ITfGopEi
     networks:
       - app-network
 
