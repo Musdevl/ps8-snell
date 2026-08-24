@@ -17,7 +17,7 @@ const puzzle_1 =
         const playerColor = COLORS.WHITE
 
         const puzzle_steps = [
-            "PLACE/91,0",  // WHITE
+            "ROTATE/97,48", // WHITE
         ];
 
         const board = new Board();
@@ -27,7 +27,7 @@ const puzzle_1 =
         const white_first_protector = pieceService.createPiece(PIECE.PROTECTOR, COLORS.WHITE, DIRECTIONS.SOUTH)
         const white_second_protector = pieceService.createPiece(PIECE.PROTECTOR, COLORS.WHITE, DIRECTIONS.SOUTH)
         const white_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.WHITE, DIRECTIONS.NORTH)
-        const white_triangle = pieceService.createPiece(PIECE.TRIANGLE, COLORS.WHITE, DIRECTIONS.EAST)
+        const white_triangle = pieceService.createPiece(PIECE.TRIANGLE, COLORS.WHITE, DIRECTIONS.SOUTH)
 
         const black_shooter = pieceService.createPiece(PIECE.SHOOTER, COLORS.BLACK, DIRECTIONS.EAST)
         const black_king = pieceService.createPiece(PIECE.KING, COLORS.BLACK, DIRECTIONS.NORTH)
@@ -40,11 +40,11 @@ const puzzle_1 =
         board.setSlot(6, 2, white_first_protector)
         board.setSlot(5, 4, white_second_protector)
         board.setSlot(5, 6, white_full_mirror)
-        board.setSlot(2, 1, white_triangle);
+        board.setSlot(2, 7, white_triangle);
 
         board.setSlot(0, 2, black_shooter)
         board.setSlot(2, 5, black_king)
-        board.setSlot(3, 7, black_first_protector)
+        board.setSlot(3, 8, black_first_protector)
         board.setSlot(4, 5, black_second_protector)
         board.setSlot(4, 3, black_full_mirror)
 
@@ -66,7 +66,7 @@ const puzzle_2 =
         const playerColor = COLORS.WHITE
 
         const puzzle_steps = [
-            "ROTATE/97,48", // WHITE
+            "PLACE/90,0", // WHITE
         ];
 
         const board = new Board();
@@ -75,8 +75,7 @@ const puzzle_2 =
         const white_king = pieceService.createPiece(PIECE.KING, COLORS.WHITE, DIRECTIONS.NORTH)
         const white_second_protector = pieceService.createPiece(PIECE.PROTECTOR, COLORS.WHITE, DIRECTIONS.SOUTH)
         const white_full_mirror = pieceService.createPiece(PIECE.FULL_MIRROR, COLORS.WHITE, DIRECTIONS.EAST);
-        const white_triangle_1 = pieceService.createPiece(PIECE.TRIANGLE, COLORS.WHITE, DIRECTIONS.WEST)
-        const white_triangle_2 = pieceService.createPiece(PIECE.TRIANGLE, COLORS.WHITE, DIRECTIONS.SOUTH);
+        const white_triangle_1 = pieceService.createPiece(PIECE.TRIANGLE, COLORS.WHITE, DIRECTIONS.EAST)
 
         const black_shooter = pieceService.createPiece(PIECE.SHOOTER, COLORS.BLACK, DIRECTIONS.SOUTH)
         const black_king = pieceService.createPiece(PIECE.KING, COLORS.BLACK, DIRECTIONS.NORTH)
@@ -89,8 +88,7 @@ const puzzle_2 =
         board.setSlot(7, 4, white_king)
         board.setSlot(5, 4, white_second_protector)
         board.setSlot(5, 7, white_full_mirror)
-        board.setSlot(5, 9, white_triangle_1);
-        board.setSlot(2, 9, white_triangle_2);
+        board.setSlot(2, 0, white_triangle_1);
 
         board.setSlot(0, 2, black_shooter)
         board.setSlot(2, 5, black_king)
@@ -99,7 +97,7 @@ const puzzle_2 =
         board.setSlot(4, 3, black_full_mirror)
         board.setSlot(0, 8, black_triangle);
 
-        const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 5);
+        const white_player = PlayerInitializer.initPlayer(new Player(COLORS.WHITE, undefined, undefined), 6);
         const black_player = PlayerInitializer.initPlayer(new Player(COLORS.BLACK, undefined, undefined), 6);
 
         const game = new Game(board, "LOCAL", true);
@@ -107,7 +105,7 @@ const puzzle_2 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(2, "Angle caché", game, puzzle_steps, PUZZLE_DIFFICULTY.WOOD, playerColor);
+        return new Puzzle(2, "Double réflexion", game, puzzle_steps, PUZZLE_DIFFICULTY.WOOD, playerColor);
     }
 }
 

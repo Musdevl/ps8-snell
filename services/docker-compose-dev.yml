@@ -111,7 +111,7 @@ services:
   ai:
     build:
       context: .
-      dockerfile: AI/Dockerfile
+      dockerfile: ai/Dockerfile
     environment:
       - GATEWAY_URL=http://gateway:8000
     networks:

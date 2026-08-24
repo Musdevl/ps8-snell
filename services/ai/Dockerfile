@@ -3,12 +3,12 @@ FROM node:22.18-slim
 WORKDIR /app
 
 COPY helpers ./helpers
-WORKDIR /app/AI
-COPY AI/package*.json ./
+WORKDIR /app/ai
+COPY ai/package*.json ./
 
 RUN npm install
 
-COPY AI/ .
+COPY ai/ .
 
 
 EXPOSE 8020
