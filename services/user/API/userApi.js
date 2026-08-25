@@ -400,30 +400,52 @@ app.post("/api/user/inventory/add-purchased-item", async (req, res) => {
 
 // Crée la session de paiement Stripe
 app.post('/api/user/shop/create-checkout', async (req, res) => {
-    const { userId } = req.body;
+    try {
+        const { userId } = req.body || {};
 
-    const params = new URLSearchParams({
-        'payment_method_types[0]': 'card',
-        'line_items[0][price_data][currency]': 'eur',
-        'line_items[0][price_data][product_data][name]': '5000 Snell Coins',
-        'line_items[0][price_data][unit_amount]': '99', // centimes
-        'line_items[0][quantity]': '1',
-        'mode': 'payment',
-        'success_url': `${process.env.PUBLIC_GATEWAY_URL}/pages/shop/success/?session_id={CHECKOUT_SESSION_ID}&userId=${userId}`,
-        'cancel_url': `${process.env.PUBLIC_GATEWAY_URL}/`,
-    });
+        if (!userId || typeof userId !== 'string') {
+            return res.json({ error: 'Bad request', message: 'userId is required' }, 400);
+        }
 
-    const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: params.toString()
-    });
+        if (!process.env.STRIPE_SECRET_KEY || !process.env.PUBLIC_GATEWAY_URL) {
+            console.error('[STRIPE] Missing STRIPE_SECRET_KEY or PUBLIC_GATEWAY_URL env variable');
+            return res.json({ error: 'Payment unavailable' }, 500);
+        }
 
-    const session = await response.json();
-    res.json({ url: session.url });
+        const params = new URLSearchParams({
+            'payment_method_types[0]': 'card',
+            'line_items[0][price_data][currency]': 'eur',
+            'line_items[0][price_data][product_data][name]': '5000 Snell Coins',
+            'line_items[0][price_data][unit_amount]': '99', // centimes
+            'line_items[0][quantity]': '1',
+            'mode': 'payment',
+            'client_reference_id': userId,
+            'success_url': `${process.env.PUBLIC_GATEWAY_URL}/pages/shop/success/?session_id={CHECKOUT_SESSION_ID}&userId=${userId}`,
+            'cancel_url': `${process.env.PUBLIC_GATEWAY_URL}/`,
+        });
+
+        const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        });
+
+        const session = await response.json();
+
+        if (!response.ok) {
+            console.error('[STRIPE] Failed to create checkout session:', session.error);
+            return res.json({ error: 'Failed to create checkout session', message: session.error?.message }, 502);
+        }
+
+        console.log(`[STRIPE] Checkout session ${session.id} created for user ${userId}`);
+        res.json({ url: session.url }, 200);
+    } catch (e) {
+        console.error('[STRIPE] Error creating checkout session:', e);
+        res.json({ error: 'Failed to create checkout session', message: e.message }, 400);
+    }
 });
 
 
