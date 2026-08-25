@@ -115,6 +115,8 @@ To run the services on the host instead of in containers:
 ### 3. Production deployment
 
 ```bash
+cp .env.example .env
+# then edit .env and set PUBLIC_URL=http://my-server:8000
 ./compose-prod.sh
 ```
 
@@ -131,7 +133,7 @@ call goes to their own machine and nothing works.
 ### 4. Reset the database
 
 ```bash
-./restart_db.sh
+./reset_db.sh
 ```
 
 ### 5. Stop all containers
