@@ -115,27 +115,17 @@ To run the services on the host instead of in containers:
 ### 3. Production deployment
 
 ```bash
-./compose-prod.sh
-```
-
-Builds every image and starts the stack detached. The public URL written into the
-frontend defaults to a hardcoded server IP and is overridable, either inline:
-
-```bash
-PUBLIC_URL=http://my-server:8000 ./compose-prod.sh
-```
-
-or, to avoid re-typing it on every deploy, in a `services/.env` file:
-
-```bash
 cp .env.example .env
 # then edit .env and set PUBLIC_URL=http://my-server:8000
 ./compose-prod.sh
 ```
 
-`.env` is git-ignored; both `compose-prod.sh` and `docker compose` itself read it
-automatically. An inline `PUBLIC_URL=... ./compose-prod.sh` still takes priority
-over the `.env` value.
+Builds every image and starts the stack detached. The public URL written into the
+frontend defaults to the current server and is overridable:
+
+```bash
+PUBLIC_URL=http://my-server:8000 ./compose-prod.sh
+```
 
 That URL runs in the visitor's browser — if it points at `localhost`, every API
 call goes to their own machine and nothing works.
