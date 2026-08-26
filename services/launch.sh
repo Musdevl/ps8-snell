@@ -14,12 +14,6 @@ for arg in "$@"; do
     --env=*)
       ENV_FILE="${arg#--env=}"
       ;;
-    --prod)
-      MODE="prod"
-      ;;
-    --dev)
-      MODE="dev"
-      ;;
     --build)
       BUILD=true
       ;;
@@ -80,10 +74,9 @@ PUBLIC_URL="$(load_public_url_from_env)"
 write_env_files "$PUBLIC_URL"
 
 # Exportées pour que `docker compose` les substitue dans docker-compose.yml
-export ENV="$MODE"
 export PUBLIC_URL
 
-echo "🚀 Lancement en mode ${MODE^^}..."
+echo "🚀 Lancement en mode ..."
 docker network inspect proxy >/dev/null 2>&1 || docker network create proxy
 if [ "$BUILD" = true ]; then
   docker compose --env-file "$ENV_FILE" up --build
