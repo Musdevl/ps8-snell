@@ -79,12 +79,11 @@ All services communicate through a central **API Gateway** over an internal Dock
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) ≥ 24
-- [Docker Compose](https://docs.docker.com/compose/) ≥ 2.20 (the `include:` key)
+- [Docker Compose](https://docs.docker.com/compose/) ≥ 2.20
 - (For Stripe) A valid Stripe secret key
 
-The stack currently runs over plain HTTP: there is no domain name, so no valid
-certificate is obtainable. The gateway still supports HTTPS — set `ENV=prod` and
-mount certificates into `/app/https` — see the comment in `docker-compose-prod.yml`.
+The stack runs from a single `docker-compose.yml`, shared between dev and prod.
+What changes between environments is only the `.env` file loaded — see below.
 
 ---
 
@@ -97,50 +96,75 @@ git clone <repository-url>
 cd ps8-26-snell/services
 ```
 
-### 2. Local development
+### 2. Configure your `.env`
 
-```bash
-docker compose up --build
+Copy `.env.example` to `.env` and adjust the values:
+
+```dotenv
+ENV="dev"                        # "dev" or "prod"
+STRIPE_SECRET_KEY="sk_test_..."
+PUBLIC_URL="http://localhost:8000"
 ```
 
-Emails go to **Mailpit**, a fake SMTP server bundled with the dev stack: nothing
-leaves the machine and messages show up on <http://localhost:8025>.
+| Variable | Description |
+|---|---|
+| `ENV` | `dev` or `prod`. In `prod`, the gateway mounts and reads HTTPS certificates from `../../secrets/https`. In `dev`, that volume is mounted but ignored. |
+| `PUBLIC_URL` | The URL written into the frontend and used by clients (including emails sent by `user`). **This URL runs in the visitor's browser** — if it points at `localhost` on a real deployment, every API call goes to the visitor's own machine and nothing works. |
+| `STRIPE_SECRET_KEY` | Stripe secret key, forwarded to the `user` service. |
 
-To run the services on the host instead of in containers:
-
-```bash
-./launch-dev-mode.sh
-```
-
-### 3. Production deployment
+### 3. Launch the stack
 
 ```bash
-cp .env.example .env
-# then edit .env and set PUBLIC_URL=http://my-server:8000
-./compose-prod.sh
+./launch.sh
 ```
 
-Builds every image and starts the stack detached. The public URL written into the
-frontend defaults to the current server and is overridable:
+This script:
+1. Reads `PUBLIC_URL` from your `.env` (or from an already-exported `PUBLIC_URL`, which takes priority — a warning is printed if so).
+2. Regenerates `files/front/env.js` and `user/env.js` with that URL (these are plain JS files read directly by the browser, not part of any bundler build).
+3. Exports `ENV` and `PUBLIC_URL` so Docker Compose can substitute them into `docker-compose.yml`.
+4. Creates the external `proxy` Docker network if it doesn't already exist.
+5. Runs `docker compose up`.
+
+**Flags:**
+
+| Flag | Effect |
+|---|---|
+| *(none)* | Prod mode, `.env` next to the script, no rebuild (`docker compose up -d`) |
+| `--dev` | Dev mode |
+| `--prod` | Prod mode (default, explicit) |
+| `--build` | Rebuilds images (`docker compose up --build`), runs attached |
+| `--env="path"` | Loads a custom `.env` file instead of the default one |
+
+**Examples:**
 
 ```bash
-PUBLIC_URL=http://my-server:8000 ./compose-prod.sh
+./launch.sh                                # prod, no rebuild, detached
+./launch.sh --build                        # prod, rebuild, attached (see logs)
+./launch.sh --dev --build                  # dev, rebuild, attached
+./launch.sh --dev --env=".env.dev"         # dev, using a specific .env file
 ```
 
-That URL runs in the visitor's browser — if it points at `localhost`, every API
-call goes to their own machine and nothing works.
+> ⚠️ Without `--build`, the stack starts detached (`-d`) from whatever images
+> already exist locally. Use `--build` after any code change.
 
-### 4. Reset the database
+### 4. Stop / restart / reset the stack
 
 ```bash
-./reset_db.sh
+./stop-dockers.sh
 ```
 
-### 5. Stop all containers
+| Flags | Effect |
+|---|---|
+| *(none)* | `docker compose down` — stops and removes containers, keeps volumes (DB data preserved) |
+| `--restart` | Restarts existing containers in place (`docker compose restart`) |
+| `--restart --build` | `docker compose down` then `docker compose up --build -d` |
+| `--reset` | `docker compose down -v` — **removes containers AND volumes** (database wiped), does **not** restart anything |
+| `--reset --restart` | `docker compose down -v` then `docker compose up -d` |
+| `--reset --restart --build` | `docker compose down -v` then `docker compose up --build -d` |
 
-```bash
-./shutdown-dockers.sh
-```
+`--reset` on its own only tears everything down — nothing comes back up until
+`--restart` is also passed. This lets you wipe the database without immediately
+relaunching the stack.
 
 ---
 
