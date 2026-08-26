@@ -73,8 +73,18 @@ load_public_url_from_env() {
 PUBLIC_URL="$(load_public_url_from_env)"
 write_env_files "$PUBLIC_URL"
 
+# La gateway ne sert en TLS qu'en mode prod. Les services qui ouvrent une
+# socket vers elle doivent viser le meme schema, sinon le handshake echoue
+# sans le moindre message et le temps reel meurt en silence.
+if [ "$MODE" = "prod" ]; then
+  GATEWAY_INTERNAL_URL="https://gateway:8000"
+else
+  GATEWAY_INTERNAL_URL="http://gateway:8000"
+fi
+
 # Exportées pour que `docker compose` les substitue dans docker-compose.yml
 export PUBLIC_URL
+export GATEWAY_INTERNAL_URL
 
 echo "🚀 Lancement en mode ..."
 docker network inspect proxy >/dev/null 2>&1 || docker network create proxy
