@@ -55,6 +55,7 @@ services:
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
       - MAIL_SERVICE_URL=http://mail:8006
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - ENV=${ENV:-dev}
     networks:
       - app-network
 
