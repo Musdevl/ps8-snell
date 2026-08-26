@@ -20,6 +20,9 @@ for arg in "$@"; do
     --build)
       BUILD=true
       ;;
+    --build)
+      BUILD=true
+      ;;
     *)
       echo "⚠️  Argument inconnu ignoré : $arg"
       ;;

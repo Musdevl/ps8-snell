@@ -149,6 +149,3 @@ networks:
     driver: bridge
   proxy:
     external: true
-
-volumes:
-  mongodb_data:
