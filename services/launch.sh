@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # --- Valeurs par défaut ---
 MODE="prod"
 ENV_FILE="$SCRIPT_DIR/.env"
+BUILD=false
 
 # --- Parsing des arguments ---
 for arg in "$@"; do
@@ -19,11 +20,21 @@ for arg in "$@"; do
     --dev)
       MODE="dev"
       ;;
+    --build)
+      BUILD=true
+      ;;
     *)
-      echo "⚠️ Argument inconnu ignoré : $arg"
+      echo "⚠️  Argument inconnu ignoré : $arg"
       ;;
   esac
 done
+
+# --- Vérification obligatoire du fichier .env ---
+if [ ! -f "$ENV_FILE" ]; then
+  echo "❌ Erreur : aucun fichier .env trouvé à l'emplacement : $ENV_FILE"
+  echo "   → Créez ce fichier, ou précisez son chemin avec --env=\"/chemin/vers/.env\""
+  exit 1
+fi
 
 FRONT_ENV_FILE="./files/front/env.js"
 USER_ENV_FILE="./user/env.js"
@@ -47,14 +58,9 @@ load_public_url_from_env() {
   # Une variable déjà exportée garde la priorité sur le .env
   local preset="$PUBLIC_URL"
 
-  if [ -f "$ENV_FILE" ]; then
-    set -a
-    source "$ENV_FILE"
-    set +a
-  else
-    echo "Aucun fichier .env trouvé à $ENV_FILE."
-    exit 1
-  fi
+  set -a
+  source "$ENV_FILE"
+  set +a
 
   if [ -n "$preset" ]; then
     echo "⚠️  PUBLIC_URL déjà exportée dans l'environnement ($preset), elle prend le pas sur $ENV_FILE." >&2
@@ -78,4 +84,9 @@ export ENV="$MODE"
 export PUBLIC_URL
 
 echo "🚀 Lancement en mode ${MODE^^}..."
-docker compose --env-file "$ENV_FILE" up --build
+docker network inspect proxy >/dev/null 2>&1 || docker network create proxy
+if [ "$BUILD" = true ]; then
+  docker compose --env-file "$ENV_FILE" up --build
+else
+  docker compose up -d
+fi
