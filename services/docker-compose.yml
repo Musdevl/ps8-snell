@@ -22,6 +22,7 @@ services:
       - ../../secrets/https:/app/https:ro
     networks:
       - app-network
+      - proxy
 
   game:
     build:
@@ -143,3 +144,5 @@ services:
 networks:
   app-network:
     driver: bridge
+  proxy:
+    external: true
