@@ -37,6 +37,7 @@ app.post('/api/user/register', async (req, res) => {
             httpOnly: true,
             // sameSite: 'Strict',
             maxAge: 60 * 60 * 24 * 7, // 7 jours en secondes
+            secure: process.env.ENV === 'prod',
 
         });
 
@@ -44,7 +45,7 @@ app.post('/api/user/register', async (req, res) => {
             httpOnly: true,
             // sameSite: 'Strict',
             maxAge: 15 * 60, // 15 minutes
-            //secure: true,    // HTTPS uniquement (en prod)
+            secure: process.env.ENV === 'prod',    // HTTPS uniquement (en prod)
         });
 
 
@@ -71,6 +72,7 @@ app.post('/api/user/login', async (req, res) => {
             httpOnly: true,
             // sameSite: 'Strict',
             maxAge: 60 * 60 * 24 * 7, // 7 jours en secondes
+            secure: process.env.ENV === 'prod',
 
         });
 
@@ -78,7 +80,7 @@ app.post('/api/user/login', async (req, res) => {
             httpOnly: true,
             // sameSite: 'Strict',
             maxAge: 15 * 60, // 15 minutes
-            //secure: true,    // HTTPS uniquement (en prod)
+            secure: process.env.ENV === 'prod',    // HTTPS uniquement (en prod)
         });
 
         // On renvoie le token dans le body à cause de Capacitor :(
