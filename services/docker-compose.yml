@@ -133,6 +133,8 @@ services:
     image: mongo:latest
     container_name: mongodb
     command: mongod --quiet --logpath /dev/null
+    volumes:
+      - mongodb_data:/data/db
     networks:
       - app-network
     healthcheck:
@@ -147,3 +149,6 @@ networks:
     driver: bridge
   proxy:
     external: true
+
+volumes:
+  mongodb_data:
