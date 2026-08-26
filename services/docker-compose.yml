@@ -19,7 +19,7 @@ services:
       - ENV=${ENV:-dev}
       - GATEWAY_URL=http://gateway:8000
     volumes:
-      - ../../secrets/https:/app/https:ro
+      - ../secrets/https:/app/https:ro
     networks:
       - app-network
       - proxy
