@@ -122,9 +122,16 @@ export class GameManager extends EventEmitter {
         this.emit("timeout", { game: gameService.getCurrentGameStatus(game), players_web_sockets: gameService.getPlayerSockets(game) });
     }
 
-    isAiBegining(game) {
-        const white_player = gameService.findPlayerByColor(game, COLORS.WHITE);
-        return white_player.webSocketId === "NONE";
+    /**
+     * Est-ce a l'IA de jouer maintenant ? Un joueur controle par l'IA n'a pas
+     * de socket ("NONE"). Vrai a n'importe quel moment de la partie, pas
+     * seulement au premier coup : c'est ce qui permet de relancer l'IA apres
+     * une reconnexion tombee en plein milieu de son tour.
+     */
+    isAiToPlay(game) {
+        if (!game || game.isGameOver) return false;
+        const player_to_play = gameService.findPlayerByColor(game, game.colorTurn);
+        return player_to_play?.webSocketId === "NONE";
     }
 
     processAction(game, action, player_socket_id) {

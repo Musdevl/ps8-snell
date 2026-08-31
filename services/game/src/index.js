@@ -10,6 +10,11 @@ const gameManager = new GameManager();
 const GATEWAY_URL = process.env.GATEWAY_URL || "http://localhost:8000";
 
 const PORT = 8002;
+
+// Temps mort avant que l'IA ne joue. Il ne sert pas a corriger une course :
+// il laisse au joueur le temps de voir la position avant la reponse de l'IA,
+// aussi bien au premier coup qu'apres chacun des siens.
+const AI_MOVE_DELAY_MS = 1000;
 const server = gameApi.startHttpServer(PORT, gameManager);
 
 const ioServer = new Server(server, {
@@ -146,6 +151,9 @@ async function handleJoin(data) {
             console.log("[GAME SERVICE] - Reconnecting... ");
             res = formatToSend([playerInfo.webSocketId], "reconnect", reconnect_status.game)
             gatewayConnection.emit("game-ws-service", res);
+            // Se reconnecter pendant le tour de l'IA ne doit pas figer la
+            // partie : personne d'autre ne relancerait son coup.
+            if (data.gameType === "AI") scheduleAiMove(gameManager.findGame(res.data.gameId));
             return;
         }
 
@@ -167,13 +175,10 @@ async function handleJoin(data) {
         }
 
         gatewayConnection.emit("game-ws-service", res);
-        if (data.gameType === "AI") {
-            const game = gameManager.findGame(res.data.gameId);
-            if (gameManager.isAiBegining(game)) {
-                res = await handleAiAction(game);
-                gatewayConnection.emit("game-ws-service", res);
-            }
-        }
+
+        // Le client recoit d'abord "start" avec la position de depart, puis
+        // "update" avec le coup de l'IA si elle a les blancs.
+        if (data.gameType === "AI") scheduleAiMove(gameManager.findGame(res.data.gameId));
     } catch (error) {
         console.log(error);
     }
@@ -238,16 +243,15 @@ function handleAction(data) {
 
         if (game) {
 
-            let res = handlePlayerAction(game.gameType, game, data.action, data.clientId);
+            const res = handlePlayerAction(game.gameType, game, data.action, data.clientId);
+
+            // Action refusee (ce n'est pas son tour, coup illegal...) : il n'y
+            // a rien a diffuser, et emettre undefined casserait le gateway.
+            if (!res) return;
 
             gatewayConnection.emit("game-ws-service", res);
 
-            if (game.gameType === "AI" && res.data.status === "CONTINUE") {
-                setTimeout(async () => {
-                    res = await handleAiAction(game);
-                    gatewayConnection.emit("game-ws-service", res);
-                }, 1000);
-            }
+            if (game.gameType === "AI" && res.data.status === "CONTINUE") scheduleAiMove(game);
 
         } else {
             console.log("No Game Found")
@@ -268,12 +272,30 @@ function handlePlayerAction(gameType, game, action, player_web_socket_id) {
 
 }
 
+/**
+ * Fait jouer l'IA si c'est son tour. Regroupe les trois moments ou ca arrive :
+ * a la creation de la partie quand l'IA a les blancs, apres chaque coup du
+ * joueur, et apres une reconnexion tombee pendant le tour de l'IA.
+ */
+function scheduleAiMove(game) {
+    if (!gameManager.isAiToPlay(game)) return;
+
+    setTimeout(async () => {
+        const res = await handleAiAction(game);
+        // handleAiAction rend null si le service IA est injoignable : emettre
+        // quand meme ferait planter le handler du gateway au destructuring.
+        if (res) gatewayConnection.emit("game-ws-service", res);
+    }, AI_MOVE_DELAY_MS);
+}
+
 async function handleAiAction(game) {
     try {
         const game_buffer = await gameManager.processAiAction(game);
+        if (!game_buffer) throw new Error("AI service returned no action");
         return formatToSend(game_buffer.players_web_sockets, "update", game_buffer.game);
     } catch (error) {
-        console.log(error);
+        console.error("[GAME SERVICE] - AI move failed:", error);
+        return null;
     }
 }
 
