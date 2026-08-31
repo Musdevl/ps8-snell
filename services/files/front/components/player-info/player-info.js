@@ -1,4 +1,4 @@
-import { DIRECTIONS } from '../../enum/Directions.js';
+import { DIRECTIONS, OPPOSITE_DIRECTIONS } from '../../enum/Directions.js';
 import * as BoardUtils from '../../utils/BoardUtils.js';
 import { InventoryRenderer } from './renderer/inventory-renderer.js';
 import { RotationRenderer } from './renderer/rotation-renderer.js';
@@ -54,6 +54,7 @@ class PlayerInfo extends HTMLElement {
 
         this.low_timer_sound = new Audio(`/assets/themes/${this.theme}/sounds/lowtimer.mp3`);
         this.low_timer_sound.preload = 'auto';
+        this.is_reversed = false;
 
     }
 
@@ -113,7 +114,7 @@ class PlayerInfo extends HTMLElement {
                 this.rotationRenderer.drawPiece(Uint16Utils.rotatePiece(this.inventoryCell, DIRECTIONS.EAST));
             } else if (this.selectedPiece) {
                 this.dispatchEvent(new CustomEvent("rotate", {
-                    detail: { color: this.color, direction: DIRECTIONS.EAST },
+                    detail: { color: this.color, direction: this.is_reversed ? DIRECTIONS.EAST : DIRECTIONS.WEST },
                     bubbles: true, composed: true
                 }));
                 this.selectedPiece = null;
@@ -125,7 +126,7 @@ class PlayerInfo extends HTMLElement {
                 this.rotationRenderer.drawPiece(Uint16Utils.rotatePiece(this.inventoryCell, DIRECTIONS.WEST));
             } else if (this.selectedPiece) {
                 this.dispatchEvent(new CustomEvent("rotate", {
-                    detail: { color: this.color, direction: DIRECTIONS.WEST },
+                    detail: { color: this.color, direction: this.is_reversed ? DIRECTIONS.WEST : DIRECTIONS.EAST },
                     bubbles: true, composed: true
                 }));
                 this.selectedPiece = null;
@@ -242,6 +243,10 @@ class PlayerInfo extends HTMLElement {
         }
     }
 
+    reverse() {
+        this.is_reversed = true;
+    }
+
     // ─── Public API ──────────────────────────────────────────────────────────
 
     async updateInventory(inventory) {
@@ -272,7 +277,16 @@ class PlayerInfo extends HTMLElement {
         this.shadowRoot.querySelector('.player-info-wrapper').classList.add(COLORS_NAME[color]);
     }
 
-    getSelectedInventoryCell() { return this.inventoryCell; }
+    getSelectedInventoryCellDirection() {
+        if (this.inventoryCell) {
+            if (this.is_reversed) {
+                return OPPOSITE_DIRECTIONS[this.inventoryCell.direction];
+            }
+            return this.inventoryCell.direction;
+        } else {
+            return null;
+        }
+    }
 
     setSelectedPiece(piece) {
         this.clearRotationCell();
@@ -294,8 +308,6 @@ class PlayerInfo extends HTMLElement {
     }
 
     setColorTurn(newColorTurn) {
-
-        console.log("Upadted received", newColorTurn);
         this.colorTurn = newColorTurn;
         const isMyTurn = this.color === this.colorTurn;
 

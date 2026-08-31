@@ -255,10 +255,13 @@ function setupBoardComponentEvents(boardComponent) {
 
         // Adding the rotation from the right inventory
         if (e.detail.action.split("/")[0] === "PLACE") {
-            if (boardComponent.colorTurn === COLORS.WHITE && whitePlayerInfoComponent.getSelectedInventoryCell())
-                e.detail.action += `,${whitePlayerInfoComponent.getSelectedInventoryCell().direction}`;
-            else if (boardComponent.colorTurn === COLORS.BLACK && blackPlayerInfoComponent.getSelectedInventoryCell())
-                e.detail.action += `,${blackPlayerInfoComponent.getSelectedInventoryCell().direction}`;
+            const whiteDirection = whitePlayerInfoComponent.getSelectedInventoryCellDirection();
+            const blackDirection = blackPlayerInfoComponent.getSelectedInventoryCellDirection();
+
+            if (boardComponent.colorTurn === COLORS.WHITE && whiteDirection !== null)
+                e.detail.action += `,${whiteDirection}`;
+            else if (boardComponent.colorTurn === COLORS.BLACK && blackDirection !== null)
+                e.detail.action += `,${blackDirection}`;
             else {
                 return;
             }
@@ -340,6 +343,7 @@ async function setPlayerColor(white_id, black_id) {
         // main.flipped existe deja dans shared/game.css : il renvoie le
         // panneau du joueur de son cote, comme en multijoueur.
         main.classList.add('flipped');
+        blackPlayerInfoComponent.reverse();
     }
     boardComponent.setPlayerColor(color);
     boardComponent.setBoardOrientation(color);
