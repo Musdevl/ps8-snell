@@ -5,8 +5,8 @@ import { weightsWithAggression } from "../ai.js";
 export class PatrickBizot extends MinimaxAi {
 
     constructor(id) {
-        super(id, "Patrick Bizot", 750, "/assets/ais/patrick-bizot-ai.png", {
-            maxDepth: 3,
+        super(id, "Patrick Bizot", 800, "/assets/ais/patrick-bizot-ai.png", {
+            maxDepth: 2,
             timeBudgetMs: 500,
             blunderRate: 0.4,
             blunderPool: 8,

@@ -9,7 +9,7 @@ export class MathiasHellal extends MinimaxAi {
 
     constructor(id) {
         super(id, "Mathias Hellal", 500, "/assets/ais/mathias-hellal-ai.png", {
-            maxDepth: 2,
+            maxDepth: 1,
             timeBudgetMs: 300,
             blunderRate: 0.6,
             blunderPool: 12,
