@@ -64,7 +64,7 @@ async function setupGame() {
 
     // Écouter les événements du serveur
     socket.on('start', async (data) => { gameId = data.gameId, await handleUpdate(data, true) });
-    socket.on('reconnect', async (data) => { console.log("reconnect"); gameId = data.gameId; await handleUpdate(data) });
+    socket.on('reconnect', async (data) => { gameId = data.gameId; await handleUpdate(data) });
     socket.on('update', async (data) => await handleUpdate(data));
 
     // Setup les composants

@@ -134,7 +134,6 @@ async function getAiInformation(aiId) {
         });
         if (!response.ok) throw new Error(`Error while getting user information: ${response.status}`);
         const res = await response.json();
-        console.log(res);
         return {
             _id: res.ai.id,
             username: res.ai.name,
@@ -165,9 +164,7 @@ async function onGameReady(data, whitePlayerInfo, blackPlayerInfo) {
     blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo);
     blackPlayerInfoComponent.disableElo();
     blackPlayerInfoComponent.disableTimer();
-
-    console.log("data", data);
-
+    
     handleUpdate(data);
 }
 

@@ -1,15 +1,8 @@
-import { AbstractAi } from "./AbstractAi.js";
-import * as engine from "../engine.js";
-export class MathiasHellal extends AbstractAi {
+import { MinimaxAi } from "./MinimaxAi.js";
+
+export class MathiasHellal extends MinimaxAi {
 
     constructor(id) {
-        super(id, "Mathias Hellal", 500, "/assets/ais/mathias-hellal-ai.png");
+        super(id, "Mathias Hellal", 500, "/assets/ais/mathias-hellal-ai.png", 1, 500);
     }
-
-    getNextAction(game) {
-        const all_action = engine.getAllActions(game);
-        const random_idx = Math.floor(Math.random() * all_action.length)
-        return all_action[random_idx];
-    }
-
 }

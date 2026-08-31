@@ -23,7 +23,6 @@ export function getToken() {
 }
 
 export function setTokens(jwt_token, jwt_refresh_token) {
-    console.log("setting new tokens", jwt_token, jwt_refresh_token);
     if (jwt_token) localStorage.setItem(TOKEN_KEY, jwt_token);
     if (jwt_refresh_token) localStorage.setItem(REFRESH_TOKEN_KEY, jwt_refresh_token);
 }

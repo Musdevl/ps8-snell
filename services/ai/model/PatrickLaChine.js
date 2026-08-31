@@ -1,15 +1,8 @@
-import { AbstractAi } from "./AbstractAi.js";
-import * as engine from "../engine.js";
+import { RandomAi } from "./RandomAi.js";
 
-export class PatrickLaChine extends AbstractAi {
+export class PatrickLaChine extends RandomAi {
 
     constructor(id) {
         super(id, "Patrick La Chine", 100, "/assets/ais/patrick-la-chine-ai.png");
-    }
-
-    getNextAction(game) {
-        const all_action = engine.getAllActions(game);
-        const random_idx = Math.floor(Math.random() * all_action.length)
-        return all_action[random_idx];
     }
 }

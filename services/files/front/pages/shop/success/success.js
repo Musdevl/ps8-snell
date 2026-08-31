@@ -15,8 +15,6 @@ async function init() {
         const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/shop/verify?session_id=${sessionId}&userId=${userId}`);
         const data = await res.json();
 
-        console.log("[API RESPONSE]", data);
-
         if (data.success) {
             title.textContent = 'Payment confirmed';
             message.textContent = '5000 Snell Coins have been added to your account.';

@@ -124,7 +124,6 @@ export class GameManager extends EventEmitter {
 
     isAiBegining(game) {
         const white_player = gameService.findPlayerByColor(game, COLORS.WHITE);
-        console.log(white_player);
         return white_player.webSocketId === "NONE";
     }
 
