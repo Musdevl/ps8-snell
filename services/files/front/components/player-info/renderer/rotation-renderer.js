@@ -10,6 +10,7 @@ export class RotationRenderer {
         this.cellSize    = cellSize;
         this.pieceImages = {};
         this.selectedPiece = null;
+        this.pieceFlipped = false;
 
         this._initCanvas();
     }
@@ -24,7 +25,7 @@ export class RotationRenderer {
         this._initCanvas();
         // Redessiner l'état courant après resize
         if (this.selectedPiece) {
-            this.drawPiece(this.selectedPiece);
+            this.drawPiece(this.selectedPiece, this.pieceFlipped);
         } else {
             this.clearCell();
         }
@@ -39,15 +40,22 @@ export class RotationRenderer {
         ctx.strokeRect(0, 0, this.cellSize, this.cellSize);
 
         if (this.selectedPiece) {
-            this.drawPiece(this.selectedPiece);
+            this.drawPiece(this.selectedPiece, this.pieceFlipped);
         }
     }
 
-    drawPiece(piece) {
-        // Mémoriser la pièce courante pour pouvoir la redessiner après un resize
-        this.selectedPiece = piece;
-
+    /**
+     * `flipped` ajoute un demi-tour au dessin, pour que la cellule montre la
+     * pièce exactement comme le joueur la voit sur un plateau retourné.
+     * C'est l'appelant qui décide : lui seul sait d'où vient la pièce.
+     */
+    drawPiece(piece, flipped = false) {
         this.clearCell();
+
+        // Mémoriser après le clearCell, qui remet l'état à zéro : sans ça la
+        // pièce n'était jamais redessinée après un redimensionnement.
+        this.selectedPiece = piece;
+        this.pieceFlipped = flipped;
 
         const colorNames = { 0: 'white', 8: 'black' };
         const img = this.pieceImages[`${piece.pieceName}_${colorNames[piece.color]}`];
@@ -60,13 +68,14 @@ export class RotationRenderer {
 
         ctx.save();
         ctx.translate(x, y);
-        ctx.rotate(directionToRadians(piece.direction));
+        ctx.rotate(directionToRadians(piece.direction) + (flipped ? Math.PI : 0));
         ctx.drawImage(img, -size / 2, -size / 2, size, size);
         ctx.restore();
     }
 
     clearCell() {
         this.selectedPiece = null;
+        this.pieceFlipped = false;
 
         this.ctx.fillStyle   = "#EEEED2";
         this.ctx.fillRect(0, 0, this.cellSize, this.cellSize);

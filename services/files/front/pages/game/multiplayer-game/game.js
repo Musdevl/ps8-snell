@@ -403,6 +403,8 @@ function setPlayerColor(white_id, black_id) {
     boardComponent.setBoardOrientation(color);
     whitePlayerInfoComponent.setPlayerColor(color);
     blackPlayerInfoComponent.setPlayerColor(color);
+    whitePlayerInfoComponent.setBoardOrientation(color);
+    blackPlayerInfoComponent.setBoardOrientation(color);
     endMessage.setColor(color);
 }
 

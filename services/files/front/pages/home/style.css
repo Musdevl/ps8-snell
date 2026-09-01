@@ -338,6 +338,10 @@ shop-component {
         width: 120%;
     }
 
+    #play-section {
+        overflow-y: auto;
+    }
+
     .popup-content-title {
         font-size: 2em
     }
