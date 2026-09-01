@@ -3,6 +3,7 @@ import { GridRenderer } from "./grid-renderer.js";
 import { InteractionRenderer } from "./interaction-renderer.js";
 import { PiecesRenderer } from "./piece-renderer.js";
 import * as BoardUtils from "../../../utils/BoardUtils.js";
+import { BoardOrientation } from "../../../utils/BoardOrientation.js";
 
 const CELL_NUMBER_IN_A_ROW = 10;
 
@@ -23,13 +24,17 @@ export class BoardRenderer {
         this.laserCanvas       = laserCanvas;
         this.interactionCanvas = interactionCanvas;
 
+        this.orientation = new BoardOrientation(false);
+
         this._initAllCanvas();
 
         // Créer les renderers
-        this.gridRenderer        = new GridRenderer(gridCanvas, cellSize);
-        this.piecesRenderer      = new PiecesRenderer(piecesCanvas, cellSize);
-        this.laserRenderer       = new LaserRenderer(laserCanvas, cellSize);
+        this.gridRenderer        = new GridRenderer(gridCanvas, cellSize, this.orientation);
+        this.piecesRenderer      = new PiecesRenderer(piecesCanvas, cellSize, this.orientation);
+        this.laserRenderer       = new LaserRenderer(laserCanvas, cellSize, this.orientation);
         this.interactionRenderer = new InteractionRenderer(interactionCanvas, cellSize);
+
+        this._applyOrientation();
 
         laserCanvas.addEventListener('piece-killed', (e) => {
             const { row, col } = e.detail;
@@ -68,8 +73,46 @@ export class BoardRenderer {
         this.laserRenderer.cellSize       = cellSize;
         this.interactionRenderer.cellSize = cellSize;
 
+        // Réaffecter canvas.width remet le contexte à zéro : l'orientation
+        // doit être réinstallée avant tout nouveau dessin.
+        this._applyOrientation();
+
         // Redessiner la grille de fond (statique)
         this.gridRenderer.draw();
+    }
+
+    // ─── Orientation ─────────────────────────────────────────────────────────
+
+    /**
+     * Retourne le plateau (le joueur noir voit la partie depuis l'autre côté).
+     * Renvoie true si l'orientation a effectivement changé, pour que l'appelant
+     * sache qu'il doit redessiner les pièces.
+     */
+    setFlipped(flipped) {
+        if (this.orientation.flipped === flipped) return false;
+
+        this.orientation.flipped = flipped;
+        this._applyOrientation();
+        this.gridRenderer.draw();
+        return true;
+    }
+
+    /**
+     * Le plateau tourné est obtenu par une transformation posée une fois sur
+     * chaque contexte, et non en convertissant les coordonnées dans la
+     * vingtaine d'endroits qui dessinent. Aucun de ces endroits ne peut donc
+     * être oublié, et les animations (déplacement, rotation, échange, laser)
+     * en héritent sans une ligne de plus.
+     *
+     * Le canvas de la grille est volontairement exclu : il porte les libellés
+     * de lignes et de colonnes, qui doivent rester lisibles à l'endroit. Il
+     * gère donc sa propre conversion, ce qui ne concerne que ces libellés — le
+     * damier, lui, est invariant par rotation de 180°.
+     */
+    _applyOrientation() {
+        this.orientation.applyTo(this.piecesRenderer.ctx, this.boardSize);
+        this.orientation.applyTo(this.laserRenderer.ctx, this.boardSize);
+        this.orientation.applyTo(this.interactionRenderer.ctx, this.boardSize);
     }
 
     // ─── Rendering ───────────────────────────────────────────────────────────
@@ -105,8 +148,10 @@ export class BoardRenderer {
 
     onCellClick(callback) {
         this.interactionRenderer.canvas.addEventListener('click', (e) => {
-            const position = BoardUtils.getClickPosition(e, this.cellSize);
-            callback(position, e);
+            // Le clic arrive en coordonnées écran : on le repasse en
+            // coordonnées logiques, les seules que connaisse le jeu.
+            const { row, col } = BoardUtils.getClickPosition(e, this.cellSize);
+            callback(this.orientation.toLogical(row, col), e);
         });
     }
 

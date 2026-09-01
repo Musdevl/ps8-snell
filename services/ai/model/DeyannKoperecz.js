@@ -1,15 +1,16 @@
-import { AbstractAi } from "./AbstractAi.js";
-import * as engine from "../engine.js";
+import { MinimaxAi } from "./MinimaxAi.js";
+import { weightsWithAggression } from "../ai.js";
 
-export class DeyannKoperecz extends AbstractAi {
+/** Fort joueur : profondeur reelle, quasiment plus de gaffes, jeu offensif. */
+export class DeyannKoperecz extends MinimaxAi {
 
-    constructor(id, name = "Deyann Koperecz", elo = 1200, path = "/assets/ais/deyann-koperecz-ai.png") {
-        super(id, name, elo, path);
-    }
-
-    getNextAction(game) {
-        const all_action = engine.getAllActions(game);
-        const random_idx = Math.floor(Math.random() * all_action.length)
-        return all_action[random_idx];
+    constructor(id, name = "Deyann Koperecz", elo = 2000, path = "/assets/ais/deyann-koperecz-ai.png") {
+        super(id, name, elo, path, {
+            maxDepth: 8,
+            timeBudgetMs: 1800,
+            blunderRate: 0.05,
+            blunderPool: 2,
+            weights: weightsWithAggression(1.2),
+        });
     }
 }

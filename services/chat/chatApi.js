@@ -92,7 +92,6 @@ app.post('/api/chat/friend/message', async (req, res) => {
 app.post('/api/chat/friend', async (req, res) => {
     try {
         const { user1, user2 } = req.body;
-        console.log("[CHAT SERVICE] -- ", user1, user2)
         let id = friendChatRepo.initFriendChat(user1, user2);
         res.json({ id });
     } catch (error) {

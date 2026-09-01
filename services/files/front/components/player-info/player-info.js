@@ -3,8 +3,8 @@ import * as BoardUtils from '../../utils/BoardUtils.js';
 import { InventoryRenderer } from './renderer/inventory-renderer.js';
 import { RotationRenderer } from './renderer/rotation-renderer.js';
 import * as Uint16Utils from "../../utils/Uint16Utils.js";
-import { PIECE_NAME } from '../../enum/Pieces.js';
-import { COLORS_NAME } from "../../enum/Colors.js";
+import { PIECE, PIECE_NAME } from '../../enum/Pieces.js';
+import { COLORS, COLORS_NAME } from "../../enum/Colors.js";
 import * as accountService from "../../services/account-service.js";
 
 class PlayerInfo extends HTMLElement {
@@ -110,7 +110,7 @@ class PlayerInfo extends HTMLElement {
 
         this.leftArrow.addEventListener('click', () => {
             if (this.inventoryCell) {
-                this.rotationRenderer.drawPiece(Uint16Utils.rotatePiece(this.inventoryCell, DIRECTIONS.EAST));
+                this.#showInRotationCell(Uint16Utils.rotatePiece(this.inventoryCell, DIRECTIONS.EAST), false);
             } else if (this.selectedPiece) {
                 this.dispatchEvent(new CustomEvent("rotate", {
                     detail: { color: this.color, direction: DIRECTIONS.EAST },
@@ -122,7 +122,7 @@ class PlayerInfo extends HTMLElement {
 
         this.rightArrow.addEventListener('click', () => {
             if (this.inventoryCell) {
-                this.rotationRenderer.drawPiece(Uint16Utils.rotatePiece(this.inventoryCell, DIRECTIONS.WEST));
+                this.#showInRotationCell(Uint16Utils.rotatePiece(this.inventoryCell, DIRECTIONS.WEST), false);
             } else if (this.selectedPiece) {
                 this.dispatchEvent(new CustomEvent("rotate", {
                     detail: { color: this.color, direction: DIRECTIONS.WEST },
@@ -180,9 +180,8 @@ class PlayerInfo extends HTMLElement {
         this.inventoryRenderer.draw(this.inventory);
         this.mobileInventoryRenderer.draw(this.inventory);
         this.rotationRenderer.draw();
-        if (this.inventoryCell || this.selectedPiece) {
-            this.rotationRenderer.drawPiece(this.inventoryCell ?? this.selectedPiece);
-        }
+        if (this.inventoryCell) this.#showInRotationCell(this.inventoryCell, false);
+        else if (this.selectedPiece) this.#showInRotationCell(this.selectedPiece, true);
     }
 
     _applyArrowSize() {
@@ -234,7 +233,7 @@ class PlayerInfo extends HTMLElement {
             this.inventoryCell = piece;
 
             // Affiche la piece selectionnée dans la cellule de rotation
-            this.rotationRenderer.drawPiece(piece);
+            this.#showInRotationCell(piece, false);
             return true;
         } else {
             this.selectedInventoryCell = null;
@@ -282,7 +281,33 @@ class PlayerInfo extends HTMLElement {
             this.leftArrow.style.opacity = "0";
             this.rightArrow.style.opacity = "0";
         }
-        this.rotationRenderer.drawPiece(piece);
+        this.#showInRotationCell(piece, true);
+    }
+
+    /**
+     * Oriente la cellule de rotation comme le plateau.
+     *
+     * Volontairement séparé de setPlayerColor : en partie locale ce dernier
+     * reçoit la couleur du TRAIT, qui alterne à chaque coup. À n'appeler que
+     * là où le joueur occupe un seul camp.
+     */
+    setBoardOrientation(color) {
+        this.boardFlipped = color === COLORS.BLACK;
+    }
+
+    /**
+     * Affiche une pièce dans la cellule de rotation.
+     *
+     * La cellule doit montrer exactement ce que le joueur voit sur le plateau,
+     * sinon les flèches sembleraient tourner la pièce à l'envers. Une pièce
+     * prise SUR LE PLATEAU y apparaît tournée de 180° quand on joue les noirs
+     * — sauf le roi, qui reste à l'endroit — donc la cellule applique la même
+     * règle. Une pièce prise dans l'INVENTAIRE n'a jamais été affichée sur le
+     * plateau : elle est déjà dans le bon sens, on n'y touche pas.
+     */
+    #showInRotationCell(piece, fromBoard) {
+        const flipped = fromBoard && this.boardFlipped && piece.pieceName !== PIECE_NAME[PIECE.KING];
+        this.rotationRenderer.drawPiece(piece, flipped);
     }
 
     clearRotationCell() {
@@ -338,7 +363,6 @@ class PlayerInfo extends HTMLElement {
     }
 
     setPlayerInfo(player_info) {
-        console.log(player_info)
         this.username.textContent = player_info.username;
         this.elo.textContent = player_info.elo;
         this.player_avatar.src = player_info.picture.picture;

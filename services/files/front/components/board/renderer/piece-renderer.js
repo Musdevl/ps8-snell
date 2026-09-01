@@ -1,14 +1,19 @@
 import { GATEWAY_URL } from "../../../env.js";
 import * as accountService from "../../../services/account-service.js";
+import { PIECE, PIECE_NAME } from "../../../enum/Pieces.js";
+
+const KING = PIECE_NAME[PIECE.KING];
+const PIECE_COLORS = { 0: 'white', 8: 'black' };
 
 export class PiecesRenderer {
 
     #canvas;
-    constructor(canvas, cellSize) {
+    constructor(canvas, cellSize, orientation) {
 
         this.#canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.cellSize = cellSize;
+        this.orientation = orientation;
         this.pieceImages = {};
 
         this.theme = accountService.getTheme()?.path ?? "default";
@@ -56,24 +61,37 @@ export class PiecesRenderer {
     }
 
     drawPiece(piece, row, col) {
+        this.#drawSprite(
+            piece,
+            col * this.cellSize + this.cellSize / 2,
+            row * this.cellSize + this.cellSize / 2,
+            directionToRadians(piece.direction)
+        );
+    }
 
-        const colors = {
-            0: 'white',
-            8: 'black'
-        }
-
-        const img = this.pieceImages[`${piece.pieceName}_${colors[piece.color]}`];
-
+    /**
+     * Seul endroit qui pose une pièce sur le canvas.
+     *
+     * Le plateau retourné est obtenu par une rotation du contexte, donc tout
+     * ce qui est dessiné tourne avec lui. C'est ce qu'on veut pour les pièces
+     * dont l'orientation compte — un miroir doit renvoyer le faisceau là où le
+     * joueur le voit partir. Le roi, lui, n'a pas d'orientation : le moteur
+     * interdit de le faire pivoter et le laser le tue depuis n'importe quel
+     * côté. Le faire tourner ne ferait que l'afficher à l'envers, on annule
+     * donc la rotation du plateau pour lui seul.
+     */
+    #drawSprite(piece, x, y, angleRad) {
+        const img = this.pieceImages[`${piece.pieceName}_${PIECE_COLORS[piece.color]}`];
         if (!img) return;
 
-        const ctx = this.ctx;
-        const x = col * this.cellSize + this.cellSize / 2;
-        const y = row * this.cellSize + this.cellSize / 2;
+        if (piece.pieceName === KING && this.orientation?.flipped) angleRad += Math.PI;
+
         const size = this.cellSize * 0.85;
+        const ctx = this.ctx;
 
         ctx.save();
         ctx.translate(x, y);
-        ctx.rotate(directionToRadians(piece.direction));
+        ctx.rotate(angleRad);
         ctx.drawImage(img, -size / 2, -size / 2, size, size);
         ctx.restore();
     }
@@ -246,32 +264,16 @@ export class PiecesRenderer {
     }
 
     drawPieceAtAngle(piece, row, col, angleRad) {
-        const colors = { 0: 'white', 8: 'black' };
-        const img = this.pieceImages[`${piece.pieceName}_${colors[piece.color]}`];
-        if (!img) return;
-
-        const x = col * this.cellSize + this.cellSize / 2;
-        const y = row * this.cellSize + this.cellSize / 2;
-        const size = this.cellSize * 0.85;
-
-        this.ctx.save();
-        this.ctx.translate(x, y);
-        this.ctx.rotate(angleRad);
-        this.ctx.drawImage(img, -size / 2, -size / 2, size, size);
-        this.ctx.restore();
+        this.#drawSprite(
+            piece,
+            col * this.cellSize + this.cellSize / 2,
+            row * this.cellSize + this.cellSize / 2,
+            angleRad
+        );
     }
 
     drawPieceAt(piece, x, y) {
-        const colors = { 0: 'white', 8: 'black' };
-        const img = this.pieceImages[`${piece.pieceName}_${colors[piece.color]}`];
-        if (!img) return;
-
-        const size = this.cellSize * 0.85;
-        this.ctx.save();
-        this.ctx.translate(x, y);
-        this.ctx.rotate(directionToRadians(piece.direction));
-        this.ctx.drawImage(img, -size / 2, -size / 2, size, size);
-        this.ctx.restore();
+        this.#drawSprite(piece, x, y, directionToRadians(piece.direction));
     }
 }
 

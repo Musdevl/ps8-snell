@@ -12,6 +12,7 @@ class Board extends HTMLElement {
     playerColor;
     availableCells;
     unavailableCells;
+    boardOrientationColor;
 
     constructor() {
         super();
@@ -78,6 +79,9 @@ class Board extends HTMLElement {
 
         this.whiteInventory = [];
         this.blackInventory = [];
+
+        // L'orientation peut avoir été fixée avant que le renderer n'existe.
+        this.boardRenderer.setFlipped(this.boardOrientationColor === COLORS.BLACK);
 
         await this.boardRenderer.render(this.gridState);
 
@@ -179,6 +183,25 @@ class Board extends HTMLElement {
 
     setPlayerColor(color) {
         this.playerColor = color;
+    }
+
+    /**
+     * Oriente le plateau selon le camp depuis lequel on regarde la partie :
+     * jouer les noirs, c'est s'asseoir en face, donc le plateau tourne de 180°.
+     * Les coordonnées manipulées par le jeu ne bougent pas d'un pouce, seule
+     * la façon de les dessiner change.
+     *
+     * Volontairement séparé de setPlayerColor : en partie locale ce dernier
+     * reçoit la couleur du TRAIT, qui alterne à chaque coup, alors que
+     * l'orientation doit rester fixe pendant toute la partie. À n'appeler que
+     * là où le joueur occupe un seul camp.
+     */
+    setBoardOrientation(color) {
+        this.boardOrientationColor = color;
+
+        if (this.boardRenderer?.setFlipped(color === COLORS.BLACK)) {
+            this.boardRenderer.renderGrid(this.gridState);
+        }
     }
 
     selectPiece(position) {

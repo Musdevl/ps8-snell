@@ -39,7 +39,9 @@ if (accountService.isLoggedIn()) {
 
     const snell_coins = document.getElementById('snell-coins');
     snell_coins.textContent = accountService.getSnellCoins();
-    snell_coins.addEventListener('click', async (e) => {
+    const add_coins = document.querySelector('.snell-coins-container');
+    console.log(add_coins);
+    add_coins.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();

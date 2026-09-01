@@ -61,6 +61,5 @@ export async function fetchFriendChat(chatId) {
         method: "GET"
     });
     const json = await res.json();
-    console.log("DEBUG : Get chat friend : " + json)
     return json;
 }
