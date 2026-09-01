@@ -43,8 +43,9 @@ app.post('/api/ais/evaluate', (req, res) => {
 
 
         // on fait vrmt comme chess com raf
-        if (score === Infinity) return res.json({ score: "1 - 0" }, 200);
-        if (score === -Infinity) return res.json({ score: "0 - 1" }, 200);
+        // (l'evaluation rend un score fini : Infinity ne survivrait pas a JSON.stringify)
+        if (score >= ai.MATE_THRESHOLD) return res.json({ score: "1 - 0" }, 200);
+        if (score <= -ai.MATE_THRESHOLD) return res.json({ score: "0 - 1" }, 200);
 
 
         res.json({ score }, 200);

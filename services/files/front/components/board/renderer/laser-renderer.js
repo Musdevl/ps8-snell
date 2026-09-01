@@ -5,10 +5,11 @@ export class LaserRenderer {
     #canvas;
     #animationId = null;
 
-    constructor(canvas, cellSize) {
+    constructor(canvas, cellSize, orientation) {
         this.#canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.cellSize = cellSize;
+        this.orientation = orientation;
         this.theme = accountService.getTheme()?.path ?? "default";
         this.explosionSound = new Audio(`${GATEWAY_URL}/assets/themes/${this.theme}/sounds/explosion.mp3`);
 
@@ -208,9 +209,14 @@ export class LaserRenderer {
     }
 
     showExplosion(row, col, gifDuration = 1000) {
+        // Seul endroit du plateau dessiné en DOM et non en canvas : la
+        // transformation d'orientation ne s'y applique pas, il faut convertir
+        // la position à la main.
+        const screen = this.orientation.toScreen(row, col);
+
         const size = this.cellSize * 1;
-        const x = col * this.cellSize + this.cellSize / 2 - size / 2;
-        const y = row * this.cellSize + this.cellSize / 2 - size / 2;
+        const x = screen.col * this.cellSize + this.cellSize / 2 - size / 2;
+        const y = screen.row * this.cellSize + this.cellSize / 2 - size / 2;
 
         const img = document.createElement('img');
         img.src = `${GATEWAY_URL}/assets/themes/${this.theme}/animations/explosion.gif?t=${Date.now()}`;
