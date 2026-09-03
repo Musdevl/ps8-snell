@@ -253,12 +253,14 @@ function setupBoardComponentEvents(boardComponent) {
         e.detail.userId = userId;
         e.detail.gameType = GAME_TYPE;
 
-        // Adding the rotation from the right inventory
         if (e.detail.action.split("/")[0] === "PLACE") {
-            if (boardComponent.colorTurn === COLORS.WHITE && whitePlayerInfoComponent.getSelectedInventoryCell())
-                e.detail.action += `,${whitePlayerInfoComponent.getSelectedInventoryCell().direction}`;
-            else if (boardComponent.colorTurn === COLORS.BLACK && blackPlayerInfoComponent.getSelectedInventoryCell())
-                e.detail.action += `,${blackPlayerInfoComponent.getSelectedInventoryCell().direction}`;
+            const whiteDirection = whitePlayerInfoComponent.getSelectedInventoryCellDirection();
+            const blackDirection = blackPlayerInfoComponent.getSelectedInventoryCellDirection();
+
+            if (boardComponent.colorTurn === COLORS.WHITE && whiteDirection !== null)
+                e.detail.action += `,${whiteDirection}`;
+            else if (boardComponent.colorTurn === COLORS.BLACK && blackDirection !== null)
+                e.detail.action += `,${blackDirection}`;
             else {
                 return;
             }
@@ -323,6 +325,8 @@ function startNewGame() {
 
     socket.emit("join", { gameType: GAME_TYPE, userId: userId, aiId: aiId, playerColor: playerColor });
     boardComponent.clearSelection();
+    whitePlayerInfoComponent.resetRotationCell();
+    blackPlayerInfoComponent.resetRotationCell();
     endMessage.clear();
 }
 
@@ -337,6 +341,7 @@ async function setPlayerColor(white_id, black_id) {
     else if (black_id === userId) {
         color = COLORS.BLACK;
         whitePlayerInfoComponent.disableRotation();
+        blackPlayerInfoComponent.reverse();
         // main.flipped existe deja dans shared/game.css : il renvoie le
         // panneau du joueur de son cote, comme en multijoueur.
         main.classList.add('flipped');

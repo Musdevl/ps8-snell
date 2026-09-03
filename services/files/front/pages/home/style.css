@@ -190,6 +190,7 @@ chat-component {
 nav-bar {
     display: none;
     box-sizing: border-box;
+
 }
 
 #shop-section {
@@ -491,7 +492,7 @@ shop-component {
 
     nav-bar {
         display: flex;
-        position: absolute;
+        position: fixed;
         bottom: 0;
         left: 0;
         height: 10%;

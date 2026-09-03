@@ -488,7 +488,7 @@ end-message {
     }
 
     body {
-        justify-content: flex-end;
+        justify-content: center;
         box-sizing: border-box;
     }
 
@@ -496,7 +496,7 @@ end-message {
         height: 90%;
         flex-direction: column;
         gap: 1em;
-        justify-content: flex-end;
+        justify-content: flex-start;
     }
 
     main.flipped {
@@ -505,7 +505,6 @@ end-message {
 
     .black {
         border-top: 1px solid #454340;
-        padding-top: 2em;
     }
 
     /* Chat (mobile) */
@@ -601,6 +600,7 @@ end-message {
         width: 100%;
         display: flex;
         justify-content: center;
+        height: auto;
     }
 
     .game-board {
