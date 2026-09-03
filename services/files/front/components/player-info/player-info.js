@@ -1,4 +1,4 @@
-import { DIRECTIONS } from '../../enum/Directions.js';
+import { DIRECTIONS, OPPOSITE_DIRECTIONS } from '../../enum/Directions.js';
 import * as BoardUtils from '../../utils/BoardUtils.js';
 import { InventoryRenderer } from './renderer/inventory-renderer.js';
 import { RotationRenderer } from './renderer/rotation-renderer.js';
@@ -33,6 +33,8 @@ class PlayerInfo extends HTMLElement {
 
     low_timers_sound_played;
 
+    is_reversed;
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -49,6 +51,7 @@ class PlayerInfo extends HTMLElement {
         this.elo = null;
         this.time = 0;
         this.low_timers_sound_played = false;
+        this.is_reversed = false;
 
         this.theme = accountService.getTheme()?.path ?? "default";
 
@@ -70,6 +73,10 @@ class PlayerInfo extends HTMLElement {
             return size > 0 ? size : 0;
         }
         return 75;
+    }
+
+    reverse() {
+        this.is_reversed = true;
     }
 
     async connectedCallback() {
@@ -273,6 +280,17 @@ class PlayerInfo extends HTMLElement {
 
     getSelectedInventoryCell() { return this.inventoryCell; }
 
+    getSelectedInventoryCellDirection() {
+        if (this.inventoryCell) {
+            if (this.is_reversed) {
+                return OPPOSITE_DIRECTIONS[this.inventoryCell.direction];
+            } return this.inventoryCell.direction;
+        } else {
+            return null;
+        }
+    }
+
+
     setSelectedPiece(piece) {
         this.clearRotationCell();
         this.selectedPiece = piece;
@@ -367,6 +385,11 @@ class PlayerInfo extends HTMLElement {
         this.elo.textContent = player_info.elo;
         this.player_avatar.src = player_info.picture.picture;
         this.low_timer_sound.load();
+    }
+
+    resetRotationCell() {
+        this.clearRotationCell();
+        this.shadowRoot.querySelector('.facing-cell-container').style.opacity = "1";
     }
 
     setPlayerName(playerName) { this.username.textContent = playerName; }

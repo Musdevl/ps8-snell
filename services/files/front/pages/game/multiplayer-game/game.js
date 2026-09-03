@@ -191,14 +191,17 @@ function setupBoardEvents() {
         e.detail.userId = userId;
         e.detail.gameType = GAME_TYPE;
 
-        // Append rotation from the right inventory for PLACE actions
         if (e.detail.action.split("/")[0] === "PLACE") {
-            const activePlayer = boardComponent.colorTurn === COLORS.WHITE
-                ? whitePlayerInfoComponent
-                : blackPlayerInfoComponent;
-            const selectedCell = activePlayer.getSelectedInventoryCell();
-            if (!selectedCell) return;
-            e.detail.action += `,${selectedCell.direction}`;
+            const whiteDirection = whitePlayerInfoComponent.getSelectedInventoryCellDirection();
+            const blackDirection = blackPlayerInfoComponent.getSelectedInventoryCellDirection();
+
+            if (boardComponent.colorTurn === COLORS.WHITE && whiteDirection !== null)
+                e.detail.action += `,${whiteDirection}`;
+            else if (boardComponent.colorTurn === COLORS.BLACK && blackDirection !== null)
+                e.detail.action += `,${blackDirection}`;
+            else {
+                return;
+            }
         }
 
         whitePlayerInfoComponent.clearRotationCell();
@@ -396,6 +399,7 @@ function setPlayerColor(white_id, black_id) {
     } else if (black_id === userId) {
         color = COLORS.BLACK;
         whitePlayerInfoComponent.disableRotation();
+        blackPlayerInfoComponent.reverse();
         main.classList.add('flipped');
     }
 
