@@ -361,7 +361,6 @@ function renderEmotes() {
 }
 
 
-
 async function updateProfilePicture(profile_picture) {
 
     try {
