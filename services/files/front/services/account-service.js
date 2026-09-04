@@ -36,7 +36,7 @@ export function clearTokens() {
 export async function authFetch(url, options = {}) {
     const token = getToken();
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    
+
     const res = await fetch(url, {
         ...options,
         headers: {
@@ -158,7 +158,7 @@ export function getElo() {
 }
 
 export function getSelectedEmotes() {
-    return accountData.selected_emotes;
+    return accountData.selected_emotes ?? [];
 }
 
 export function getEmotes() {
