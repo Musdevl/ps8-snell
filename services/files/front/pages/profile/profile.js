@@ -245,31 +245,53 @@ async function renderInventory() {
 }
 
 function renderProfilePictures() {
-    const profile_pictures = document.querySelector('#profile-picture-list');
+    try {
+        const profile_pictures = document.querySelector('#profile-picture-list');
 
-    loadPictureList(profile_pictures, accountService.getProfilePictureList(), 'profile-picture-item',
+        loadPictureList(profile_pictures, accountService.getProfilePictureList(), 'profile-picture-item',
 
-        async (item) => { await updateProfilePicture(item); },
+            async (item) => { await updateProfilePicture(item); },
 
-        (profile_picture_id, img) => {
-            if (accountService.getProfilePicture().id === profile_picture_id) {
-                img.classList.add('selected');
-            }
-        });
+            (profile_picture_id, img) => {
+                if (accountService.getProfilePicture().id === profile_picture_id) {
+                    img.classList.add('selected');
+                }
+            });
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 function renderThemes() {
-    const themeList = document.querySelector('#theme-list');
+    try {
+        const themeList = document.querySelector('#theme-list');
 
-    loadPictureList(themeList, accountService.getThemes(), "theme-item",
+        loadPictureList(themeList, accountService.getThemes(), "theme-item",
 
-        async (theme) => { await updateSelectedTheme(theme); },
+            async (theme) => { await updateSelectedTheme(theme); },
 
-        (theme_id, theme) => {
-            if (accountService.getTheme().id === theme_id) {
-                theme.classList.add('selected');
-            }
-        })
+            (theme_id, theme) => {
+                if (accountService.getTheme().id === theme_id) {
+                    theme.classList.add('selected');
+                }
+            })
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
+function isEmote(emote) {
+    return !!emote && typeof emote.picture === 'string';
+}
+
+// Ramene la liste sauvegardee a EMOTE_SLOT_COUNT slots, les entrees invalides
+// (null, undefined, objet sans picture) devenant des slots vides.
+function normalizeEmoteSlots(emotes) {
+    const slots = Array.isArray(emotes) ? emotes.slice(0, EMOTE_SLOT_COUNT) : [];
+    while (slots.length < EMOTE_SLOT_COUNT) slots.push(null);
+    return slots.map(emote => isEmote(emote) ? emote : null);
 }
 
 function renderSelectedEmotes() {
@@ -292,20 +314,26 @@ function renderSelectedEmotes() {
 }
 
 function renderEmotes() {
-    const emoteList = document.querySelector('#emote-list');
+    try {
+        const emoteList = document.querySelector('#emote-list');
 
-    loadPictureList(emoteList, accountService.getEmotes(), 'emote-item', async (newEmote) => {
-        if (currentEmoteIndex !== null) {
-            selected_profile_emotes[currentEmoteIndex] = newEmote;
+        loadPictureList(emoteList, accountService.getEmotes(), 'emote-item', async (newEmote) => {
+            if (currentEmoteIndex !== null) {
+                selected_profile_emotes[currentEmoteIndex] = newEmote;
 
-            await updateSelectedEmotes();
+                await updateSelectedEmotes();
 
-            closeInventoryModal();
-            currentEmoteIndex = null; // Reset
-        }
-    });
+                closeInventoryModal();
+                currentEmoteIndex = null; // Reset
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
+
+    closeInventoryModal();
+    currentEmoteIndex = null; // Reset
 }
-
 
 
 async function updateProfilePicture(profile_picture) {
@@ -395,11 +423,16 @@ async function updateSelectedEmotes() {
 
 
 async function renderChat() {
-    await customElements.whenDefined('chat-component');
-    chat.disableDrawButton();
-    chat.disableForfeitButton();
-    const messages = await UserService.fetchFriendChat(chatId);
-    chat.setChat(messages);
+    try {
+        await customElements.whenDefined('chat-component');
+        chat.disableDrawButton();
+        chat.disableForfeitButton();
+        const messages = await UserService.fetchFriendChat(chatId);
+        chat.setChat(messages);
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 // ─── Inventory ────────────────────────────────────────────────────────────────
