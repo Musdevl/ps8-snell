@@ -11,4 +11,5 @@ RUN npm install
 COPY game/ .
 
 EXPOSE 8002
+ENTRYPOINT ["bash", "/app/helpers/entrypoint.sh"]
 CMD ["node", "src/index.js"]

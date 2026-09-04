@@ -31,10 +31,10 @@ export class MinimaxAi extends AbstractAi {
 
     getNextAction(game) {
         const result = findBestAction(game, this.profile);
-        console.log(
-            `[AI] ${this.name} (${this.elo} Elo) -> ${result.action} | profondeur ${result.depthReached}/${this.profile.maxDepth}`
-            + ` | ${result.nodes} noeuds en ${result.elapsedMs.toFixed(0)}ms | score ${formatScore(result.score)}`
-        );
+        // console.log(
+        //     `[AI] ${this.name} (${this.elo} Elo) -> ${result.action} | profondeur ${result.depthReached}/${this.profile.maxDepth}`
+        //     + ` | ${result.nodes} noeuds en ${result.elapsedMs.toFixed(0)}ms | score ${formatScore(result.score)}`
+        // );
         return result.action;
     }
 }

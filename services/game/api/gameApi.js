@@ -85,8 +85,6 @@ app.post('/api/game/forward-message', async (req, res) => {
         const { gameId, message } = req.body;
         const res = await gameManager.processMessage(gameId, message);
         return gatewayConnection.emit("game-ws-service", formatToSend(res.players_web_sockets, "new-message", res.message));
-
-        res.json("Message successfully forwared", 200);
     } catch (error) {
         console.log("[User API] Failed to forward the message to the gateway", error);
         res.json("Failed to forward the message", 503);
@@ -98,9 +96,7 @@ app.post('/api/game/forward-message', async (req, res) => {
 export function startHttpServer(port, newGameManager) {
     gameManager = newGameManager;
     const PORT = port;
-    const server = app.listen(PORT, () => {
-        console.log(`[GAME SERVER] Server listening on port ${PORT}`);
-    });
+    const server = app.listen(PORT, () => {});
 
     process.on('SIGTERM', () => { app.close(() => { process.exit(0); }); });
     process.on('SIGINT', () => { app.close(() => { process.exit(0); }); });
