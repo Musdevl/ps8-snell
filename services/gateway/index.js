@@ -21,13 +21,10 @@ const URLS = {
 const proxy = httpProxy.createProxyServer();
 
 const gameClient = ioClient(URLS.game, { reconnection: true, reconnectionDelay: 1000, reconnectionAttempts: 5 });
-gameClient.on('connect', () => console.log('[GATEWAY-GAME] - Game Service connected'));
 
 const userClient = ioClient(URLS.user, { reconnection: true, reconnectionDelay: 1000, reconnectionAttempts: 5 });
-userClient.on('connect', () => console.log('[GATEWAY-USER] - User connected'));
 
 const chatClient = ioClient(URLS.chat, { reconnection: true, reconnectionDelay: 1000, reconnectionAttempts: 5 });
-chatClient.on('connect', () => console.log("[GATEWAY-CHAT] - Chat connected"));
 
 const PUBLIC_ROUTES = [
     '/pages/auth/',
@@ -93,7 +90,6 @@ const requestHandler = (req, res) => {
             }
 
             if (verified.isNew) {
-                console.log("[AUTH MIDDLEWARE] - New Token !");
                 res.setHeader('Set-Cookie', `jwt_token=${verified.token}; HttpOnly; Path=/`);
                 res.setHeader('X-New-Token', verified.token);
             }
@@ -169,7 +165,6 @@ const requestHandler = (req, res) => {
                 return proxy.web(req, res,
                     { target: URLS.files },
                     err => {
-                        console.log("[GATEWAY] - File service down:", err);
                         res.statusCode = 502;
                         return res.end("File service unavailable");
                     });
@@ -198,9 +193,7 @@ const server = getServer();
 const io = new Server(server, { cors: { origin: '*', methods: ['GET', 'POST'], credentials: false } });
 
 io.on('connection', socket => {
-    console.log('[GATEWAY] connected:', socket.id);
     socket.on('disconnect', () => {
-        console.log('[GATEWAY] disconnected:', socket.id);
         gameClient.emit("disconnect", socket.id);
     });
 });
@@ -210,8 +203,6 @@ io.on('connection', socket => {
 const gameNamespace = io.of('/game');
 
 gameNamespace.on('connection', socket => {
-    console.log('[FRONT-GATEWAY-GAME] connected:', socket.id);
-
     const eventToRedirect = [
         'join', 'action', 'leave', 'send-message',
         'ask-draw', 'deny-draw', 'accept-draw', 'forfeit'
@@ -221,7 +212,6 @@ gameNamespace.on('connection', socket => {
 
     socket.on("game-ws-service", ({ webSocketIds, event, data }) => {
         gameNamespace.to(webSocketIds).emit(event, data);
-        console.log("[FRONT-GATEWAY-GAME] Broadcast to " + webSocketIds + " event: " + event);
     });
 });
 
@@ -230,13 +220,10 @@ gameNamespace.on('connection', socket => {
 const userNamespace = io.of('/user');
 
 userNamespace.on('connection', socket => {
-    console.log('[FRONT-GATEWAY-USER] connected:', socket.id);
-
     const eventToRedirect = ['register'];
 
     eventToRedirect.forEach(event => socket.on(event, data => {
         userClient.emit(event, { clientId: socket.id, ...data });
-        console.log(`[FRONT-GATEWAY-USER] Redirected event "${event}" to user service`);
     }));
 
     socket.on('disconnect', () => {
@@ -245,7 +232,6 @@ userNamespace.on('connection', socket => {
 
     socket.on("user-ws-service", ({ webSocketIds, event, data }) => {
         userNamespace.to(webSocketIds).emit(event, data);
-        console.log(`[USER-GATEWAY-FRONT] Broadcasted event "${event}" to [${webSocketIds}]`);
     });
 });
 
@@ -253,15 +239,12 @@ userNamespace.on('connection', socket => {
 
 const chatNamespace = io.of("/chat");
 chatNamespace.on('connection', socket => {
-    console.log("[FRONT-GATEWAY-CHAT] connected:", socket.id);
-
     chatClient.emit("register", { socketId: socket.id });
 
     const eventToRedirect = [];
 
     eventToRedirect.forEach(event => socket.on(event, data => {
         chatNamespace.emit(event, { clientId: socket.id, ...data });
-        console.log(`[FRONT-GATEWAY-CHAT] Redirected event "${event}" to chat service`);
     }));
 
     socket.on("disconnect", () => {
@@ -270,8 +253,7 @@ chatNamespace.on('connection', socket => {
 
     socket.on("chat-ws-service", ({ webSocketIds, event, data }) => {
         chatNamespace.to(webSocketIds).emit(event, data);
-        console.log(`[CHAT-GATEWAY-FRONT] Broadcasted event "${event}" to [${webSocketIds}]`);
     });
 });
 
-server.listen(PORT, () => console.log(`[SERVER] ${ENV === "prod" ? "HTTPS" : "HTTP"} listening on port ${PORT}`));
+server.listen(PORT, () => { });

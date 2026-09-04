@@ -67,7 +67,6 @@ function getPlayersInRange(player) {
         let pHigh = p.elo + p.range;
 
         if (playerHigh >= pLow && playerLow <= pHigh || playerLow >= pLow && playerHigh <= pHigh) {
-            console.log("Match found:", player.userId, "vs", p.userId, "mode:", player.gameMode);
             matchEvents.emit("match", [{ ...p }, { ...player }], player.gameMode);
         }
     });

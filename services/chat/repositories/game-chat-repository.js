@@ -9,11 +9,10 @@ let game_chat_collection;
 export async function initDatabase() {
     try {
         await client.connect();
-        console.log('[GAME_CHAT_REPO] - Connecté à MongoDB');
         db = client.db(dbName);
         game_chat_collection = db.collection('game_chat');
     } catch (error) {
-        console.error('[GAME_CHAT_REPO] - Erreur de connexion MongoDB:', error);
+        console.error('[CHAT SERVICE] - Erreur de connexion MongoDB:', error);
         throw error;
     }
 }
@@ -25,7 +24,7 @@ export async function initGameChat(gameId) {
 
         return result;
     } catch (error) {
-        console.error('[GAME_CHAT_REPO] - Erreur lors de la création du chat:', error);
+        console.error('[CHAT SERVICE] - Erreur lors de la création du chat:', error);
         throw error;
     }
 }
@@ -53,7 +52,6 @@ export async function addMessageToChat(gameId, message) {
 export async function closeDatabase() {
     try {
         await client.close();
-        console.log('[GAME_CHAT_REPO] - Connexion MongoDB fermée');
     } catch (error) {
         console.error('[GAME_CHAT_REPO] - Erreur lors de la fermeture:', error);
     }

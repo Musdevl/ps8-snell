@@ -96,5 +96,5 @@ docker network inspect proxy >/dev/null 2>&1 || docker network create proxy
 if [ "$BUILD" = true ]; then
   docker compose --env-file "$ENV_FILE" up --build
 else
-  docker compose --env-file "$ENV_FILE" up -d
+  docker compose --env-file "$ENV_FILE" up
 fi

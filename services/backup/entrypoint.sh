@@ -36,14 +36,16 @@ chmod 600 /etc/snell-backup.env
 mkdir -p "${BACKUP_DIR:-/backup}"
 touch "$LOG"
 
+echo
 echo "──────────────────────────────────────────────────────────────"
-echo " snell-backup démarré"
+echo "  📦  BACKUP SERVICE "
+echo "──────────────────────────────────────────────────────────────"
 echo "   base          : ${MONGO_DB_URL:-mongodb://mongodb:27017}"
 echo "   destination   : ${BACKUP_DIR:-/backup}  (dossier ./backup de l'hôte)"
 echo "   rétention     : ${BACKUP_RETENTION_DAYS:-14} jours glissants"
 echo "   fuseau        : ${TZ:-UTC}  —  heure actuelle : $(date '+%Y-%m-%d %H:%M:%S')"
 echo "   planification : tous les jours à 02:00"
-echo "──────────────────────────────────────────────────────────────"
+echo 
 
 if [ -z "${BACKUP_ENCRYPTION_KEY:-}" ]; then
   echo "⚠️  ATTENTION : BACKUP_ENCRYPTION_KEY est vide."

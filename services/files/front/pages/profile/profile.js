@@ -261,7 +261,7 @@ function renderProfilePictures() {
                 }
             });
     } catch (error) {
-        console.log(error);
+        console.log("[Profile]", error);
     }
 
 }
@@ -280,7 +280,7 @@ function renderThemes() {
                 }
             })
     } catch (error) {
-        console.log(error);
+        console.log("[Profile]", error);
     }
 
 }
@@ -355,7 +355,7 @@ function renderEmotes() {
             }
         });
     } catch (error) {
-        console.log(error);
+        console.log("[Profile]", error);
     }
 
 }
@@ -442,7 +442,7 @@ async function updateSelectedEmotes() {
         renderSelectedEmotes();
         notificationService.notify("Selected emotes saved successfuly", "success")
     } catch (error) {
-        console.log(error)
+        console.log("[Profile]", error);
         notificationService.notify("Failed to save emotes", "error");
     }
 }
@@ -456,7 +456,7 @@ async function renderChat() {
         const messages = await UserService.fetchFriendChat(chatId);
         chat.setChat(messages);
     } catch (error) {
-        console.log(error);
+        console.log("[Profile]", error);
     }
 
 }

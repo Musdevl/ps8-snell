@@ -30,11 +30,7 @@ const ioServer = new Server(server, {
 
 ioServer.on('connection', (socket) => {
 
-    console.log(`GATEWAY Client connected to Game Service with id: ${socket.id}`);
-
-    socket.on('disconnect', () => {
-        console.log(`GATEWAY Client connected to Game Service with id: ${socket.id}`);
-    });
+    socket.on('disconnect', () => {});
 
     socket.on('join', (data) => {
         handleJoin(data)
@@ -56,7 +52,7 @@ ioServer.on('connection', (socket) => {
 
 });
 
-gatewayConnection.on('connect', () => { console.log('GAME SERVICE CLIENT Connected to gateway'); });
+gatewayConnection.on('connect', () => {});
 
 // Gestion Timeout
 
@@ -148,7 +144,6 @@ async function handleJoin(data) {
         const reconnect_status = gameManager.tryReconnect(playerInfo, data.gameType);
 
         if (reconnect_status) {
-            console.log("[GAME SERVICE] - Reconnecting... ");
             res = formatToSend([playerInfo.webSocketId], "reconnect", reconnect_status.game)
             gatewayConnection.emit("game-ws-service", res);
             // Se reconnecter pendant le tour de l'IA ne doit pas figer la
@@ -254,7 +249,7 @@ function handleAction(data) {
             if (game.gameType === "AI" && res.data.status === "CONTINUE") scheduleAiMove(game);
 
         } else {
-            console.log("No Game Found")
+            console.log("[GAME SERVICE] No Game Found")
         }
     } catch (error) {
         console.log(error);

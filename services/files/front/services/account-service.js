@@ -61,12 +61,10 @@ export function setUsername(newUsername) {
     if (newUsername) {
         accountData.username = newUsername;
         saveToStorage(accountData);
-        console.log("[Account Service] - User Name successfully changed");
     }
 }
 
 export function setAccount(account) {
-    console.log("[Account Service] - Setting a new account");
     if (account) {
         accountData.userId = account._id;
         accountData.username = account.username;
@@ -82,8 +80,6 @@ export function setAccount(account) {
         accountData.friends_requests = account.friendsRequests;
 
         saveToStorage(accountData);
-
-        console.log("[Account Service] - Account saved");
     } else {
         console.log("[Account Service] - Invalid User Account");
     }

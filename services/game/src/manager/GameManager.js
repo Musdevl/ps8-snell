@@ -253,9 +253,6 @@ export class GameManager extends EventEmitter {
         // Censure Message
 
         const game = this.findGame(gameId);
-
-        console.log("RECEIVED MESSAGE", message)
-
         const userResponse = await fetch(
             `${this.USER_SERVICE_URL}/api/user/info/${message.userId}`,
             { method: "GET" }

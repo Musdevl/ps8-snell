@@ -21,7 +21,6 @@ async function init() {
 
             dancers.forEach(d => {
                 d.classList.add('show-celebration');
-                console.log("[UI] Classe ajoutée à un danseur");
             });
 
             const userRes = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${userId}`);
