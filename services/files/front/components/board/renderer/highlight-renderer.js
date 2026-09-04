@@ -102,13 +102,18 @@ export class HighlightRenderer {
         ctx.save();
         ctx.fillStyle = `rgba(${dimColor}, ${dim})`;
         ctx.fillRect(0, 0, this.#canvas.width, this.#canvas.height);
+        ctx.restore();
 
         // 2. On perce le voile à l'emplacement des cases mises en avant.
-        ctx.globalCompositeOperation = 'destination-out';
+        //
+        // clearRect, et surtout pas un fillRect en 'destination-out' : ce
+        // dernier retire de la destination l'alpha de la SOURCE. Le voile étant
+        // posé à `dim` (0.6), il n'en effacerait que 60 % et la case censée être
+        // mise en lumière resterait grisée. clearRect, lui, ignore alpha et
+        // composition : le trou est un vrai trou.
         for (const { row, col } of this.#cells) {
-            ctx.fillRect(col * size, row * size, size, size);
+            ctx.clearRect(col * size, row * size, size, size);
         }
-        ctx.restore();
 
         if (!outline) return;
 

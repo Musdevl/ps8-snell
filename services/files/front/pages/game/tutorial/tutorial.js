@@ -197,6 +197,12 @@ function setupBoardComponentEvents(boardComponent) {
         blackPlayerInfoComponent.clearRotationCell();
 
         if (action === tutorial_steps[tutorial_index].expectedAction) {
+            // Le coup demandé vient d'être joué : on éteint le projecteur tout
+            // de suite. Sinon le plateau resterait assombri pendant la pose de
+            // la pièce puis tout le passage du laser — c'est-à-dire pendant
+            // exactement ce qu'on veut donner à voir. L'étape suivante
+            // rallumera le sien si elle en a un.
+            boardComponent.clearHighlightedCells();
             nextTutorielStep();
             playSound(correct_action);
         }
