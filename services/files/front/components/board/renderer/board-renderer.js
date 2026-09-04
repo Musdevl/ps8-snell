@@ -2,6 +2,7 @@ import { LaserRenderer } from "./laser-renderer.js";
 import { GridRenderer } from "./grid-renderer.js";
 import { InteractionRenderer } from "./interaction-renderer.js";
 import { PiecesRenderer } from "./piece-renderer.js";
+import { HighlightRenderer } from "./highlight-renderer.js";
 import * as BoardUtils from "../../../utils/BoardUtils.js";
 import { BoardOrientation } from "../../../utils/BoardOrientation.js";
 
@@ -13,7 +14,8 @@ export class BoardRenderer {
         gridCanvas,
         piecesCanvas,
         laserCanvas,
-        interactionCanvas) {
+        interactionCanvas,
+        highlightCanvas = null) {
 
         this.cellSize = cellSize;
         this.boardSize = cellSize * CELL_NUMBER_IN_A_ROW;
@@ -23,6 +25,7 @@ export class BoardRenderer {
         this.piecesCanvas      = piecesCanvas;
         this.laserCanvas       = laserCanvas;
         this.interactionCanvas = interactionCanvas;
+        this.highlightCanvas   = highlightCanvas;
 
         this.orientation = new BoardOrientation(false);
 
@@ -33,6 +36,10 @@ export class BoardRenderer {
         this.piecesRenderer      = new PiecesRenderer(piecesCanvas, cellSize, this.orientation);
         this.laserRenderer       = new LaserRenderer(laserCanvas, cellSize, this.orientation);
         this.interactionRenderer = new InteractionRenderer(interactionCanvas, cellSize);
+        // Optionnel : un board.html plus ancien (ou en cache) n'a pas le calque.
+        this.highlightRenderer   = highlightCanvas
+            ? new HighlightRenderer(highlightCanvas, cellSize)
+            : null;
 
         this._applyOrientation();
 
@@ -54,6 +61,7 @@ export class BoardRenderer {
         this._initCanvas(this.piecesCanvas);
         this._initCanvas(this.laserCanvas);
         this._initCanvas(this.interactionCanvas);
+        if (this.highlightCanvas) this._initCanvas(this.highlightCanvas);
     }
 
     /**
@@ -72,6 +80,7 @@ export class BoardRenderer {
         this.piecesRenderer.cellSize      = cellSize;
         this.laserRenderer.cellSize       = cellSize;
         this.interactionRenderer.cellSize = cellSize;
+        if (this.highlightRenderer) this.highlightRenderer.cellSize = cellSize;
 
         // Réaffecter canvas.width remet le contexte à zéro : l'orientation
         // doit être réinstallée avant tout nouveau dessin.
@@ -79,6 +88,9 @@ export class BoardRenderer {
 
         // Redessiner la grille de fond (statique)
         this.gridRenderer.draw();
+
+        // Le projecteur a été effacé par la réaffectation de canvas.width.
+        this.highlightRenderer?.redraw();
     }
 
     // ─── Orientation ─────────────────────────────────────────────────────────
@@ -94,6 +106,7 @@ export class BoardRenderer {
         this.orientation.flipped = flipped;
         this._applyOrientation();
         this.gridRenderer.draw();
+        this.highlightRenderer?.redraw();
         return true;
     }
 
@@ -113,6 +126,7 @@ export class BoardRenderer {
         this.orientation.applyTo(this.piecesRenderer.ctx, this.boardSize);
         this.orientation.applyTo(this.laserRenderer.ctx, this.boardSize);
         this.orientation.applyTo(this.interactionRenderer.ctx, this.boardSize);
+        if (this.highlightRenderer) this.orientation.applyTo(this.highlightRenderer.ctx, this.boardSize);
     }
 
     // ─── Rendering ───────────────────────────────────────────────────────────
@@ -142,6 +156,13 @@ export class BoardRenderer {
     showNearCases(cases)         { this.interactionRenderer.showNearCases(cases); }
     clearInteractions()          { this.interactionRenderer.clear(); }
     clearPieces()                { this.piecesRenderer.clearPieces(); }
+
+    /**
+     * Assombrit tout le plateau sauf les cases passées en paramètre.
+     * `cells` accepte [{row, col}] comme [[row, col]], en coordonnées logiques.
+     */
+    highlightCells(cells, options)  { this.highlightRenderer?.show(cells, options); }
+    clearHighlightedCells()         { this.highlightRenderer?.clear(); }
 
     highLightAllAvailableCell(availableCells)     { this.interactionRenderer.showNearCases(availableCells); }
     highLightAllUnavailableCells(unavailableCells) { this.interactionRenderer.showUnavailableCells(unavailableCells); }

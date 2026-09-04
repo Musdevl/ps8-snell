@@ -133,6 +133,8 @@ async function previousTutorielStep() {
         await handleUpdate(game_states[state_index], true);
     }
 
+    applyStepHighlight(landingStep);
+
     tutorial_next.disabled = landingStep.blocking;
 }
 
@@ -171,6 +173,9 @@ async function nextTutorielStep() {
     }
 
     const step = tutorial_steps[tutorial_index];
+
+    applyStepHighlight(step);
+
     tutorial_next.disabled = step.blocking;
 }
 
@@ -293,7 +298,102 @@ async function startTutorial() {
     boardComponent.clear();
     await handleUpdate(game_states[state_index], true);
     await renderTutorialStep();
+    applyStepHighlight(tutorial_steps[tutorial_index]);
 
+}
+
+
+/**
+ * Coup de projecteur de l'étape courante : le plateau s'assombrit, sauf les
+ * cases concernées. Appelé APRÈS la mise à jour du plateau, parce que les
+ * surlignages de type "piece" se lisent dans la position affichée.
+ */
+function applyStepHighlight(step) {
+    const cells = resolveHighlightCells(step);
+
+    if (cells.length === 0) {
+        boardComponent.clearHighlightedCells();
+        return;
+    }
+
+    boardComponent.highlightCells(cells);
+}
+
+/**
+ * Les cases à mettre en avant pour une étape.
+ *
+ * Par défaut elles sont DÉDUITES de `expectedAction` : c'est ce qu'on demande
+ * au joueur de faire, donc c'est exactement ce qu'il faut lui montrer, et les
+ * deux ne peuvent pas se contredire quand on modifie le scénario. `highlight`
+ * ne sert qu'aux étapes explicatives, qui n'attendent aucune action.
+ */
+function resolveHighlightCells(step) {
+    if (!step) return [];
+
+    const cellsFromAction = actionCells(step.expectedAction);
+    if (cellsFromAction.length > 0) return cellsFromAction;
+
+    const highlight = step.highlight;
+    if (!highlight) return [];
+
+    switch (highlight.type) {
+        case "cells":
+            return Array.isArray(highlight.cells) ? highlight.cells : [];
+
+        case "cell":
+            return [[highlight.row, highlight.col]];
+
+        case "piece":
+            return findPieceCells(highlight.piece, highlight.color);
+
+        // "panel" désigne le panneau latéral, qui n'est pas sur le plateau.
+        default:
+            return [];
+    }
+}
+
+/** Les cases citées par une action : "MOVE/54,53" → [[5,4], [5,3]]. */
+function actionCells(expectedAction) {
+    if (!expectedAction || expectedAction === "NONE") return [];
+
+    const [type, coords] = expectedAction.split("/");
+    if (!coords) return [];
+
+    const [from, to] = coords.split(",");
+
+    switch (type) {
+        case "PLACE":
+        case "ROTATE":
+            // Le second membre est une direction, pas une case.
+            return [parseCell(from)];
+
+        case "MOVE":
+        case "SWAP":
+            return [parseCell(from), parseCell(to)];
+
+        default:
+            return [];
+    }
+}
+
+const parseCell = (coords) => [Number(coords[0]), Number(coords[1])];
+
+/** Toutes les cases occupées par un type de pièce d'une couleur donnée. */
+function findPieceCells(pieceName, colorName) {
+    const grid = boardComponent.gridState ?? [];
+    const color = colorName === "black" ? COLORS.BLACK : COLORS.WHITE;
+    const cells = [];
+
+    for (let row = 0; row < grid.length; row++) {
+        for (let col = 0; col < grid[row].length; col++) {
+            const piece = grid[row][col];
+            if (piece && piece.pieceName === pieceName && piece.color === color) {
+                cells.push([row, col]);
+            }
+        }
+    }
+
+    return cells;
 }
 
 async function renderTutorialStep() {
