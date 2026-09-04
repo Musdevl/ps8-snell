@@ -195,12 +195,17 @@ class Chat extends HTMLElement {
     }
 
     renderEmotes() {
-        const emotes = accountService?.getSelectedEmotes();
-        if (emotes) {
-            for (let i = 0; i < emotes.length; i++) {
-                this.emote_section.innerHTML += `<img src="${emotes[i].picture}" class="emote-item">`;
+        try {
+            const emotes = accountService?.getSelectedEmotes();
+            if (emotes) {
+                for (let i = 0; i < emotes.length; i++) {
+                    this.emote_section.innerHTML += `<img src="${emotes[i].picture}" class="emote-item">`;
+                }
             }
+        } catch (error) {
+            console.log(error);
         }
+
     }
 
     setChat(message_list) {

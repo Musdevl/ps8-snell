@@ -508,6 +508,21 @@ main {
     transition: border-color 0.3s;
 }
 
+.add-emote-btn {
+    min-width: 10rem;
+    height: 7rem;
+    border-radius: 6px;
+    border: 5px dotted gray;
+    object-fit: cover;
+    cursor: pointer;
+    transition: border-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+    font-weight: 500;
+}
+
 .selected-emote-item {
     border: 2px solid transparent;
     transition: border-color 0.3s;
@@ -633,7 +648,7 @@ chat-component .chat-wrapper {
 /* ============================================================
    UTILITIES
    ============================================================ */
-   
+
 .hidden {
     display: none;
 }

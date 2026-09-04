@@ -44,7 +44,7 @@ async function loadProfile() {
         user = await res.json();
 
         if (!res.ok) {
-            window.location.replace(``);
+            window.location.replace(`/`);
             return;
         }
 
@@ -245,65 +245,103 @@ async function renderInventory() {
 }
 
 function renderProfilePictures() {
-    const profile_pictures = document.querySelector('#profile-picture-list');
+    try {
+        const profile_pictures = document.querySelector('#profile-picture-list');
 
-    loadPictureList(profile_pictures, accountService.getProfilePictureList(), 'profile-picture-item',
+        loadPictureList(profile_pictures, accountService.getProfilePictureList(), 'profile-picture-item',
 
-        async (item) => { await updateProfilePicture(item); },
+            async (item) => { await updateProfilePicture(item); },
 
-        (profile_picture_id, img) => {
-            if (accountService.getProfilePicture().id === profile_picture_id) {
-                img.classList.add('selected');
-            }
-        });
+            (profile_picture_id, img) => {
+                if (accountService.getProfilePicture().id === profile_picture_id) {
+                    img.classList.add('selected');
+                }
+            });
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 function renderThemes() {
-    const themeList = document.querySelector('#theme-list');
+    try {
+        const themeList = document.querySelector('#theme-list');
 
-    loadPictureList(themeList, accountService.getThemes(), "theme-item",
+        loadPictureList(themeList, accountService.getThemes(), "theme-item",
 
-        async (theme) => { await updateSelectedTheme(theme); },
+            async (theme) => { await updateSelectedTheme(theme); },
 
-        (theme_id, theme) => {
-            if (accountService.getTheme().id === theme_id) {
-                theme.classList.add('selected');
-            }
-        })
+            (theme_id, theme) => {
+                if (accountService.getTheme().id === theme_id) {
+                    theme.classList.add('selected');
+                }
+            })
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 function renderSelectedEmotes() {
-    const selectedEmoteList = document.querySelector('.selected-emote-list');
-    selectedEmoteList.innerHTML = '';
+    try {
+        const selectedEmoteList = document.querySelector('.selected-emote-list');
+        selectedEmoteList.innerHTML = '';
 
-    selected_profile_emotes.forEach((emote, index) => {
-        const img = document.createElement('img');
-        img.src = emote.picture;
-        img.className = 'selected-emote-item selected-inventory-item';
+        selected_profile_emotes.forEach((emote, index) => {
+            const img = document.createElement('img');
+            img.src = emote.picture;
+            img.className = 'selected-emote-item selected-inventory-item';
 
 
-        img.addEventListener('click', () => {
-            currentEmoteIndex = index;
-            showInventoryModal();
+            img.addEventListener('click', () => {
+                currentEmoteIndex = index;
+                showInventoryModal();
+            });
+
+            selectedEmoteList.appendChild(img);
         });
 
-        selectedEmoteList.appendChild(img);
-    });
+        const free_slots = 8 - selected_profile_emotes.length;
+        console.log("Free_slotes", free_slots);
+        if (free_slots > 0) {
+            for (let i = 0; i < free_slots; i++) {
+                const randomIdx = Math.floor(Math.random() * 999999);
+                const empty_img = document.createElement('div');
+                empty_img.className = `add-emote-btn`;
+                empty_img.innerHTML += `+`
+
+                empty_img.addEventListener('click', () => {
+                    currentEmoteIndex = randomIdx;
+                    showInventoryModal();
+                });
+
+                selectedEmoteList.appendChild(empty_img);
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 function renderEmotes() {
-    const emoteList = document.querySelector('#emote-list');
+    try {
+        const emoteList = document.querySelector('#emote-list');
 
-    loadPictureList(emoteList, accountService.getEmotes(), 'emote-item', async (newEmote) => {
-        if (currentEmoteIndex !== null) {
-            selected_profile_emotes[currentEmoteIndex] = newEmote;
+        loadPictureList(emoteList, accountService.getEmotes(), 'emote-item', async (newEmote) => {
+            if (currentEmoteIndex !== null) {
+                selected_profile_emotes[currentEmoteIndex] = newEmote;
 
-            await updateSelectedEmotes();
+                await updateSelectedEmotes();
 
-            closeInventoryModal();
-            currentEmoteIndex = null; // Reset
-        }
-    });
+                closeInventoryModal();
+                currentEmoteIndex = null; // Reset
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 
@@ -395,11 +433,16 @@ async function updateSelectedEmotes() {
 
 
 async function renderChat() {
-    await customElements.whenDefined('chat-component');
-    chat.disableDrawButton();
-    chat.disableForfeitButton();
-    const messages = await UserService.fetchFriendChat(chatId);
-    chat.setChat(messages);
+    try {
+        await customElements.whenDefined('chat-component');
+        chat.disableDrawButton();
+        chat.disableForfeitButton();
+        const messages = await UserService.fetchFriendChat(chatId);
+        chat.setChat(messages);
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 // ─── Inventory ────────────────────────────────────────────────────────────────
