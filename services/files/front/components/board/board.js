@@ -65,6 +65,7 @@ class Board extends HTMLElement {
         const gridCanvas = this.shadowRoot.querySelector('#grid-canvas');
         const piecesCanvas = this.shadowRoot.querySelector('#pieces-canvas');
         const laserCanvas = this.shadowRoot.querySelector('#laser-canvas');
+        const highlightCanvas = this.shadowRoot.querySelector('#highlight-canvas');
         const interactionCanvas = this.shadowRoot.querySelector('#interaction-canvas');
 
         this._applyContainerSize();
@@ -74,7 +75,8 @@ class Board extends HTMLElement {
             gridCanvas,
             piecesCanvas,
             laserCanvas,
-            interactionCanvas
+            interactionCanvas,
+            highlightCanvas
         );
 
         this.whiteInventory = [];
@@ -130,14 +132,22 @@ class Board extends HTMLElement {
         container.style.height = size;
     }
 
-    async updateBoard(data) {
+    /**
+     * @param {Object} data  état de jeu renvoyé par le serveur
+     * @param {Object} [options]
+     * @param {boolean} [options.animate=true]  rejouer l'animation de la
+     *        dernière action. À mettre à false quand l'état affiché ne suit
+     *        pas celui d'avant (review : retour arrière, saut direct), sinon
+     *        on animerait un coup depuis une position qui n'existait pas.
+     */
+    async updateBoard(data, { animate = true } = {}) {
         this.colorTurn = data.colorTurn;
         this.gameId = data.gameId;
-        await this.updateGridWithAnimation(data);
+        await this.updateGridWithAnimation(data, animate);
         await this.updateLaser(data.laserBeam, data.killedPiecePos);
     }
 
-    async updateGridWithAnimation(data) {
+    async updateGridWithAnimation(data, animate = true) {
         await this.readyPromise;
 
         const previousGridState = this.gridState;
@@ -149,7 +159,7 @@ class Board extends HTMLElement {
             intermediateState[row][col] = previousGridState?.[row]?.[col] ?? null;
         }
 
-        if (data.lastAction && previousGridState) {
+        if (animate && data.lastAction && previousGridState) {
             await this.boardRenderer.animateAction(data.lastAction, previousGridState, intermediateState);
         }
 
@@ -183,6 +193,23 @@ class Board extends HTMLElement {
 
     setPlayerColor(color) {
         this.playerColor = color;
+    }
+
+    /**
+     * Assombrit tout le plateau sauf les cases demandées — le « projecteur »
+     * du tutoriel, pour montrer où poser une pièce.
+     *
+     * @param {Array} cells  [{row, col}] ou [[row, col]], coordonnées logiques
+     * @param {Object} [options]  {dim, dimColor, outline, outlineColor, pulse}
+     */
+    async highlightCells(cells, options = {}) {
+        await this.readyPromise;
+        this.boardRenderer.highlightCells(cells, options);
+    }
+
+    async clearHighlightedCells() {
+        await this.readyPromise;
+        this.boardRenderer.clearHighlightedCells();
     }
 
     /**
@@ -324,6 +351,7 @@ class Board extends HTMLElement {
 
     clear() {
         this.clearSelection();
+        this.boardRenderer.clearHighlightedCells();
         this.boardRenderer.gridRenderer.clearGrid();
         this.boardRenderer.clearPieces();
     }

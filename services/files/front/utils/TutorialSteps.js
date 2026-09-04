@@ -1,5 +1,21 @@
 import { COLORS } from "../enum/Colors.js";
 
+/**
+ * Étapes du tutoriel.
+ *
+ * `highlight` ne concerne QUE les étapes explicatives (expectedAction: "NONE") :
+ * dès qu'une étape attend une action du joueur, les cases mises en avant sont
+ * déduites de `expectedAction` par la page du tutoriel. Les deux ne peuvent
+ * donc pas se contredire quand on retouche le scénario — c'est ce qui était
+ * arrivé aux anciennes coordonnées, restées sur un jeu d'actions précédent.
+ *
+ * Formes acceptées :
+ *   { type: "piece", piece: "king", color: "white" }  toutes les pièces de ce type
+ *   { type: "cells", cells: [[row, col], ...] }       des cases précises
+ *   { type: "cell", row, col }                        une seule case
+ *   { type: "panel", side: "right" }                  hors plateau : rien n'est surligné
+ */
+
 export const TUTORIAL_STEPS = [
 
     // === WELCOME ===
@@ -148,7 +164,7 @@ export const TUTORIAL_STEPS = [
     // WHITE: ROTATE/02,48
     {
         message: "Turn 2 - White.\n Your Shooter is currently pointing in a direction that could hit your own pieces. Rotate it to aim safely. Click your Shooter, then use the rotate buttons to rotate it to the right.",
-        highlight: { type: "cell", row: 0, col: 2 },
+        highlight: null, // déduit de expectedAction (ROTATE/97,48)
         expectedAction: "ROTATE/97,48",
         color: COLORS.WHITE,
         blocking: true,
@@ -168,7 +184,7 @@ export const TUTORIAL_STEPS = [
     // WHITE: PLACE/32,0
     {
         message: "Turn 3 - White.\n Place a Triangle on the square h4 of the board with its mirror facing down-left. This redirects the laser toward one of Black's Triangles - if it hits a vulnerable face, it will destroy it and the Triangle goes to your shoulder bag.",
-        highlight: { type: "cell", row: 3, col: 2 },
+        highlight: null, // déduit de expectedAction (PLACE/67,32)
         expectedAction: "PLACE/67,32",
         color: COLORS.WHITE,
         blocking: true,
@@ -197,7 +213,7 @@ export const TUTORIAL_STEPS = [
     // WHITE: SWAP/56,74
     {
         message: "Turn 4 - White.\n Your Full Mirror can swap with your King. This repositions your King to a safer cell and puts the Full Mirror - which is indestructible - in its place. Try it now.",
-        highlight: { type: "cell", row: 4, col: 3 },
+        highlight: null, // déduit de expectedAction (SWAP/56,74)
         expectedAction: "SWAP/56,74",
         color: COLORS.WHITE,
         blocking: true,
@@ -225,7 +241,7 @@ export const TUTORIAL_STEPS = [
     // WHITE: MOVE/45,46
     {
         message: "Turn 5 - White.\n Move your Protector one cell to the left on d5. This small adjustment shifts the laser's bounce point and opens a new angle toward the opponent's King.",
-        highlight: { type: "cell", row: 4, col: 5 },
+        highlight: null, // déduit de expectedAction (MOVE/54,53)
         expectedAction: "MOVE/54,53",
         color: COLORS.WHITE,
         blocking: true,
@@ -253,7 +269,7 @@ export const TUTORIAL_STEPS = [
     // WHITE: PLACE/75,48
     {
         message: "Turn 6 - White.\n Place your final Triangle on the e8 square of the board facing bottom-right. This completes the chain - the laser will bounce through your Triangles and hit the opponent's King directly.",
-        highlight: { type: "cell", row: 7, col: 5 },
+        highlight: null, // déduit de expectedAction (PLACE/24,16)
         expectedAction: "PLACE/24,16",
         color: COLORS.WHITE,
         blocking: true,

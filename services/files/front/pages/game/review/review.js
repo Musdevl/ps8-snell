@@ -20,14 +20,32 @@ let notification;
 
 let review_analytics;
 
+/**
+ * Curseur unique de la review, index dans `game_states` :
+ *   0 → position initiale, avant le moindre coup
+ *   k → position APRÈS le k-ième coup, donc celle produite par `moves[k - 1]`
+ *
+ * Le composant review-analytics suit la même convention : `highlight_cell(k)`
+ * surligne le coup n° k, et `first` (k = 0) ne surligne rien puisqu'aucun coup
+ * n'a encore été joué. Toute la page passe par `goToState`, il ne peut donc
+ * plus y avoir deux façons de compter.
+ */
 let state_index = 0;
+let has_rendered = false;
 
 let game_states = [];
+let game_result = null;
 
 let white_player_id;
 let black_player_id;
 
 let isInPlayMode = false;
+let play_timeout = null;
+let play_token = 0;
+let game_over_shown = false;
+
+const PLAY_INTERVAL_MS = 1500;
+const GAME_OVER_MODAL_DELAY_MS = 3000;
 
 let evalBar;
 let evalScores;
@@ -72,6 +90,7 @@ async function waitForBoard() {
         boardComponent.readyPromise,
         whitePlayerInfoComponent.readyPromise,
         blackPlayerInfoComponent.readyPromise,
+        review_analytics.readyPromise,
     ]);
 
     console.log('[Game] Board component ready');
@@ -103,75 +122,40 @@ async function setupGame() {
     });
 
     review_analytics.addEventListener("next", async () => {
-        const next_index = getNextIndex();
-        review_analytics.highlight_cell(next_index);
-        await handleUpdate(game_states[next_index + 1]);
+        await goToState(state_index + 1);
     })
 
     review_analytics.addEventListener("previous", async () => {
-        const pres_index = getPreviousIndex();
-        review_analytics.highlight_cell(pres_index);
-        await handleUpdate(game_states[pres_index + 1]);
+        await goToState(state_index - 1);
     })
 
     review_analytics.addEventListener("first", async () => {
-        state_index = 0;
-        review_analytics.highlight_cell(state_index);
-        await handleUpdate(game_states[state_index + 1]);
+        await goToState(0);
     })
 
     review_analytics.addEventListener("last", async () => {
-        state_index = game_states.length - 2
-        review_analytics.highlight_cell(state_index);
-        await handleUpdate(game_states[state_index + 1]);
+        await goToState(lastStateIndex());
     })
 
     review_analytics.addEventListener("go-to", async (e) => {
-        state_index = e.detail.index;
-        review_analytics.highlight_cell(state_index);
-        await handleUpdate(game_states[state_index + 1]);
+        await goToState(e.detail.index);
     })
 
-    review_analytics.addEventListener("play", async (e) => {
-        isInPlayMode = true;
+    review_analytics.addEventListener("play", () => startPlayback());
 
-        const playNext = async () => {
-            if (!isInPlayMode) return;
-
-            if (state_index >= game_states.length - 1) {
-                isInPlayMode = false;
-                review_analytics.pause();
-                return;
-            }
-
-            const nextIndex = getNextIndex();
-            review_analytics.highlight_cell(nextIndex - 1);
-            await handleUpdate(game_states[nextIndex]);
-
-            setTimeout(playNext, 1500);
-        };
-
-        setTimeout(playNext, 1500);
-    })
-
-    review_analytics.addEventListener("pause", async (e) => {
-        isInPlayMode = false;
-    })
+    review_analytics.addEventListener("pause", () => stopPlayback());
 
     document.addEventListener("keydown", async (e) => {
         if (e.key === "ArrowLeft") {
-            review_analytics.pause();
-            const pres_index = getPreviousIndex();
-            review_analytics.highlight_cell(pres_index);
-            await handleUpdate(game_states[pres_index]);
+            stopPlayback();
+            await goToState(state_index - 1);
         }
         if (e.key === "ArrowRight") {
-            review_analytics.pause();
-            const next_index = getNextIndex();
-            review_analytics.highlight_cell(next_index);
-            await handleUpdate(game_states[next_index]);
+            stopPlayback();
+            await goToState(state_index + 1);
         }
         if (e.key === " ") {
+            e.preventDefault(); // sinon la page défile
             if (!isInPlayMode) {
                 review_analytics.play();
             } else {
@@ -189,9 +173,10 @@ async function setupGame() {
 
     const res = await accountService.authFetch(`${GATEWAY_URL}/api/game/review/${gameId}`);
     const raw = await res.json();
-    game_states = raw.grid_states.map(state => uint16Utils.normalizeGameState(state));
 
-    review_analytics.setActions(raw.actions);
+    const moves = extractStatesAndMoves(raw);
+
+    review_analytics.setActions(moves);
 
     white_player_id = raw.white_player_id;
     black_player_id = raw.black_player_id;
@@ -204,43 +189,139 @@ async function setupGame() {
 
 }
 
+/**
+ * Aligne les états et les coups, et remplit `game_states` / `game_result`.
+ *
+ * Le serveur empile l'état initial PUIS rejoue toutes les actions sauvegardées
+ * — or la liste sauvegardée commence par "INIT", une action qui ne fait rien et
+ * qui produit donc un doublon de la position de départ. Elle se termine
+ * symétriquement par le résultat ("White won", "DRAW"…), qui n'est pas rejoué
+ * et ne produit donc aucun état.
+ *
+ * On retire ces deux intrus ici, une fois pour toutes. Après quoi l'invariant
+ * tient tout seul dans le reste du fichier :
+ *
+ *      game_states.length === moves.length + 1
+ *      moves[k - 1]  a produit  game_states[k]
+ *
+ * @returns {string[]} les coups réellement joués, dans l'ordre
+ */
+function extractStatesAndMoves(raw) {
+    const states = (raw.grid_states ?? []).map(state => uint16Utils.normalizeGameState(state));
+    const actions = [...(raw.actions ?? [])];
 
-async function generateEvaluationList(s) {
-    const evaluation_list = [];
+    const hasInitAction = actions[0] === "INIT";
 
-    // change pas en foreach pck on peut pas await dedans
-    for (const state of game_states) {
-        const score = await evaluatePosition(state);
-        evaluation_list.push(score);
+    game_states = hasInitAction ? states.slice(1) : states;
+
+    const moves = hasInitAction ? actions.slice(1) : actions;
+
+    // Ce qui dépasse en fin de liste n'a pas d'état : c'est l'issue de partie.
+    game_result = null;
+    while (moves.length > game_states.length - 1) {
+        game_result = moves.pop();
     }
 
-    return evaluation_list;
+    return moves;
 }
 
 
-function getNextIndex() {
-    let next = state_index + 1;
-    if (next >= game_states.length - 1) {
-        setTimeout(() => {
-            showModal({
-                message: "Game Over ?",
-                confirmLabel: "Leave",
-                cancelLabel: "Cancel",
-                onConfirm: () => {
-                    window.location.replace(`/`);
-                }
-            });
-        }, 3000)
-    } else {
-        state_index = next;
-    }
-    return state_index;
+async function generateEvaluationList() {
+    // Une requête par position, mais toutes en parallèle : en séquentiel la
+    // review met plusieurs secondes à s'afficher sur une longue partie.
+    return Promise.all(game_states.map(state => evaluatePosition(state)));
 }
 
-function getPreviousIndex() {
-    let previous = state_index - 1;
-    if (previous >= 0) state_index = previous;
-    return state_index;
+
+function lastStateIndex() {
+    return Math.max(0, game_states.length - 1);
+}
+
+/**
+ * Seul point d'entrée pour changer de position : plateau, eval-bar et
+ * surlignage du coup sont mis à jour ensemble, ils ne peuvent pas diverger.
+ */
+async function goToState(index) {
+    const target = Math.min(Math.max(index, 0), lastStateIndex());
+
+    if (has_rendered && target === state_index) return;
+
+    // On n'anime que la lecture en avant, coup par coup. En marche arrière ou
+    // sur un saut direct, le plateau affiché n'est pas celui d'où part le coup :
+    // l'animation jouerait un déplacement depuis une position qui n'a jamais
+    // existé.
+    const animate = has_rendered && target === state_index + 1;
+
+    state_index = target;
+    has_rendered = true;
+
+    review_analytics.highlight_cell(state_index);
+
+    await handleUpdate(state_index, { animate });
+
+    if (state_index === lastStateIndex()) showGameOverModalOnce();
+}
+
+function startPlayback() {
+    if (isInPlayMode) return;
+    if (state_index >= lastStateIndex()) {
+        review_analytics.pause();
+        return;
+    }
+
+    isInPlayMode = true;
+
+    // Un jeton par lecture : une chaîne restée en vol (barre espace pressée
+    // deux fois, clic pendant l'attente) se retire d'elle-même.
+    const token = ++play_token;
+
+    const playNext = async () => {
+        if (!isInPlayMode || token !== play_token) return;
+
+        await goToState(state_index + 1);
+
+        if (!isInPlayMode || token !== play_token) return;
+
+        if (state_index >= lastStateIndex()) {
+            stopPlayback();
+            return;
+        }
+
+        play_timeout = setTimeout(playNext, PLAY_INTERVAL_MS);
+    };
+
+    play_timeout = setTimeout(playNext, PLAY_INTERVAL_MS);
+}
+
+function stopPlayback() {
+    play_token++;
+
+    if (play_timeout) {
+        clearTimeout(play_timeout);
+        play_timeout = null;
+    }
+
+    if (!isInPlayMode) return;
+
+    isInPlayMode = false;
+    review_analytics.pause(); // remet l'icône du bouton et l'état du composant
+}
+
+function showGameOverModalOnce() {
+    if (game_over_shown || lastStateIndex() === 0) return;
+    game_over_shown = true;
+
+    // Laissé le temps à la dernière animation (coup + laser) de se terminer.
+    setTimeout(() => {
+        showModal({
+            message: game_result ? `Game over — ${game_result}` : "Game Over ?",
+            confirmLabel: "Leave",
+            cancelLabel: "Cancel",
+            onConfirm: () => {
+                window.location.replace(`/`);
+            }
+        });
+    }, GAME_OVER_MODAL_DELAY_MS);
 }
 
 function showModal({ message, confirmLabel, cancelLabel, onConfirm, onCancel }) {
@@ -276,16 +357,19 @@ function closeModal() {
 
 
 
-async function handleUpdate(data, isStarting = false) {
+async function handleUpdate(index, { animate = true } = {}) {
+
+    const data = game_states[index];
+    if (!data) return;
 
     console.log("[GAME] - Update received: ");
 
-    evalBar.setScore(evalScores[state_index + 1]);
+    evalBar.setScore(evalScores?.[index]);
 
-    await boardComponent.updateBoard(data);
+    await boardComponent.updateBoard(data, { animate });
 
-    await updatePlayerInfo(whitePlayerInfoComponent, data.colorTurn, data.white_inventory, data.white_time, isStarting)
-    await updatePlayerInfo(blackPlayerInfoComponent, data.colorTurn, data.black_inventory, data.black_time, isStarting)
+    await updatePlayerInfo(whitePlayerInfoComponent, data.colorTurn, data.white_inventory, data.white_time)
+    await updatePlayerInfo(blackPlayerInfoComponent, data.colorTurn, data.black_inventory, data.black_time)
 
 
 }
@@ -324,18 +408,19 @@ async function evaluatePosition(data) {
     }
 }
 
-async function updatePlayerInfo(playerInfo, colorTurn, inventory, time, isStarting = false) {
+/**
+ * En review le chrono ne tourne pas : on affiche le temps restant tel qu'il
+ * était à cet instant de la partie, et on ne démarre jamais l'intervalle.
+ */
+async function updatePlayerInfo(playerInfo, colorTurn, inventory, time) {
     playerInfo.updateInventory(inventory);
     playerInfo.updateTimer(time);
     await playerInfo.setColorTurn(colorTurn);
-    if (!isStarting) {
-        playerInfo.startTimer();
-    }
 }
 
 async function startReview() {
     boardComponent.clear();
-    await handleUpdate(game_states[state_index], true);
+    await goToState(0);
 }
 
 async function getUserInformation(userId) {

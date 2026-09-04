@@ -55,7 +55,7 @@ echo "${CYAN}${R}  ${B}${EMOJI}  ${LABEL}${R}                             "
 echo "${CYAN}──────────────────────────────────────────────────────────────${R}"
 
 line "environnement" "${ENV:-dev}"
-line "node"          "$(node --version 2>/dev/null || echo '?')"
+# line "node"          "$(node --version 2>/dev/null || echo '?')"
 line "fuseau"        "${TZ:-UTC}  —  $(date '+%Y-%m-%d %H:%M:%S')"
 
 # --- Dépendances ----------------------------------------------------------
