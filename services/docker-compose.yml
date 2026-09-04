@@ -129,6 +129,48 @@ services:
     networks:
       - app-network
 
+  # Sauvegardes chiffrées (AES-256) de MongoDB.
+  # Le conteneur ne sert rien : il héberge un cron qui lance backup.sh
+  # tous les jours à 2h du matin, et fournit les outils mongodump /
+  # mongorestore utilisés par les scripts (voir backup/README.md).
+  backup:
+    build:
+      context: .
+      dockerfile: backup/Dockerfile
+    container_name: snell-backup
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - MONGO_DB_URL=mongodb://mongodb:27017
+      # Clé de chiffrement AES-256, lue dans services/.env.
+      # Générez-la avec : ./backup.sh --genkey
+      - BACKUP_ENCRYPTION_KEY=${BACKUP_ENCRYPTION_KEY:-}
+      # Rétention glissante : les archives plus vieilles sont supprimées
+      # automatiquement à la fin de chaque sauvegarde.
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-14}
+      # Sans TZ, cron raisonne en UTC et "2h du matin" dérive avec les saisons.
+      - TZ=${TZ:-Europe/Paris}
+    volumes:
+      # Le suffixe ":z" demande à Docker de réétiqueter ces fichiers pour
+      # SELinux (container_file_t). Sans lui, sur Fedora/RHEL, le conteneur se
+      # voit refuser l'accès à tout ce qui vient du dépôt : "SELinux is
+      # preventing bash from ioctl access on /app/backup/backup.sh".
+      # ":z" (minuscule) = partagé entre conteneurs, contrairement à ":Z" qui
+      # réserverait le fichier à ce seul conteneur.
+      #
+      # Les archives atterrissent dans le dossier ./backup à la racine du dépôt.
+      - ../backup:/backup:z
+      # Les scripts sont montés depuis l'hôte : une modification est prise en
+      # compte immédiatement, sans avoir à reconstruire l'image.
+      - ./backup.sh:/app/backup/backup.sh:ro,z
+      - ./test-backup.sh:/app/backup/test-backup.sh:ro,z
+      - ./restore-backup.sh:/app/backup/restore-backup.sh:ro,z
+      - ./backup/lib.sh:/app/backup/lib.sh:ro,z
+    networks:
+      - app-network
+    restart: unless-stopped
+
   mongodb:
     image: mongo:latest
     container_name: mongodb
