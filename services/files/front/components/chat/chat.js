@@ -195,17 +195,15 @@ class Chat extends HTMLElement {
     }
 
     renderEmotes() {
-        try {
-            const emotes = accountService?.getSelectedEmotes();
-            if (emotes) {
-                for (let i = 0; i < emotes.length; i++) {
-                    this.emote_section.innerHTML += `<img src="${emotes[i].picture}" class="emote-item">`;
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
+        const emotes = accountService?.getSelectedEmotes();
+        if (!Array.isArray(emotes)) return;
 
+        for (let i = 0; i < emotes.length; i++) {
+            const emote = emotes[i];
+            // Un slot vide (null) n'a rien a envoyer dans le chat.
+            if (!emote || typeof emote.picture !== 'string') continue;
+            this.emote_section.innerHTML += `<img src="${emote.picture}" class="emote-item">`;
+        }
     }
 
     setChat(message_list) {

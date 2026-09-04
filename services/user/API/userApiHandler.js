@@ -358,8 +358,17 @@ export async function completeAchievement(userId, achievement) {
 
 }
 
+// Un slot vide est stocke comme null pour conserver sa position dans la liste.
+// Toute entree qui n'est pas une emote exploitable est ramenee a un slot vide.
+function sanitizeSelectedEmotes(selected_emotes) {
+    if (!Array.isArray(selected_emotes)) return [];
+    return selected_emotes.map(emote =>
+        emote && typeof emote.picture === 'string' ? emote : null
+    );
+}
+
 export async function updateSelectedEmotes(selected_emotes, userId) {
-    await userRepo.updateSelectedEmotes(userId, selected_emotes);
+    await userRepo.updateSelectedEmotes(userId, sanitizeSelectedEmotes(selected_emotes));
 }
 
 

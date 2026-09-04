@@ -484,6 +484,58 @@ main {
     cursor: pointer;
 }
 
+.selected-emote-slot {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+}
+
+.empty-emote-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border: 2px dashed #3a3632;
+    background: #1f1e1c;
+    color: #6b655e;
+    font-size: 2rem;
+    line-height: 1;
+    transition: border-color 0.3s, color 0.3s;
+}
+
+.empty-emote-slot:hover {
+    border-color: #c8a84b;
+    color: #c8a84b;
+}
+
+.remove-emote-btn {
+    position: absolute;
+    top: -0.4rem;
+    right: -0.4rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #232220;
+    color: #d4cfc9;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s, background 0.3s, color 0.3s;
+}
+
+.selected-emote-slot:hover .remove-emote-btn,
+.remove-emote-btn:focus-visible {
+    opacity: 1;
+}
+
+.remove-emote-btn:hover {
+    background: #c8a84b;
+    color: #232220;
+}
+
 
 
 /* ============================================================

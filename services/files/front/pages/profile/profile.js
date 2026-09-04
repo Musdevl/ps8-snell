@@ -7,6 +7,9 @@ import { GATEWAY_URL } from "../../env.js";
 
 const params = new URLSearchParams(window.location.search);
 const username = params.get("username");
+// Nombre de slots d'emotes affiches sur le profil. Un slot sans emote vaut
+// null : la position est conservee pour pouvoir la remplir plus tard.
+const EMOTE_SLOT_COUNT = 8;
 
 const loader = document.getElementById('loader');
 const profile = document.getElementById('profile');
@@ -132,7 +135,7 @@ async function renderProfile() {
     //document.getElementById('snell-coins').textContent = user.snell_coins;
 
 
-    selected_profile_emotes = accountService.getSelectedEmotes();
+    selected_profile_emotes = normalizeEmoteSlots(accountService.getSelectedEmotes());
 
     await renderFriends();
 
@@ -282,46 +285,59 @@ function renderThemes() {
 
 }
 
-function renderSelectedEmotes() {
-    try {
-        const selectedEmoteList = document.querySelector('.selected-emote-list');
-        selectedEmoteList.innerHTML = '';
+function isEmote(emote) {
+    return !!emote && typeof emote.picture === 'string';
+}
 
-        selected_profile_emotes.forEach((emote, index) => {
+// Ramene la liste sauvegardee a EMOTE_SLOT_COUNT slots, les entrees invalides
+// (null, undefined, objet sans picture) devenant des slots vides.
+function normalizeEmoteSlots(emotes) {
+    const slots = Array.isArray(emotes) ? emotes.slice(0, EMOTE_SLOT_COUNT) : [];
+    while (slots.length < EMOTE_SLOT_COUNT) slots.push(null);
+    return slots.map(emote => isEmote(emote) ? emote : null);
+}
+
+function renderSelectedEmotes() {
+    const selectedEmoteList = document.querySelector('.selected-emote-list');
+    selectedEmoteList.innerHTML = '';
+
+    selected_profile_emotes.forEach((emote, index) => {
+        const slot = document.createElement('div');
+        slot.className = 'selected-emote-slot';
+
+        if (isEmote(emote)) {
             const img = document.createElement('img');
             img.src = emote.picture;
+            img.alt = emote.name ?? 'emote';
             img.className = 'selected-emote-item selected-inventory-item';
+            slot.appendChild(img);
 
-
-            img.addEventListener('click', () => {
-                currentEmoteIndex = index;
-                showInventoryModal();
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'remove-emote-btn';
+            remove.title = 'Empty this slot';
+            remove.textContent = '\u00d7';
+            remove.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                selected_profile_emotes[index] = null;
+                await updateSelectedEmotes();
             });
+            slot.appendChild(remove);
+        } else {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'empty-emote-slot selected-inventory-item';
+            placeholder.textContent = '+';
+            placeholder.title = 'Empty slot';
+            slot.appendChild(placeholder);
+        }
 
-            selectedEmoteList.appendChild(img);
+        slot.addEventListener('click', () => {
+            currentEmoteIndex = index;
+            showInventoryModal();
         });
 
-        const free_slots = 8 - selected_profile_emotes.length;
-        console.log("Free_slotes", free_slots);
-        if (free_slots > 0) {
-            for (let i = 0; i < free_slots; i++) {
-                const randomIdx = Math.floor(Math.random() * 999999);
-                const empty_img = document.createElement('div');
-                empty_img.className = `add-emote-btn`;
-                empty_img.innerHTML += `+`
-
-                empty_img.addEventListener('click', () => {
-                    currentEmoteIndex = randomIdx;
-                    showInventoryModal();
-                });
-
-                selectedEmoteList.appendChild(empty_img);
-            }
-        }
-    } catch (error) {
-        console.log(error);
-    }
-
+        selectedEmoteList.appendChild(slot);
+    });
 }
 
 function renderEmotes() {
