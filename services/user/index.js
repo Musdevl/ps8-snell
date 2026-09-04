@@ -25,12 +25,10 @@ const gatewayConnection = ioClient(`${GATEWAY_URL}/user`, {
 });
 
 ioServer.on('connection', (socket) => {
-    console.log(`GATEWAY Client connected: ${socket.id}`);
 
     socket.on('register', ({ clientId, userId }) => {
         userId_socketId_Map.set(userId, clientId);
         socketId_userId_Map.set(clientId, userId);
-        console.log(`Mapped userId ${userId} <-> socketId ${clientId}`);
     });
 
     socket.on('disconnection', ({ clientId }) => {
@@ -38,11 +36,10 @@ ioServer.on('connection', (socket) => {
         if (userId) {
             userId_socketId_Map.delete(userId);
             socketId_userId_Map.delete(clientId);
-            console.log(`Unmapped userId ${userId} <-> socketId ${clientId}`);
         }
     });
 });
 
 setIoClient(gatewayConnection);
 
-gatewayConnection.on('connect', () => { console.log('USER CLIENT Connected to gateway'); });
+gatewayConnection.on('connect', () => {});

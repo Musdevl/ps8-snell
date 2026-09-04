@@ -77,9 +77,7 @@ app.post('/api/ais/{id}/best-action', (req, res) => {
 
 export function startHttpServer() {
     const PORT = 8020;
-    const server = app.listen(PORT, () => {
-        console.log(`[AI SERVICE] Server listening on port ${PORT}`);
-    });
+    const server = app.listen(PORT, () => {});
 
     process.on('SIGTERM', () => { app.close(() => { process.exit(0); }); });
     process.on('SIGINT', () => { app.close(() => { process.exit(0); }); });

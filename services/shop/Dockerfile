@@ -12,4 +12,6 @@ COPY shop/ .
 
 
 EXPOSE 8005
+
+ENTRYPOINT ["bash", "/app/helpers/entrypoint.sh"]
 CMD ["node", "index.js"]

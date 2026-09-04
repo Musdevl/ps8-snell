@@ -157,9 +157,6 @@ export async function requestFriend(userId, friendId) {
     const friendSocketId = userId_socketId_Map.get(friendId.toString());
     if (friendSocketId && ioClient) {
         ioClient.emit('user-ws-service', { webSocketIds: friendSocketId, event: 'friend-request', data: { from: userId } });
-        console.log(`Notification envoyée à ${friendId} (socket: ${friendSocketId})`);
-    } else {
-        console.log("Amis hors ligne pas de WS");
     }
 }
 
@@ -180,10 +177,6 @@ export async function forwardMessage(userIds, message) {
 
     if (friendSocketId && ioClient) {
         ioClient.emit('user-ws-service', { webSocketIds: [userSocketId, friendSocketId], event: 'friend-message', data: message });
-        console.log(`Notification envoyée à ${userIds.user2} (socket: ${friendSocketId})`);
-        console.log(`Notification envoyée à ${userIds.user1} (socket: ${userSocketId})`);
-    } else {
-        console.log("Amis hors ligne pas de WS");
     }
 
     return message;
@@ -198,9 +191,6 @@ export async function requestChallenge(userId, opponentId) {
 
     if (oppentSocketId && ioClient) {
         ioClient.emit('user-ws-service', { webSocketIds: oppentSocketId, event: 'challenge-request', data: { from: { username: user.username, userId: userId } } });
-        console.log(`Notification envoyée à ${opponentId} (socket: ${oppentSocketId})`);
-    } else {
-        console.log("Adversaire hors ligne pas de WS");
     }
 }
 
@@ -232,7 +222,6 @@ export async function acceptFriendRequest(userId, friendId) {
     const senderSocketId = userId_socketId_Map.get(userId.toString());
     if (senderSocketId && ioClient) {
         ioClient.emit('user-ws-service', { webSocketIds: senderSocketId, event: 'friend-request-accepted', data: { from: friendId } });
-        console.log(`Notification d'acceptation envoyée à ${userId} (socket: ${senderSocketId})`);
     }
 }
 
@@ -256,7 +245,6 @@ export async function removeFriend(userId, friendId) {
 
     if (friendSocketId && ioClient) {
         ioClient.emit('user-ws-service', { webSocketIds: friendSocketId, event: 'friend-removed', data: { from: userId } });
-        console.log("Notification de suppression d'amis envoyée")
     }
 }
 
@@ -358,8 +346,17 @@ export async function completeAchievement(userId, achievement) {
 
 }
 
+// Un slot vide est stocke comme null pour conserver sa position dans la liste.
+// Toute entree qui n'est pas une emote exploitable est ramenee a un slot vide.
+function sanitizeSelectedEmotes(selected_emotes) {
+    if (!Array.isArray(selected_emotes)) return [];
+    return selected_emotes.map(emote =>
+        emote && typeof emote.picture === 'string' ? emote : null
+    );
+}
+
 export async function updateSelectedEmotes(selected_emotes, userId) {
-    await userRepo.updateSelectedEmotes(userId, selected_emotes);
+    await userRepo.updateSelectedEmotes(userId, sanitizeSelectedEmotes(selected_emotes));
 }
 
 

@@ -7,7 +7,7 @@ try {
     const { LocalNotifications } = Capacitor.Plugins;
     _LocalNotifications = LocalNotifications;
 } catch (error) {
-    console.log(error)
+    console.log("[Notification]", error)
 }
 
 // // Demander la permission (à faire au démarrage de l'app)
@@ -99,12 +99,12 @@ class NotificationBar extends HTMLElement {
                         }
                     );
                 } catch (error) {
-                    console.log(error);
+                    console.log("[Notification]", error);
                 }
             })
 
             el.querySelector('.deny-challenge').addEventListener('click', () => {
-                console.log("Chal Denied");
+                console.log("[Notification] Challenge Denied");
             })
         }
 

@@ -11,7 +11,6 @@ let game_collection;
 export async function initDatabase() {
     try {
         await client.connect();
-        console.log('[GAME REPO] - Connecté à MongoDB');
         db = client.db(dbName);
         game_collection = db.collection('game');
     } catch (error) {
@@ -23,7 +22,6 @@ export async function initDatabase() {
 export async function closeDatabase() {
     try {
         await client.close();
-        console.log('[GAME REPO] - Connexion MongoDB fermée');
     } catch (error) {
         console.error('[GAME REPO] - Erreur lors de la fermeture:', error);
     }

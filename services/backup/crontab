@@ -1,0 +1,16 @@
+# ---------------------------------------------------------------------------
+# Planification des sauvegardes — copié dans /etc/cron.d/snell-backup
+#
+# Format d'une ligne /etc/cron.d :
+#   min  heure  jour-du-mois  mois  jour-semaine  UTILISATEUR  commande
+#    0     2         *          *        *          root       backup.sh
+#           └── tous les jours à 02:00 (heure du fuseau TZ du conteneur)
+#
+# cron démarre ses tâches dans un environnement vide : on recharge donc
+# /etc/snell-backup.env (écrit par entrypoint.sh) avant d'appeler le script.
+# ---------------------------------------------------------------------------
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+0 2 * * * root set -a; . /etc/snell-backup.env; set +a; bash /app/backup/backup.sh >> /var/log/snell-backup.log 2>&1
+

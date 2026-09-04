@@ -27,7 +27,6 @@ export async function searchInGameAchievements(previous_game_state, next_game_st
 
 
 async function achievementComplete(userId, achievement) {
-    console.log("[ACHIEVEMENT SERVICE]", userId, " completed the achievement ", achievement.name);
     try {
         await fetch(`${USER_SERVICE_URL}/api/user/achievement`,
             {

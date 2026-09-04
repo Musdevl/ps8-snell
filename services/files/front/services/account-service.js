@@ -36,7 +36,7 @@ export function clearTokens() {
 export async function authFetch(url, options = {}) {
     const token = getToken();
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    
+
     const res = await fetch(url, {
         ...options,
         headers: {
@@ -61,12 +61,10 @@ export function setUsername(newUsername) {
     if (newUsername) {
         accountData.username = newUsername;
         saveToStorage(accountData);
-        console.log("[Account Service] - User Name successfully changed");
     }
 }
 
 export function setAccount(account) {
-    console.log("[Account Service] - Setting a new account");
     if (account) {
         accountData.userId = account._id;
         accountData.username = account.username;
@@ -82,8 +80,6 @@ export function setAccount(account) {
         accountData.friends_requests = account.friendsRequests;
 
         saveToStorage(accountData);
-
-        console.log("[Account Service] - Account saved");
     } else {
         console.log("[Account Service] - Invalid User Account");
     }
@@ -158,7 +154,7 @@ export function getElo() {
 }
 
 export function getSelectedEmotes() {
-    return accountData.selected_emotes;
+    return accountData.selected_emotes ?? [];
 }
 
 export function getEmotes() {

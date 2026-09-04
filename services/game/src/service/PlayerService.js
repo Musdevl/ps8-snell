@@ -12,12 +12,12 @@ export function createPlayer(color, webSocketId, userId) {
 
 export function checkPlayerCanPlace(player) {
     if (player.inventory.every(v => v === 0)) {
-        console.log(`Player ${player.color} hasn't enough inventory`);
+        console.log(`[GAME SERVICE] Player ${player.color} hasn't enough inventory`);
         return false;
     }
 
     if (player.inventory.every(item => PieceService.getCooldown(item) > 0)) {
-        console.log(`Player ${player.color} can't place any piece right now`);
+        console.log(`[GAME SERVICE] Player ${player.color} can't place any piece right now`);
         return false;
     }
 
