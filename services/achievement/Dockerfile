@@ -9,6 +9,9 @@ COPY achievement/package*.json ./
 RUN npm install
 
 COPY achievement/ .
+COPY achievement/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8004
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["node", "index.js"]
