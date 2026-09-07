@@ -162,6 +162,7 @@ nav-bar {
     height: 100%;
     scrollbar-color: #232220 #3a3734;
     overflow-y: auto;
+    padding-top: 0.5em;
 }
 
 .no-ais-container {
@@ -207,7 +208,7 @@ nav-bar {
     min-width: 0;
     background-color: var(--bg-dark);
     width: 100%;
-    height: 7rem;
+    height: 6rem;
     border: none;
     border-bottom: 3px solid #0000008b;
     border-radius: var(--radius);
@@ -483,7 +484,7 @@ nav-bar {
 
     nav-bar {
         display: flex;
-        position: absolute;
+        position: fixed;
         bottom: 0;
         left: 0;
         height: 10%;

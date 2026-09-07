@@ -39,6 +39,7 @@ social-bar {
     rotate: 180deg;
     z-index: -1;
     height: 10em;
+    width: 100%;
 }
 
 
@@ -161,6 +162,7 @@ nav-bar {
     height: 100%;
     scrollbar-color: #232220 #3a3734;
     overflow-y: auto;
+    padding-top: 0.5em;
 }
 
 .no-puzzles-container {
@@ -201,16 +203,29 @@ nav-bar {
 }
 
 .puzzle-item {
+    z-index: 1;
+    min-width: 0;
+    background-color: #262522;
+    width: 100%;
+    height: 6rem;
+    border: none;
+    border-bottom: 3px solid #0000008b;
+    border-radius: 5px;
+    padding: 1rem;
     display: flex;
-    padding: 1em 2em;
-    border-radius: 10px;
-    align-items: center;
     justify-content: space-between;
-    border: 1px solid #808080;
+    gap: 2em;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
+    cursor: pointer;
 
     &:hover {
         cursor: pointer;
-        background-color: rgba(210, 210, 210, 0.05);
+        background-color: rgba(210, 210, 210, 0.104);
+        transform: translateY(-5px);
     }
 }
 

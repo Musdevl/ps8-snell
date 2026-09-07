@@ -11,4 +11,6 @@ RUN npm install
 COPY gateway/ .
 
 EXPOSE 8000
+
+ENTRYPOINT ["bash", "/app/helpers/entrypoint.sh"]
 CMD ["node", "index.js"]

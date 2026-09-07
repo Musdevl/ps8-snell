@@ -103,8 +103,7 @@ main {
 .profile-header-left-side {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 2rem;
+    gap: 3rem;
     width: 100%;
 }
 
@@ -244,7 +243,7 @@ main {
     border: 1px solid #3a3632;
     border-radius: 8px;
     max-height: 20rem;
-    min-height: 10rem;
+    min-height: 20rem;
     padding: 1rem 1rem;
     gap: 0.5em;
     overflow-y: auto;
@@ -327,7 +326,7 @@ main {
     border: 1px solid #3a3632;
     border-radius: 8px;
     max-height: 20rem;
-    min-height: 10rem;
+    min-height: 20rem;
     padding: 1rem 1rem;
     flex-direction: column;
     overflow-y: auto;
@@ -395,15 +394,62 @@ main {
     scrollbar-color: #232220 #3a3734;
 }
 
-.game-card {
+
+.history-header {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 2em;
     padding: 12px 16px;
     background: #262522;
     border: 1px solid #3a3632;
     border-radius: 6px;
-    border-left-width: 3px;
+}
+
+.history-header-item {
+    font-weight: 600;
+}
+
+.game-type-header,
+.game-type-container {
+    width: 5%;
+}
+
+.players-header,
+.game-players {
+    width: 15%;
+}
+
+.result-header,
+.result-container {
+    width: 5%;
+}
+
+.actions-header,
+.actions-container {
+    width: 5%;
+}
+
+.date-header,
+.date-container {
+    width: 20%;
+}
+
+
+.game-type-container,
+.result-container,
+.actions-container {
+    display: flex;
+    justify-content: center;
+}
+
+.game-card {
+    display: flex;
+    align-items: center;
+    gap: 2em;
+    padding: 12px 16px;
+    background: #262522;
+    border: 1px solid #3a3632;
+    border-radius: 6px;
     transition: background 0.1s;
     cursor: pointer;
 }
@@ -427,18 +473,29 @@ main {
 .game-players {
     font-size: 14px;
     font-weight: 600;
-    color: #d4cfc9;
+    display: flex;
+    gap: 0.5em;
+    flex-direction: column;
 }
 
 .game-players .me {
-    color: white;
+    color: #fff;
 }
 
 .game-players .sep {
-    color: #3a3632;
+    color: #fff;
     margin: 0 6px;
 }
 
+.player-name {
+    min-width: 6em;
+}
+
+.player-container {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
 
 /* ============================================================
    INVENTORY
@@ -484,6 +541,58 @@ main {
     cursor: pointer;
 }
 
+.selected-emote-slot {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+}
+
+.empty-emote-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border: 2px dashed #3a3632;
+    background: #1f1e1c;
+    color: #6b655e;
+    font-size: 2rem;
+    line-height: 1;
+    transition: border-color 0.3s, color 0.3s;
+}
+
+.empty-emote-slot:hover {
+    border-color: #c8a84b;
+    color: #c8a84b;
+}
+
+.remove-emote-btn {
+    position: absolute;
+    top: -0.4rem;
+    right: -0.4rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #232220;
+    color: #d4cfc9;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s, background 0.3s, color 0.3s;
+}
+
+.selected-emote-slot:hover .remove-emote-btn,
+.remove-emote-btn:focus-visible {
+    opacity: 1;
+}
+
+.remove-emote-btn:hover {
+    background: #c8a84b;
+    color: #232220;
+}
+
 
 
 /* ============================================================
@@ -506,6 +615,21 @@ main {
     object-fit: cover;
     cursor: pointer;
     transition: border-color 0.3s;
+}
+
+.add-emote-btn {
+    min-width: 10rem;
+    height: 7rem;
+    border-radius: 6px;
+    border: 5px dotted gray;
+    object-fit: cover;
+    cursor: pointer;
+    transition: border-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+    font-weight: 500;
 }
 
 .selected-emote-item {
@@ -633,7 +757,7 @@ chat-component .chat-wrapper {
 /* ============================================================
    UTILITIES
    ============================================================ */
-   
+
 .hidden {
     display: none;
 }
@@ -674,6 +798,39 @@ chat-component .chat-wrapper {
     to {
         border-color: rgba(200, 168, 75, 1);
     }
+}
+
+.result-ico,
+.game-type-ico {
+    height: 1.5em;
+    width: 1.5em;
+    padding: 0 1em;
+}
+
+.white-rect {
+    width: 1rem;
+    height: 1rem;
+    background-color: white;
+    border-radius: 3px;
+}
+
+.black-rect {
+    width: 1rem;
+    height: 1rem;
+    background-color: black;
+    border-radius: 3px;
+}
+
+.game-history-field {
+    color: white;
+    font-weight: 600;
+
+}
+
+.history-container{
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
 }
 
 nav-bar {
@@ -787,6 +944,35 @@ nav-bar {
     }
 
 
+    .history-header-item {
+        font-weight: 600;
+    }
+
+    .game-type-header,
+    .game-type-container {
+        width: 5em;
+    }
+
+    .players-header,
+    .game-players {
+        width: 15em;
+    }
+
+    .result-header,
+    .result-container {
+        width: 5em;
+    }
+
+    .actions-header,
+    .actions-container {
+        width: 5em;
+    }
+
+    .date-header,
+    .date-container {
+        width: 20em;
+    }
+
 
     #mobile-logout-btn {
         text-decoration: none;
@@ -820,4 +1006,31 @@ nav-bar {
         height: 6.3rem;
     }
 
+}
+
+#loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+#loader.hidden {
+    display: none;
+}
+
+.spinner {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 4px solid #3a3632;
+    border-top-color: #68b844;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }

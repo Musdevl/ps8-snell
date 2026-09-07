@@ -1,15 +1,19 @@
-import { AbstractAi } from "./AbstractAi.js";
-import * as engine from "../engine.js";
-export class MathiasHellal extends AbstractAi {
+import { MinimaxAi } from "./MinimaxAi.js";
+import { weightsWithAggression } from "../ai.js";
+
+/**
+ * Debutant : voit le coup suivant mais se trompe plus d'une fois sur deux,
+ * et pioche large quand il se trompe. Timide sur l'attaque.
+ */
+export class MathiasHellal extends MinimaxAi {
 
     constructor(id) {
-        super(id, "Mathias Hellal", 500, "/assets/ais/mathias-hellal-ai.png");
+        super(id, "Mathias Hellal", 500, "/assets/ais/mathias-hellal-ai.png", {
+            maxDepth: 1,
+            timeBudgetMs: 300,
+            blunderRate: 0.6,
+            blunderPool: 12,
+            weights: weightsWithAggression(0.85),
+        });
     }
-
-    getNextAction(game) {
-        const all_action = engine.getAllActions(game);
-        const random_idx = Math.floor(Math.random() * all_action.length)
-        return all_action[random_idx];
-    }
-
 }

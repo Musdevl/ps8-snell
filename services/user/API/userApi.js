@@ -223,7 +223,6 @@ app.post('/api/user/add-elo', async (req, res) => {
     try {
         const { userId, elo } = req.body;
         await UserApiHandler.addElo(userId, elo);
-        console.log("ELO: " + elo + " successfully set for user " + userId);
         res.json({ message: 'ELO set successfully' }, 200);
     }
     catch (e) {
@@ -265,11 +264,11 @@ app.post('/api/user/logout', (req, res) => {
 
     res.clearCookie('jwt_token', {
         httpOnly: true
-        , sameSite: 'Strict' 
+        , sameSite: 'Strict'
     });
     res.clearCookie('jwt_refresh_token', {
         httpOnly: true
-        , sameSite: 'Strict' 
+        , sameSite: 'Strict'
     });
 
     res.json({ succes: true });
@@ -376,7 +375,6 @@ app.post("/api/user/history", async (req, res) => {
     try {
         let { userId, game } = req.body;
         await UserApiHandler.addGameHistory(userId, game);
-        console.log("History posted successfully", userId, JSON.stringify(game));
         res.json({ message: 'History posted successfully' }, 200);
     }
     catch (error) {
@@ -390,7 +388,6 @@ app.post("/api/user/inventory/add-purchased-item", async (req, res) => {
     try {
         let { userId, item } = req.body;
         await UserApiHandler.addItem(userId, item);
-        console.log("[USER SERVICES] - Item successfully added to inventory");
         res.json("Item successfully added to inventory", 200);
     } catch (e) {
         console.log("[USER SERVICES] - ", e);
@@ -442,7 +439,6 @@ app.post('/api/user/shop/create-checkout', async (req, res) => {
             return res.json({ error: 'Failed to create checkout session', message: session.error?.message }, 502);
         }
 
-        console.log(`[STRIPE] Checkout session ${session.id} created for user ${userId}`);
         res.json({ url: session.url }, 200);
     } catch (e) {
         console.error('[STRIPE] Error creating checkout session:', e);
@@ -514,9 +510,7 @@ app.get('/api/user/stats/registrations', async (req, res) => {
 // Start the server
 export function startHttpServer() {
     const PORT = 8010;
-    const server = app.listen(PORT, () => {
-        console.log(`[SERVER] Server listening on port ${PORT}`);
-    });
+    const server = app.listen(PORT, () => { });
 
     process.on('SIGTERM', () => { app.close(() => { process.exit(0); }); });
     process.on('SIGINT', () => { app.close(() => { process.exit(0); }); });

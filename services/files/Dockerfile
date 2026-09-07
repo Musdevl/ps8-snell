@@ -12,4 +12,6 @@ COPY files/ .
 
 
 EXPOSE 8001
+
+ENTRYPOINT ["bash", "/app/helpers/entrypoint.sh"]
 CMD ["node", "index.js"]

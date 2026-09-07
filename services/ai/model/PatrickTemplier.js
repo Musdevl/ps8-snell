@@ -1,15 +1,16 @@
-import { AbstractAi } from "./AbstractAi.js";
-import * as engine from "../engine.js";
+import { MinimaxAi } from "./MinimaxAi.js";
+import { weightsWithAggression } from "../ai.js";
 
-export class PatrickTemplier extends AbstractAi {
+/** Joueur regulier : tactique correcte a courte portee, erreurs occasionnelles. */
+export class PatrickTemplier extends MinimaxAi {
 
     constructor(id) {
-        super(id, "Patrick Templier", 900, "/assets/ais/patrick-templier-ai.png");
-    }
-
-    getNextAction(game) {
-        const all_action = engine.getAllActions(game);
-        const random_idx = Math.floor(Math.random() * all_action.length)
-        return all_action[random_idx];
+        super(id, "Patrick Templier", 1200, "/assets/ais/patrick-templier-ai.png", {
+            maxDepth: 3,
+            timeBudgetMs: 800,
+            blunderRate: 0.25,
+            blunderPool: 5,
+            weights: weightsWithAggression(1.1),
+        });
     }
 }

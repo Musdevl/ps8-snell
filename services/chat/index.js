@@ -29,29 +29,24 @@ const gatewayConnection = ioClient(`${GATEWAY_URL}/chat`, {
 
 ioServer.on('connection', (socket) => {
 
-    console.log(`GATEWAY Client connected: ${socket.id}`);
-
-
     socket.on("register", ({socketId}) => {
-        console.log(`User register to chat service: ${socket.id}`);
         State.addSocketId(socketId);
         chatApi.updateOnlineIds(State.onlineSocketId);
     });
 
     socket.on("disconnection", ({socketId}) =>{
-        console.log(`User disconnect from chat service : ${socket.id}`);
         State.removeSocketId(socketId);
         chatApi.updateOnlineIds(State.onlineSocketId);
     })
 
-    socket.on("disconnect", () => {
-    });
+    socket.on("disconnect", () => {});
 });
 
 
 chatApi.setGatewayConnection(gatewayConnection);
 
-gatewayConnection.on('connect', () => { console.log('USER CLIENT Connected to gateway'); });
+gatewayConnection.on('connect', () => {});
+
 process.on('SIGTERM', async() => {
     await closeRepo();
     process.exit(0);

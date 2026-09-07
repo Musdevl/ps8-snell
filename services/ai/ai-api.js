@@ -43,8 +43,9 @@ app.post('/api/ais/evaluate', (req, res) => {
 
 
         // on fait vrmt comme chess com raf
-        if (score === Infinity) return res.json({ score: "1 - 0" }, 200);
-        if (score === -Infinity) return res.json({ score: "0 - 1" }, 200);
+        // (l'evaluation rend un score fini : Infinity ne survivrait pas a JSON.stringify)
+        if (score >= ai.MATE_THRESHOLD) return res.json({ score: "1 - 0" }, 200);
+        if (score <= -ai.MATE_THRESHOLD) return res.json({ score: "0 - 1" }, 200);
 
 
         res.json({ score }, 200);
@@ -76,9 +77,7 @@ app.post('/api/ais/{id}/best-action', (req, res) => {
 
 export function startHttpServer() {
     const PORT = 8020;
-    const server = app.listen(PORT, () => {
-        console.log(`[AI SERVICE] Server listening on port ${PORT}`);
-    });
+    const server = app.listen(PORT, () => {});
 
     process.on('SIGTERM', () => { app.close(() => { process.exit(0); }); });
     process.on('SIGINT', () => { app.close(() => { process.exit(0); }); });

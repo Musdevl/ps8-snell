@@ -11,7 +11,6 @@ let usersCollection;
 export async function initDatabase() {
     try {
         await client.connect();
-        console.log('[REPO] - Connecté à MongoDB');
         db = client.db(dbName);
         usersCollection = db.collection('users');
     } catch (error) {
@@ -33,7 +32,6 @@ export async function saveUser(user) {
         }
         const result = await usersCollection.insertOne({ ...user, createdAt: new Date() });
         const savedUser = { ...user, id: result.insertedId };
-        console.log("[REPO] - Added a new user : ", savedUser);
         return savedUser;
     } catch (error) {
         console.error('[REPO] - Erreur lors de la sauvegarde:', error);
@@ -109,7 +107,6 @@ export async function removeFriend(userId, friendId) {
 export async function getUserWithCredentials(email, password) {
     try {
         const user = await usersCollection.findOne({ email, password });
-        if (user) console.log("[REPO] - User found : ", user);
         return user || null;
     } catch (error) {
         console.error('[REPO] - Erreur lors de la recherche:', error);
@@ -120,7 +117,6 @@ export async function getUserWithCredentials(email, password) {
 export async function printRepo() {
     try {
         const users = await usersCollection.find({}).toArray();
-        console.log("[REPO] - Users : ", users);
         return users;
     } catch (error) {
         console.error('[REPO] - Erreur lors de la récupération:', error);
@@ -141,7 +137,6 @@ export async function findUserByUsername(username) {
 export async function closeDatabase() {
     try {
         await client.close();
-        console.log('[REPO] - Connexion MongoDB fermée');
     } catch (error) {
         console.error('[REPO] - Erreur lors de la fermeture:', error);
     }

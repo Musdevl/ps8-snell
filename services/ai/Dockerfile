@@ -12,4 +12,5 @@ COPY ai/ .
 
 
 EXPOSE 8020
+ENTRYPOINT ["bash", "/app/helpers/entrypoint.sh"]
 CMD ["node", "index.js"]

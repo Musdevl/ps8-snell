@@ -11,4 +11,6 @@ RUN npm install
 COPY chat/ .
 
 EXPOSE 8010
+
+ENTRYPOINT ["bash", "/app/helpers/entrypoint.sh"]
 CMD ["node", "index.js"]

@@ -12,7 +12,6 @@ let global_chat_collection;
 export async function initDatabase() {
     try {
         await client.connect();
-        console.log('[FRIEND_CHAT_REPO] - Connecté à MongoDB');
         db = client.db(dbName);
         global_chat_collection = db.collection('global_chat');
     } catch (error) {
@@ -50,7 +49,6 @@ export async function getAllMessages() {
 export async function closeDatabase() {
     try {
         await client.close();
-        console.log('[FRIEND_CHAT_REPO] - Connexion MongoDB fermée');
     } catch (error) {
         console.error('[FRIEND_CHAT_REPO] - Erreur lors de la fermeture:', error);
     }

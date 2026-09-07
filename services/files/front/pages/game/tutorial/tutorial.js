@@ -2,7 +2,7 @@ import { GATEWAY_URL } from "../../../env.js";
 import { COLORS } from "../../../enum/Colors.js";
 import * as uint16Utils from "../../../utils/Uint16Utils.js";
 import { TUTORIAL_STEPS } from "../../../utils/TutorialSteps.js";
-import { authFetch } from "../../../services/account-service.js";
+import * as accountService from "../../../services/account-service.js";
 
 let boardComponent;
 let whitePlayerInfoComponent;
@@ -85,6 +85,8 @@ async function setupGame() {
 
     boardComponent.setPlayerColor(COLORS.WHITE);
 
+    setupSoundBtn();
+
     leave_btn.addEventListener("click", () => {
         showModal({
             message: "Leave the tutorial ?",
@@ -106,8 +108,39 @@ async function setupGame() {
     tutorial_previous = document.querySelector('.previous-btn');
 
     tutorial_next.addEventListener('click', async () => await nextTutorielStep());
-
     tutorial_previous.addEventListener('click', async () => await previousTutorielStep());
+
+}
+
+
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
 
 }
 
@@ -133,6 +166,8 @@ async function previousTutorielStep() {
         await handleUpdate(game_states[state_index], true);
     }
 
+    applyStepHighlight(landingStep);
+
     tutorial_next.disabled = landingStep.blocking;
 }
 
@@ -141,9 +176,12 @@ async function nextTutorielStep() {
 
         showModal({
             message: "Congratulations, you finished the tutorial !",
-            confirmLabel: "Leave",
-            cancelLabel: "Cancel",
+            confirmLabel: "Do it again",
+            cancelLabel: "Leave",
             onConfirm: () => {
+                window.location.replace('/pages/game/tutorial/index.html');
+            },
+            onCancel: () => {
                 window.location.replace(`/`);
             }
         });
@@ -171,6 +209,9 @@ async function nextTutorielStep() {
     }
 
     const step = tutorial_steps[tutorial_index];
+
+    applyStepHighlight(step);
+
     tutorial_next.disabled = step.blocking;
 }
 
@@ -192,6 +233,12 @@ function setupBoardComponentEvents(boardComponent) {
         blackPlayerInfoComponent.clearRotationCell();
 
         if (action === tutorial_steps[tutorial_index].expectedAction) {
+            // Le coup demandé vient d'être joué : on éteint le projecteur tout
+            // de suite. Sinon le plateau resterait assombri pendant la pose de
+            // la pièce puis tout le passage du laser — c'est-à-dire pendant
+            // exactement ce qu'on veut donner à voir. L'étape suivante
+            // rallumera le sien si elle en a un.
+            boardComponent.clearHighlightedCells();
             nextTutorielStep();
             playSound(correct_action);
         }
@@ -293,7 +340,102 @@ async function startTutorial() {
     boardComponent.clear();
     await handleUpdate(game_states[state_index], true);
     await renderTutorialStep();
+    applyStepHighlight(tutorial_steps[tutorial_index]);
 
+}
+
+
+/**
+ * Coup de projecteur de l'étape courante : le plateau s'assombrit, sauf les
+ * cases concernées. Appelé APRÈS la mise à jour du plateau, parce que les
+ * surlignages de type "piece" se lisent dans la position affichée.
+ */
+function applyStepHighlight(step) {
+    const cells = resolveHighlightCells(step);
+
+    if (cells.length === 0) {
+        boardComponent.clearHighlightedCells();
+        return;
+    }
+
+    boardComponent.highlightCells(cells);
+}
+
+/**
+ * Les cases à mettre en avant pour une étape.
+ *
+ * Par défaut elles sont DÉDUITES de `expectedAction` : c'est ce qu'on demande
+ * au joueur de faire, donc c'est exactement ce qu'il faut lui montrer, et les
+ * deux ne peuvent pas se contredire quand on modifie le scénario. `highlight`
+ * ne sert qu'aux étapes explicatives, qui n'attendent aucune action.
+ */
+function resolveHighlightCells(step) {
+    if (!step) return [];
+
+    const cellsFromAction = actionCells(step.expectedAction);
+    if (cellsFromAction.length > 0) return cellsFromAction;
+
+    const highlight = step.highlight;
+    if (!highlight) return [];
+
+    switch (highlight.type) {
+        case "cells":
+            return Array.isArray(highlight.cells) ? highlight.cells : [];
+
+        case "cell":
+            return [[highlight.row, highlight.col]];
+
+        case "piece":
+            return findPieceCells(highlight.piece, highlight.color);
+
+        // "panel" désigne le panneau latéral, qui n'est pas sur le plateau.
+        default:
+            return [];
+    }
+}
+
+/** Les cases citées par une action : "MOVE/54,53" → [[5,4], [5,3]]. */
+function actionCells(expectedAction) {
+    if (!expectedAction || expectedAction === "NONE") return [];
+
+    const [type, coords] = expectedAction.split("/");
+    if (!coords) return [];
+
+    const [from, to] = coords.split(",");
+
+    switch (type) {
+        case "PLACE":
+        case "ROTATE":
+            // Le second membre est une direction, pas une case.
+            return [parseCell(from)];
+
+        case "MOVE":
+        case "SWAP":
+            return [parseCell(from), parseCell(to)];
+
+        default:
+            return [];
+    }
+}
+
+const parseCell = (coords) => [Number(coords[0]), Number(coords[1])];
+
+/** Toutes les cases occupées par un type de pièce d'une couleur donnée. */
+function findPieceCells(pieceName, colorName) {
+    const grid = boardComponent.gridState ?? [];
+    const color = colorName === "black" ? COLORS.BLACK : COLORS.WHITE;
+    const cells = [];
+
+    for (let row = 0; row < grid.length; row++) {
+        for (let col = 0; col < grid[row].length; col++) {
+            const piece = grid[row][col];
+            if (piece && piece.pieceName === pieceName && piece.color === color) {
+                cells.push([row, col]);
+            }
+        }
+    }
+
+    return cells;
 }
 
 async function renderTutorialStep() {
@@ -304,7 +446,9 @@ async function renderTutorialStep() {
 }
 
 function playSound(sound) {
-    sound.play().catch(() => { });
+    if (accountService.hasSound()) {
+        sound.play().catch(() => { });
+    }
 }
 
 // Lancer l'initialisation quand le DOM est prêt

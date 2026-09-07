@@ -21,6 +21,7 @@ export class Game extends EventEmitter {
     intervalId; // Pour stopper le décompte
     isGameOver; // boolean
     isReview; // boolean
+    startDate; // string
 
     constructor(board, gameType, isReview = false, timeLimit = 600) {
         super();
@@ -54,6 +55,7 @@ export class Game extends EventEmitter {
         this.isGameOver = false;
         this.intervalId = null;
         this.isReview = isReview;
+        this.startDate = new Date();
     }
 
     startTimer() {

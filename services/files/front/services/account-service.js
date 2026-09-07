@@ -1,17 +1,17 @@
 import { GATEWAY_URL } from "../env.js";
 import { notify } from "./notification-service.js";
 
-const STORAGE_KEY = 'user_account';
+const ACCOUNT_STORAGE_KEY = 'user_account';
 const TOKEN_KEY = 'jwt_token';
 const REFRESH_TOKEN_KEY = 'jwt_refresh_token';
 
 function loadFromStorage() {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(ACCOUNT_STORAGE_KEY);
     return stored ? JSON.parse(stored) : null;
 }
 
-function saveToStorage(account) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(account));
+function saveToStorage(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
 }
 
 let accountData;
@@ -23,7 +23,6 @@ export function getToken() {
 }
 
 export function setTokens(jwt_token, jwt_refresh_token) {
-    console.log("setting new tokens", jwt_token, jwt_refresh_token);
     if (jwt_token) localStorage.setItem(TOKEN_KEY, jwt_token);
     if (jwt_refresh_token) localStorage.setItem(REFRESH_TOKEN_KEY, jwt_refresh_token);
 }
@@ -37,7 +36,7 @@ export function clearTokens() {
 export async function authFetch(url, options = {}) {
     const token = getToken();
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    
+
     const res = await fetch(url, {
         ...options,
         headers: {
@@ -61,13 +60,11 @@ export async function authFetch(url, options = {}) {
 export function setUsername(newUsername) {
     if (newUsername) {
         accountData.username = newUsername;
-        saveToStorage(accountData);
-        console.log("[Account Service] - User Name successfully changed");
+        saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
     }
 }
 
 export function setAccount(account) {
-    console.log("[Account Service] - Setting a new account");
     if (account) {
         accountData.userId = account._id;
         accountData.username = account.username;
@@ -81,10 +78,9 @@ export function setAccount(account) {
         accountData.snell_coins = account.snell_coins;
         accountData.emotes = account.emotes;
         accountData.friends_requests = account.friendsRequests;
+        accountData.hasSound = true;
 
-        saveToStorage(accountData);
-
-        console.log("[Account Service] - Account saved");
+        saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
     } else {
         console.log("[Account Service] - Invalid User Account");
     }
@@ -108,7 +104,7 @@ export async function getFriendsRequests() {
             const result = await res.json();
 
             accountData.friends_requests = result;
-            saveToStorage(accountData);
+            saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
 
             return result
         } catch (error) {
@@ -121,17 +117,17 @@ export async function getFriendsRequests() {
 
 export function setFriendsRequests(friends_requests) {
     accountData.friends_requests = friends_requests;
-    saveToStorage(accountData);
+    saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
 }
 
 export function setSelectedEmotes(selected_emotes) {
     accountData.selected_emotes = selected_emotes;
-    saveToStorage(accountData);
+    saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
 }
 
 export function setTheme(theme) {
     accountData.selected_theme = theme;
-    saveToStorage(accountData);
+    saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
 }
 
 export function getTheme() {
@@ -159,7 +155,7 @@ export function getElo() {
 }
 
 export function getSelectedEmotes() {
-    return accountData.selected_emotes;
+    return accountData.selected_emotes ?? [];
 }
 
 export function getEmotes() {
@@ -168,7 +164,16 @@ export function getEmotes() {
 
 export function decrementSnellCoins(snell_coins) {
     accountData.snell_coins -= snell_coins;
-    saveToStorage(accountData);
+    saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
+}
+
+export function setSound(status) {
+    accountData.hasSound = status
+    saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
+}
+
+export function hasSound() {
+    return accountData.hasSound;
 }
 
 export function resetAccount() {
@@ -178,7 +183,7 @@ export function resetAccount() {
         elo: null
     };
     clearTokens();
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(ACCOUNT_STORAGE_KEY);
     localStorage.clear();
 
     console.log("[Account Service] - Account reset");
@@ -186,7 +191,7 @@ export function resetAccount() {
 
 export function setProfilePicture(picture) {
     accountData.profile_picture = picture;
-    saveToStorage(accountData);
+    saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
 }
 
 export function getThemes() {
@@ -268,7 +273,8 @@ function init() {
     accountData = loadFromStorage() || {
         userId: null,
         username: null,
-        elo: null
+        elo: null,
+        hasSound: false
     };
 }
 
@@ -342,7 +348,7 @@ export function getSnellCoins() {
 export function applyReward(reward) {
     if (reward.snell_coins) {
         accountData.snell_coins += reward.snell_coins;
-        saveToStorage(accountData);
+        saveToStorage(ACCOUNT_STORAGE_KEY, accountData);
     }
 }
 

@@ -21,6 +21,66 @@ export const MASK = {
     COOLDOWN: 0b11000000
 };
 
+
+// ─── LOOKUP TABLES ───────────────────────────────────────────────────────────
+// Les regles du laser sont figees : on les precalcule une fois dans des tables
+// plates indexees par (rotationIndex * 4 + laserDirectionIndex). Les predicats
+// ci-dessous sont appeles des centaines de milliers de fois par recherche IA ;
+// construire un objet litteral a chaque appel coutait plus cher que le trace
+// du faisceau lui-meme.
+
+export const dirIndex = d => d >> 4;              // 0/16/32/48 -> 0/1/2/3
+export const indexToDir = i => i << 4;
+
+export const BEAM_DELTA_ROW = [-1, 0, 1, 0];      // indexe par dirIndex
+export const BEAM_DELTA_COL = [0, 1, 0, -1];
+
+function buildTable(spec, fallback) {
+    const table = new Int8Array(16).fill(fallback);
+    for (const [rotation, entries] of Object.entries(spec))
+        for (const [laserDir, value] of Object.entries(entries))
+            table[dirIndex(+rotation) * 4 + dirIndex(+laserDir)] = value;
+    return table;
+}
+
+const TRIANGLE_VULNERABLE = buildTable({
+    [DIRECTIONS.NORTH]: { [DIRECTIONS.NORTH]: 1, [DIRECTIONS.EAST]: 1 },
+    [DIRECTIONS.EAST]:  { [DIRECTIONS.EAST]: 1,  [DIRECTIONS.SOUTH]: 1 },
+    [DIRECTIONS.SOUTH]: { [DIRECTIONS.SOUTH]: 1, [DIRECTIONS.WEST]: 1 },
+    [DIRECTIONS.WEST]:  { [DIRECTIONS.WEST]: 1,  [DIRECTIONS.NORTH]: 1 },
+}, 0);
+
+// -1 = pas de rebond (le triangle est vulnerable depuis cette direction).
+const TRIANGLE_BOUNCE = buildTable({
+    [DIRECTIONS.NORTH]: { [DIRECTIONS.SOUTH]: DIRECTIONS.EAST,  [DIRECTIONS.WEST]:  DIRECTIONS.NORTH },
+    [DIRECTIONS.EAST]:  { [DIRECTIONS.NORTH]: DIRECTIONS.EAST,  [DIRECTIONS.WEST]:  DIRECTIONS.SOUTH },
+    [DIRECTIONS.SOUTH]: { [DIRECTIONS.NORTH]: DIRECTIONS.WEST,  [DIRECTIONS.EAST]:  DIRECTIONS.SOUTH },
+    [DIRECTIONS.WEST]:  { [DIRECTIONS.SOUTH]: DIRECTIONS.WEST,  [DIRECTIONS.EAST]:  DIRECTIONS.NORTH },
+}, -1);
+
+// Un miroir plein renvoie toujours le faisceau, quelle que soit l'incidence.
+const MIRROR_BOUNCE = buildTable({
+    [DIRECTIONS.NORTH]: { [DIRECTIONS.NORTH]: DIRECTIONS.WEST, [DIRECTIONS.EAST]: DIRECTIONS.SOUTH, [DIRECTIONS.SOUTH]: DIRECTIONS.EAST, [DIRECTIONS.WEST]: DIRECTIONS.NORTH },
+    [DIRECTIONS.SOUTH]: { [DIRECTIONS.NORTH]: DIRECTIONS.WEST, [DIRECTIONS.EAST]: DIRECTIONS.SOUTH, [DIRECTIONS.SOUTH]: DIRECTIONS.EAST, [DIRECTIONS.WEST]: DIRECTIONS.NORTH },
+    [DIRECTIONS.EAST]:  { [DIRECTIONS.NORTH]: DIRECTIONS.EAST, [DIRECTIONS.EAST]: DIRECTIONS.NORTH, [DIRECTIONS.SOUTH]: DIRECTIONS.WEST, [DIRECTIONS.WEST]: DIRECTIONS.SOUTH },
+    [DIRECTIONS.WEST]:  { [DIRECTIONS.NORTH]: DIRECTIONS.EAST, [DIRECTIONS.EAST]: DIRECTIONS.NORTH, [DIRECTIONS.SOUTH]: DIRECTIONS.WEST, [DIRECTIONS.WEST]: DIRECTIONS.SOUTH },
+}, -1);
+
+// Un protecteur ne bloque que le faisceau qui arrive pile en face de lui.
+const PROTECTOR_SAFE_FROM = {
+    [DIRECTIONS.NORTH]: DIRECTIONS.SOUTH,
+    [DIRECTIONS.SOUTH]: DIRECTIONS.NORTH,
+    [DIRECTIONS.WEST]:  DIRECTIONS.EAST,
+    [DIRECTIONS.EAST]:  DIRECTIONS.WEST,
+};
+
+const PROTECTOR_VULNERABLE = (() => {
+    const table = new Int8Array(16).fill(1);
+    for (const [rotation, safeDir] of Object.entries(PROTECTOR_SAFE_FROM))
+        table[dirIndex(+rotation) * 4 + dirIndex(safeDir)] = 0;
+    return table;
+})();
+
 // ─── PIECE UTILS ─────────────────────────────────────────────────────────────
 
 export const getPiece = p => p & MASK.PIECE;
@@ -200,46 +260,62 @@ export function rotate(board, action) {
 
 // ─── LASER ───────────────────────────────────────────────────────────────────
 
-export function shootBeam(board, colorTurn, players = []) {
+/**
+ * Tir du laser du camp `colorTurn` : detruit ce qui est touche et renvoie le
+ * trajet parcouru. `collectPath` peut etre mis a false par la recherche IA,
+ * qui n'a pas besoin du trajet et economise ainsi une allocation par noeud.
+ */
+export function shootBeam(board, colorTurn, players = [], { collectPath = true } = {}) {
     const [shooter, pos] = findShooter(board, colorTurn);
-    let dir = shooter & MASK.DIRECTION;
+    const grid = board.grid;
+    let dirIdx = dirIndex(shooter & MASK.DIRECTION);
     let r = pos[0], c = pos[1];
     const laserPath = [];
-    const visited = new Set();
-    const delta = { 0: [-1, 0], 32: [1, 0], 48: [0, -1], 16: [0, 1] };
     let white_triangle_shooted = 0, black_triange_shooted = 0;
 
+    const seen = beamSeen;
+    beamStamp++;
+
     while (true) {
-        r += delta[dir][0];
-        c += delta[dir][1];
+        r += BEAM_DELTA_ROW[dirIdx];
+        c += BEAM_DELTA_COL[dirIdx];
+        if (r < 0 || r > 9 || c < 0 || c > 9) break;
 
-        if (r < 0 || r >= 10 || c < 0 || c >= 10) break;
+        const square = r * 10 + c;
+        if (seen[square] === beamStamp) break;
+        seen[square] = beamStamp;
+        if (collectPath) laserPath.push([r, c]);
 
-        const key = r * 10 + c;
-        if (visited.has(key)) break;
-        visited.add(key);
-        laserPath.push([r, c]);
+        const cell = grid[square];
+        const piece = cell & MASK.PIECE;
+        if (piece === PIECE.NONE) continue;
 
-        const cell = board.getSlot(r, c);
+        const tableIndex = dirIndex(cell & MASK.DIRECTION) * 4 + dirIdx;
 
-        if (getPiece(cell) === PIECE.NONE) { /* empty */ }
-        else if (getPiece(cell) === PIECE.TRIANGLE) {
-            if (isTriangleVulnerable(cell, dir)) {
-                if (getColor(cell) === COLORS.WHITE) white_triangle_shooted++;
+        if (piece === PIECE.TRIANGLE) {
+            if (TRIANGLE_VULNERABLE[tableIndex] === 1) {
+                if ((cell & MASK.COLOR) === COLORS.WHITE) white_triangle_shooted++;
                 else black_triange_shooted++;
-                board.killSlot(r, c);
-            } else { dir = getTriangleBounceDirection(cell, dir); }
+                grid[square] = 0;
+            } else {
+                dirIdx = dirIndex(TRIANGLE_BOUNCE[tableIndex]);
+            }
+            continue;
         }
-        else if (getPiece(cell) === PIECE.FULL_MIRROR) { dir = getFullMirrorBounceDirection(cell, dir); }
-        else if (getPiece(cell) === PIECE.KING) {
-            players.forEach(p => { if (p.getColor() === (cell & MASK.COLOR)) p.killKing(); });
-            board.killSlot(r, c);
+        if (piece === PIECE.FULL_MIRROR) {
+            dirIdx = dirIndex(MIRROR_BOUNCE[tableIndex]);
+            continue;
         }
-        else if (getPiece(cell) === PIECE.PROTECTOR) {
-            if (isProtectorVulnerable(cell, dir)) board.killSlot(r, c);
-            else break;
+        if (piece === PIECE.KING) {
+            for (const p of players) if (p.getColor() === (cell & MASK.COLOR)) p.killKing();
+            grid[square] = 0;
+            continue;
         }
-        else if (getPiece(cell) === PIECE.SHOOTER) { break; }
+        if (piece === PIECE.PROTECTOR) {
+            if (PROTECTOR_VULNERABLE[tableIndex] === 1) { grid[square] = 0; continue; }
+            break;
+        }
+        if (piece === PIECE.SHOOTER) break;
     }
 
     return { laserPath, white_triangle_shooted, black_triange_shooted };
@@ -265,44 +341,128 @@ export function findShooter(board, color) {
 }
 
 export function isTriangleVulnerable(piece, laserDir) {
-    const d = getRotation(piece);
-    const vuln = {
-        [DIRECTIONS.SOUTH]: [48, 32],
-        [DIRECTIONS.WEST]: [0, 48],
-        [DIRECTIONS.NORTH]: [0, 16],
-        [DIRECTIONS.EAST]: [16, 32],
-    };
-    return (vuln[d] || []).includes(laserDir);
+    return TRIANGLE_VULNERABLE[dirIndex(getRotation(piece)) * 4 + dirIndex(laserDir)] === 1;
 }
 
 export function getTriangleBounceDirection(piece, inDir) {
-    const map = {
-        [DIRECTIONS.SOUTH]: { 0: 48, 16: 32 },
-        [DIRECTIONS.WEST]: { 32: 48, 16: 0 },
-        [DIRECTIONS.NORTH]: { 32: 16, 48: 0 },
-        [DIRECTIONS.EAST]: { 0: 16, 48: 32 },
-    };
-    return map[getRotation(piece)]?.[inDir] ?? null;
+    const out = TRIANGLE_BOUNCE[dirIndex(getRotation(piece)) * 4 + dirIndex(inDir)];
+    return out === -1 ? null : out;
 }
 
 export function getFullMirrorBounceDirection(piece, inDir) {
-    const map = {
-        [DIRECTIONS.SOUTH]: { 0: 48, 16: 32, 32: 16, 48: 0 },
-        [DIRECTIONS.WEST]: { 0: 16, 16: 0, 32: 48, 48: 32 },
-        [DIRECTIONS.NORTH]: { 0: 48, 16: 32, 32: 16, 48: 0 },
-        [DIRECTIONS.EAST]: { 0: 16, 16: 0, 32: 48, 48: 32 },
-    };
-    return map[getRotation(piece)]?.[inDir] ?? null;
+    const out = MIRROR_BOUNCE[dirIndex(getRotation(piece)) * 4 + dirIndex(inDir)];
+    return out === -1 ? null : out;
 }
 
 export function isProtectorVulnerable(piece, laserDir) {
-    const safe = {
-        [DIRECTIONS.NORTH]: 32,
-        [DIRECTIONS.SOUTH]: 0,
-        [DIRECTIONS.WEST]: 16,
-        [DIRECTIONS.EAST]: 48,
+    return PROTECTOR_VULNERABLE[dirIndex(getRotation(piece)) * 4 + dirIndex(laserDir)] === 1;
+}
+
+// ─── TRACE DU FAISCEAU (LECTURE SEULE) ───────────────────────────────────────
+
+const MAX_BEAM_HITS = 16;
+
+/**
+ * Rejoue exactement la trajectoire de shootBeam sans rien detruire : on veut
+ * savoir ce qui SERAIT touche si ce camp tirait maintenant. C'est la primitive
+ * de base de l'evaluation et du generateur de coups tactiques de l'IA.
+ *
+ * Attention : le faisceau TRAVERSE ce qu'il detruit (shootBeam fait killSlot
+ * puis continue). Un seul tir peut donc faire plusieurs victimes, y compris
+ * dans les deux camps a la fois. On collecte donc tous les impacts, pas
+ * seulement le premier. Le faisceau ne s'arrete que sur un bord, une boucle,
+ * un protecteur presente de face, ou un tireur.
+ *
+ * `out` est un objet reutilisable (cree par createBeamTrace) pour ne rien
+ * allouer dans la boucle chaude.
+ */
+export function createBeamTrace() {
+    return {
+        path: new Int8Array(128),
+        pathLength: 0,
+        hitSquares: new Int8Array(MAX_BEAM_HITS),
+        hitValues: new Uint8Array(MAX_BEAM_HITS),
+        hitCount: 0,
     };
-    return safe[getRotation(piece)] !== laserDir;
+}
+
+export function traceBeam(board, color, out) {
+    out.pathLength = 0;
+    out.hitCount = 0;
+
+    const start = findShooterSquare(board, color);
+    if (start < 0) return out;
+
+    const grid = board.grid;
+    let dirIdx = dirIndex(grid[start] & MASK.DIRECTION);
+    let r = (start / 10) | 0, c = start % 10;
+
+    const seen = beamSeen;
+    beamStamp++;
+
+    while (out.pathLength < out.path.length) {
+        r += BEAM_DELTA_ROW[dirIdx];
+        c += BEAM_DELTA_COL[dirIdx];
+        if (r < 0 || r > 9 || c < 0 || c > 9) return out;
+
+        const square = r * 10 + c;
+        if (seen[square] === beamStamp) return out; // le faisceau boucle
+        seen[square] = beamStamp;
+        out.path[out.pathLength++] = square;
+
+        const value = grid[square];
+        const piece = value & MASK.PIECE;
+        if (piece === PIECE.NONE) continue;
+
+        const tableIndex = dirIndex(value & MASK.DIRECTION) * 4 + dirIdx;
+
+        if (piece === PIECE.TRIANGLE) {
+            if (TRIANGLE_VULNERABLE[tableIndex] === 1) recordHit(out, square, value);
+            else dirIdx = dirIndex(TRIANGLE_BOUNCE[tableIndex]);
+            continue;
+        }
+        if (piece === PIECE.FULL_MIRROR) {
+            dirIdx = dirIndex(MIRROR_BOUNCE[tableIndex]);
+            continue;
+        }
+        if (piece === PIECE.PROTECTOR) {
+            if (PROTECTOR_VULNERABLE[tableIndex] === 1) { recordHit(out, square, value); continue; }
+            return out; // face blindee : le faisceau s'arrete sans degat
+        }
+        if (piece === PIECE.SHOOTER) return out;
+
+        recordHit(out, square, value); // ROI : detruit, et le faisceau poursuit
+    }
+    return out;
+}
+
+/** Le roi de `color` est-il detruit par le tir de `shooterColor` tel qu'oriente ? */
+export function beamKillsKing(board, shooterColor, kingColor, out) {
+    traceBeam(board, shooterColor, out);
+    for (let i = 0; i < out.hitCount; i++) {
+        const value = out.hitValues[i];
+        if ((value & MASK.PIECE) === PIECE.KING && (value & MASK.COLOR) === kingColor) return true;
+    }
+    return false;
+}
+
+const beamSeen = new Int32Array(100);
+let beamStamp = 0;
+
+function recordHit(out, square, value) {
+    if (out.hitCount >= MAX_BEAM_HITS) return;
+    out.hitSquares[out.hitCount] = square;
+    out.hitValues[out.hitCount] = value;
+    out.hitCount++;
+}
+
+export function findShooterSquare(board, color) {
+    const grid = board.grid;
+    for (let square = 0; square < 100; square++) {
+        const value = grid[square];
+        if ((value & MASK.PIECE) === PIECE.SHOOTER && (value & MASK.COLOR) === color) return square;
+    }
+    return -1;
 }
 
 // ─── PLACEMENT HELPERS ───────────────────────────────────────────────────────

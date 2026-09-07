@@ -7,6 +7,9 @@ import { GATEWAY_URL } from "../../env.js";
 
 const params = new URLSearchParams(window.location.search);
 const username = params.get("username");
+// Nombre de slots d'emotes affiches sur le profil. Un slot sans emote vaut
+// null : la position est conservee pour pouvoir la remplir plus tard.
+const EMOTE_SLOT_COUNT = 8;
 
 const loader = document.getElementById('loader');
 const profile = document.getElementById('profile');
@@ -43,63 +46,63 @@ async function loadProfile() {
         const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${profileUserId}`);
         user = await res.json();
 
-        if (!res.ok) {
-            window.location.replace(``);
-            return;
-        }
-
-        chatId = user.friends.find(f => f.friendId === accountService.getUserId())?.chatId ?? null;
-
-        setAchievements(user.achievements);
-
-        const isOwnProfile = accountService.getUserId() === profileUserId;
-        if (isOwnProfile) {
-            document.querySelector('.profile-right').style.display = 'none';
-        }
-
-        await chat.readyPromise;
-        chat.disableOptionButtons();
-
-        await renderProfile();
-        await renderHistory();
-
-        document.querySelector("#mobile-logout-btn").addEventListener("click", async () => {
-            await accountService.logout();
-            window.location.replace(`/pages/home/play`);
-        });
-
-        if (profileUserId !== accountService.getUserId()) {
-
-
-            const tabProfile = document.querySelector('#tab-profile');
-            const tabChat = document.querySelector('#tab-chat');
-            const profile_left = document.querySelector('.profile-left');
-            const profile_right = document.querySelector('.profile-right');
-
-            tabProfile.addEventListener('click', () => {
-                tabProfile.classList.add('active');
-                tabChat.classList.remove('active');
-                profile_left.style.display = 'block';
-                profile_right.style.display = 'none';
-            });
-
-            tabChat.addEventListener('click', async () => {
-                tabChat.classList.add('active');
-                tabProfile.classList.remove('active');
-                profile_left.style.display = 'none';
-                profile_right.style.display = 'flex';
-            });
-
-            document.querySelector('#mobile-logout-btn').style.display = "none"
-
-        } else {
-            document.querySelector('.tabs').style.display = "none";
-        }
-
-
     } catch (err) {
         console.error(err);
+        notificationService.notify("User not found", "error");
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        await sleep(1000);
+        window.location.replace(`/`);
     }
+
+    chatId = user.friends.find(f => f.friendId === accountService.getUserId())?.chatId ?? null;
+
+    setAchievements(user.achievements);
+
+    const isOwnProfile = accountService.getUserId() === profileUserId;
+    if (isOwnProfile) {
+        document.querySelector('.profile-right').style.display = 'none';
+    }
+
+    await chat.readyPromise;
+    chat.disableOptionButtons();
+
+    await renderProfile();
+    await renderHistory();
+
+    document.querySelector("#mobile-logout-btn").addEventListener("click", async () => {
+        await accountService.logout();
+        window.location.replace(`/pages/home/play`);
+    });
+
+    if (profileUserId !== accountService.getUserId()) {
+
+        const tabProfile = document.querySelector('#tab-profile');
+        const tabChat = document.querySelector('#tab-chat');
+        const profile_left = document.querySelector('.profile-left');
+        const profile_right = document.querySelector('.profile-right');
+
+        tabProfile.addEventListener('click', () => {
+            tabProfile.classList.add('active');
+            tabChat.classList.remove('active');
+            profile_left.style.display = 'block';
+            profile_right.style.display = 'none';
+        });
+
+        tabChat.addEventListener('click', async () => {
+            tabChat.classList.add('active');
+            tabProfile.classList.remove('active');
+            profile_left.style.display = 'none';
+            profile_right.style.display = 'flex';
+        });
+
+        document.querySelector('#mobile-logout-btn').style.display = "none"
+
+    } else {
+        document.querySelector('.tabs').style.display = "none";
+    }
+
+
+
 }
 
 async function fetchUserId(username) {
@@ -132,7 +135,7 @@ async function renderProfile() {
     //document.getElementById('snell-coins').textContent = user.snell_coins;
 
 
-    selected_profile_emotes = accountService.getSelectedEmotes();
+    selected_profile_emotes = normalizeEmoteSlots(accountService.getSelectedEmotes());
 
     await renderFriends();
 
@@ -221,19 +224,59 @@ async function renderHistory() {
         const resultClass = isDraw ? 'draw' : (won ? 'win' : 'loss');
 
         const el = document.createElement('div');
-        el.className = `game-card ${resultClass}`;
+        el.className = `game-card`;
         el.innerHTML = `
-            <span class="game-players">
-                <span class="me">${username}</span>
-                <span class="sep">vs</span>
-                ${opponentMap[opponentId] ?? opponentId}
-            </span>
+            <div class="game-type-container">
+            ${get_game_ico(game.gameType)}
+            </div>
+            <div class="game-players">
+                <div class="player-container">
+                <div class=${isWhite ? "white-rect" : "black-rect"}></div>
+                <span class="me player-name">${username}</span>
+                </div>
+
+                <div class="player-container">
+                <div class=${isWhite ? "black-rect" : "white-rect"}></div>
+                <span class="player-name">${opponentMap[opponentId] ?? opponentId}</span>
+                </div>
+                
+            </div>
+            <div class="result-container">
+                <img class="result-ico" src="/assets/${resultClass}.svg" alt="result">
+            </div>
+            <div class="actions-container">
+            <span class="game-history-field">
+                ${game.actions_count}
+                </span>
+            </div>
+            <div class="date-container">
+            <span class="game-history-field">
+                ${formatDate(game.startDate)}
+                </span>
+                </div>
+            </div>
         `;
         el.addEventListener('click', () => {
             window.location.href = `/pages/game/review/${game.gameId}`;
         });
         list.appendChild(el);
     });
+}
+
+function get_game_ico(gameType) {
+    switch (gameType) {
+        case "MULTI":
+            return `<img class="game-type-ico" src="/assets/multiplayer.svg" alt="multi-ico">`
+        case "AI":
+            return `<img class="game-type-ico" src="/assets/bot.svg" alt="bot-ico">`
+        default:
+            return "";
+    }
+}
+
+function formatDate(date) {
+    const splited = date.split('T');
+    return `${splited[0]} - ${splited[1].split(".")[0]}`
 }
 
 async function renderInventory() {
@@ -245,31 +288,53 @@ async function renderInventory() {
 }
 
 function renderProfilePictures() {
-    const profile_pictures = document.querySelector('#profile-picture-list');
+    try {
+        const profile_pictures = document.querySelector('#profile-picture-list');
 
-    loadPictureList(profile_pictures, accountService.getProfilePictureList(), 'profile-picture-item',
+        loadPictureList(profile_pictures, accountService.getProfilePictureList(), 'profile-picture-item',
 
-        async (item) => { await updateProfilePicture(item); },
+            async (item) => { await updateProfilePicture(item); },
 
-        (profile_picture_id, img) => {
-            if (accountService.getProfilePicture().id === profile_picture_id) {
-                img.classList.add('selected');
-            }
-        });
+            (profile_picture_id, img) => {
+                if (accountService.getProfilePicture().id === profile_picture_id) {
+                    img.classList.add('selected');
+                }
+            });
+    } catch (error) {
+        console.log("[Profile]", error);
+    }
+
 }
 
 function renderThemes() {
-    const themeList = document.querySelector('#theme-list');
+    try {
+        const themeList = document.querySelector('#theme-list');
 
-    loadPictureList(themeList, accountService.getThemes(), "theme-item",
+        loadPictureList(themeList, accountService.getThemes(), "theme-item",
 
-        async (theme) => { await updateSelectedTheme(theme); },
+            async (theme) => { await updateSelectedTheme(theme); },
 
-        (theme_id, theme) => {
-            if (accountService.getTheme().id === theme_id) {
-                theme.classList.add('selected');
-            }
-        })
+            (theme_id, theme) => {
+                if (accountService.getTheme().id === theme_id) {
+                    theme.classList.add('selected');
+                }
+            })
+    } catch (error) {
+        console.log("[Profile]", error);
+    }
+
+}
+
+function isEmote(emote) {
+    return !!emote && typeof emote.picture === 'string';
+}
+
+// Ramene la liste sauvegardee a EMOTE_SLOT_COUNT slots, les entrees invalides
+// (null, undefined, objet sans picture) devenant des slots vides.
+function normalizeEmoteSlots(emotes) {
+    const slots = Array.isArray(emotes) ? emotes.slice(0, EMOTE_SLOT_COUNT) : [];
+    while (slots.length < EMOTE_SLOT_COUNT) slots.push(null);
+    return slots.map(emote => isEmote(emote) ? emote : null);
 }
 
 function renderSelectedEmotes() {
@@ -277,35 +342,63 @@ function renderSelectedEmotes() {
     selectedEmoteList.innerHTML = '';
 
     selected_profile_emotes.forEach((emote, index) => {
-        const img = document.createElement('img');
-        img.src = emote.picture;
-        img.className = 'selected-emote-item selected-inventory-item';
+        const slot = document.createElement('div');
+        slot.className = 'selected-emote-slot';
 
+        if (isEmote(emote)) {
+            const img = document.createElement('img');
+            img.src = emote.picture;
+            img.alt = emote.name ?? 'emote';
+            img.className = 'selected-emote-item selected-inventory-item';
+            slot.appendChild(img);
 
-        img.addEventListener('click', () => {
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'remove-emote-btn';
+            remove.title = 'Empty this slot';
+            remove.textContent = '\u00d7';
+            remove.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                selected_profile_emotes[index] = null;
+                await updateSelectedEmotes();
+            });
+            slot.appendChild(remove);
+        } else {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'empty-emote-slot selected-inventory-item';
+            placeholder.textContent = '+';
+            placeholder.title = 'Empty slot';
+            slot.appendChild(placeholder);
+        }
+
+        slot.addEventListener('click', () => {
             currentEmoteIndex = index;
             showInventoryModal();
         });
 
-        selectedEmoteList.appendChild(img);
+        selectedEmoteList.appendChild(slot);
     });
 }
 
 function renderEmotes() {
-    const emoteList = document.querySelector('#emote-list');
+    try {
+        const emoteList = document.querySelector('#emote-list');
 
-    loadPictureList(emoteList, accountService.getEmotes(), 'emote-item', async (newEmote) => {
-        if (currentEmoteIndex !== null) {
-            selected_profile_emotes[currentEmoteIndex] = newEmote;
+        loadPictureList(emoteList, accountService.getEmotes(), 'emote-item', async (newEmote) => {
+            if (currentEmoteIndex !== null) {
+                selected_profile_emotes[currentEmoteIndex] = newEmote;
 
-            await updateSelectedEmotes();
+                await updateSelectedEmotes();
 
-            closeInventoryModal();
-            currentEmoteIndex = null; // Reset
-        }
-    });
+                closeInventoryModal();
+                currentEmoteIndex = null; // Reset
+            }
+        });
+    } catch (error) {
+        console.log("[Profile]", error);
+    }
+
 }
-
 
 
 async function updateProfilePicture(profile_picture) {
@@ -388,18 +481,23 @@ async function updateSelectedEmotes() {
         renderSelectedEmotes();
         notificationService.notify("Selected emotes saved successfuly", "success")
     } catch (error) {
-        console.log(error)
+        console.log("[Profile]", error);
         notificationService.notify("Failed to save emotes", "error");
     }
 }
 
 
 async function renderChat() {
-    await customElements.whenDefined('chat-component');
-    chat.disableDrawButton();
-    chat.disableForfeitButton();
-    const messages = await UserService.fetchFriendChat(chatId);
-    chat.setChat(messages);
+    try {
+        await customElements.whenDefined('chat-component');
+        chat.disableDrawButton();
+        chat.disableForfeitButton();
+        const messages = await UserService.fetchFriendChat(chatId);
+        chat.setChat(messages);
+    } catch (error) {
+        console.log("[Profile]", error);
+    }
+
 }
 
 // ─── Inventory ────────────────────────────────────────────────────────────────

@@ -16,14 +16,21 @@
 </head>
 
 <body>
-    <button class="leave-btn option-btn">
-        <span class="leave-text">Leave</span>
-        <svg class="mobile-leave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 19-7-7 7-7"></path>
-            <path d="M19 12H5"></path>
-        </svg>
-    </button>
+    <div class="head-btn-container">
+        <button class="leave-btn option-btn">
+            <span class="leave-text">Leave</span>
+            <svg class="mobile-leave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 19-7-7 7-7"></path>
+                <path d="M19 12H5"></path>
+            </svg>
+        </button>
+
+        <div class="sound-ico-container">
+            <img id="loud-btn" class="sound-ico" src="/assets/loud.svg" alt="loud-ico">
+            <img id="mute-btn" class="sound-ico" src="/assets/mute.svg" alt="mute-ico">
+        </div>
+    </div>
 
     <main>
         <player-info class="black player-info"></player-info>
@@ -36,8 +43,8 @@
         <div class="option-box">
             <p id="modal-message"></p>
             <div class="option-btn-container">
-                <button id="modal-confirm" class="confirm-btn option-btn"></button>
                 <button id="modal-cancel" class="cancel-btn option-btn">Cancel</button>
+                <button id="modal-confirm" class="confirm-btn option-btn"></button>
             </div>
         </div>
     </div>

@@ -12,6 +12,7 @@ class Board extends HTMLElement {
     playerColor;
     availableCells;
     unavailableCells;
+    boardOrientationColor;
 
     constructor() {
         super();
@@ -64,6 +65,7 @@ class Board extends HTMLElement {
         const gridCanvas = this.shadowRoot.querySelector('#grid-canvas');
         const piecesCanvas = this.shadowRoot.querySelector('#pieces-canvas');
         const laserCanvas = this.shadowRoot.querySelector('#laser-canvas');
+        const highlightCanvas = this.shadowRoot.querySelector('#highlight-canvas');
         const interactionCanvas = this.shadowRoot.querySelector('#interaction-canvas');
 
         this._applyContainerSize();
@@ -73,11 +75,15 @@ class Board extends HTMLElement {
             gridCanvas,
             piecesCanvas,
             laserCanvas,
-            interactionCanvas
+            interactionCanvas,
+            highlightCanvas
         );
 
         this.whiteInventory = [];
         this.blackInventory = [];
+
+        // L'orientation peut avoir été fixée avant que le renderer n'existe.
+        this.boardRenderer.setFlipped(this.boardOrientationColor === COLORS.BLACK);
 
         await this.boardRenderer.render(this.gridState);
 
@@ -126,14 +132,22 @@ class Board extends HTMLElement {
         container.style.height = size;
     }
 
-    async updateBoard(data) {
+    /**
+     * @param {Object} data  état de jeu renvoyé par le serveur
+     * @param {Object} [options]
+     * @param {boolean} [options.animate=true]  rejouer l'animation de la
+     *        dernière action. À mettre à false quand l'état affiché ne suit
+     *        pas celui d'avant (review : retour arrière, saut direct), sinon
+     *        on animerait un coup depuis une position qui n'existait pas.
+     */
+    async updateBoard(data, { animate = true } = {}) {
         this.colorTurn = data.colorTurn;
         this.gameId = data.gameId;
-        await this.updateGridWithAnimation(data);
+        await this.updateGridWithAnimation(data, animate);
         await this.updateLaser(data.laserBeam, data.killedPiecePos);
     }
 
-    async updateGridWithAnimation(data) {
+    async updateGridWithAnimation(data, animate = true) {
         await this.readyPromise;
 
         const previousGridState = this.gridState;
@@ -145,7 +159,7 @@ class Board extends HTMLElement {
             intermediateState[row][col] = previousGridState?.[row]?.[col] ?? null;
         }
 
-        if (data.lastAction && previousGridState) {
+        if (animate && data.lastAction && previousGridState) {
             await this.boardRenderer.animateAction(data.lastAction, previousGridState, intermediateState);
         }
 
@@ -179,6 +193,42 @@ class Board extends HTMLElement {
 
     setPlayerColor(color) {
         this.playerColor = color;
+    }
+
+    /**
+     * Assombrit tout le plateau sauf les cases demandées — le « projecteur »
+     * du tutoriel, pour montrer où poser une pièce.
+     *
+     * @param {Array} cells  [{row, col}] ou [[row, col]], coordonnées logiques
+     * @param {Object} [options]  {dim, dimColor, outline, outlineColor, pulse}
+     */
+    async highlightCells(cells, options = {}) {
+        await this.readyPromise;
+        this.boardRenderer.highlightCells(cells, options);
+    }
+
+    async clearHighlightedCells() {
+        await this.readyPromise;
+        this.boardRenderer.clearHighlightedCells();
+    }
+
+    /**
+     * Oriente le plateau selon le camp depuis lequel on regarde la partie :
+     * jouer les noirs, c'est s'asseoir en face, donc le plateau tourne de 180°.
+     * Les coordonnées manipulées par le jeu ne bougent pas d'un pouce, seule
+     * la façon de les dessiner change.
+     *
+     * Volontairement séparé de setPlayerColor : en partie locale ce dernier
+     * reçoit la couleur du TRAIT, qui alterne à chaque coup, alors que
+     * l'orientation doit rester fixe pendant toute la partie. À n'appeler que
+     * là où le joueur occupe un seul camp.
+     */
+    setBoardOrientation(color) {
+        this.boardOrientationColor = color;
+
+        if (this.boardRenderer?.setFlipped(color === COLORS.BLACK)) {
+            this.boardRenderer.renderGrid(this.gridState);
+        }
     }
 
     selectPiece(position) {
@@ -301,6 +351,7 @@ class Board extends HTMLElement {
 
     clear() {
         this.clearSelection();
+        this.boardRenderer.clearHighlightedCells();
         this.boardRenderer.gridRenderer.clearGrid();
         this.boardRenderer.clearPieces();
     }

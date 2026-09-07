@@ -86,6 +86,7 @@ async function setupGame() {
     });
 
     // Setting up 
+    setupSoundBtn();
     setupPlayerInfoEvents(whitePlayerInfoComponent);
     setupPlayerInfoEvents(blackPlayerInfoComponent);
     setupBoardComponentEvents(boardComponent);
@@ -95,6 +96,71 @@ async function setupGame() {
     startNewGame();
 }
 
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
+// ─── Application ordonnée des états de partie ────────────────────────────────
+// Quand on joue les noirs, le serveur envoie deux évènements coup sur coup :
+// "start" avec la position de départ, puis "update" avec le coup de l'IA.
+// Le handler de "start" doit charger les deux cartes joueur, donc il rend la
+// main le temps de deux requêtes HTTP — et applique la position de départ
+// APRÈS le coup de l'IA, qui est alors écrasé. Contre une IA rapide ça arrive
+// systématiquement, contre une IA lente jamais, d'où le bug intermittent.
+//
+// On sérialise donc les rendus dans une chaîne de promesses (deux
+// updateBoard concurrents s'entremêleraient de toute façon, chacun animant
+// depuis une grille que l'autre est en train de remplacer), et on ignore tout
+// état plus ancien que celui déjà affiché.
+
+let renderChain = Promise.resolve();
+let renderedGameId = null;
+let renderedTurnCount = -1;
+
+function queueGameState(data) {
+    renderChain = renderChain
+        .then(() => applyGameState(data))
+        .catch(error => console.error('[Game] Failed to apply game state:', error));
+    return renderChain;
+}
+
+async function applyGameState(data) {
+    // Un tour antérieur à celui affiché est une trame en retard. Une nouvelle
+    // partie repart d'un autre gameId, donc son tour 0 n'est jamais rejeté.
+    if (data.gameId === renderedGameId && data.turnCount < renderedTurnCount) return;
+
+    renderedGameId = data.gameId;
+    renderedTurnCount = data.turnCount;
+    await handleUpdate(data);
+}
 
 function setupSocketEvents() {
     socket.on('start', async (data) => {
@@ -110,7 +176,7 @@ function setupSocketEvents() {
 
     })
 
-    socket.on('update', async (data) => await handleUpdate(data));
+    socket.on('update', (data) => queueGameState(data));
 }
 
 async function getUserInformation(userId) {
@@ -134,7 +200,6 @@ async function getAiInformation(aiId) {
         });
         if (!response.ok) throw new Error(`Error while getting user information: ${response.status}`);
         const res = await response.json();
-        console.log(res);
         return {
             _id: res.ai.id,
             username: res.ai.name,
@@ -149,6 +214,12 @@ async function onGameReady(data, whitePlayerInfo, blackPlayerInfo) {
     gameId = data.gameId;
 
     await setPlayerColor(data.white, data.black);
+
+    // La position part au rendu avant les requêtes ci-dessous : sinon le coup
+    // que l'IA joue pendant ces requêtes serait écrasé par la position de
+    // départ. Les cartes joueur se remplissent ensuite, elles ne bloquent
+    // plus l'affichage du plateau.
+    queueGameState(data);
 
     if (userId === data.white) {
         whitePlayerInfo ??= await getUserInformation(data.white);
@@ -165,10 +236,6 @@ async function onGameReady(data, whitePlayerInfo, blackPlayerInfo) {
     blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo);
     blackPlayerInfoComponent.disableElo();
     blackPlayerInfoComponent.disableTimer();
-
-    console.log("data", data);
-
-    handleUpdate(data);
 }
 
 function showModal({ message, confirmLabel, onConfirm }) {
@@ -218,12 +285,14 @@ function setupBoardComponentEvents(boardComponent) {
         e.detail.userId = userId;
         e.detail.gameType = GAME_TYPE;
 
-        // Adding the rotation from the right inventory
         if (e.detail.action.split("/")[0] === "PLACE") {
-            if (boardComponent.colorTurn === COLORS.WHITE && whitePlayerInfoComponent.getSelectedInventoryCell())
-                e.detail.action += `,${whitePlayerInfoComponent.getSelectedInventoryCell().direction}`;
-            else if (boardComponent.colorTurn === COLORS.BLACK && blackPlayerInfoComponent.getSelectedInventoryCell())
-                e.detail.action += `,${blackPlayerInfoComponent.getSelectedInventoryCell().direction}`;
+            const whiteDirection = whitePlayerInfoComponent.getSelectedInventoryCellDirection();
+            const blackDirection = blackPlayerInfoComponent.getSelectedInventoryCellDirection();
+
+            if (boardComponent.colorTurn === COLORS.WHITE && whiteDirection !== null)
+                e.detail.action += `,${whiteDirection}`;
+            else if (boardComponent.colorTurn === COLORS.BLACK && blackDirection !== null)
+                e.detail.action += `,${blackDirection}`;
             else {
                 return;
             }
@@ -288,22 +357,33 @@ function startNewGame() {
 
     socket.emit("join", { gameType: GAME_TYPE, userId: userId, aiId: aiId, playerColor: playerColor });
     boardComponent.clearSelection();
+    whitePlayerInfoComponent.resetRotationCell();
+    blackPlayerInfoComponent.resetRotationCell();
     endMessage.clear();
 }
 
 async function setPlayerColor(white_id, black_id) {
+    const main = document.querySelector('main');
     let color = null;
     if (white_id === userId) {
         color = COLORS.WHITE;
         blackPlayerInfoComponent.disableRotation();
+        main.classList.remove('flipped');
     }
     else if (black_id === userId) {
         color = COLORS.BLACK;
         whitePlayerInfoComponent.disableRotation();
+        blackPlayerInfoComponent.reverse();
+        // main.flipped existe deja dans shared/game.css : il renvoie le
+        // panneau du joueur de son cote, comme en multijoueur.
+        main.classList.add('flipped');
     }
-    boardComponent.setPlayerColor(color)
+    boardComponent.setPlayerColor(color);
+    boardComponent.setBoardOrientation(color);
     whitePlayerInfoComponent.setPlayerColor(color);
     blackPlayerInfoComponent.setPlayerColor(color);
+    whitePlayerInfoComponent.setBoardOrientation(color);
+    blackPlayerInfoComponent.setBoardOrientation(color);
     await endMessage.setColor(color);
 }
 

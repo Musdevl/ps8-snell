@@ -32,9 +32,7 @@ app.post('/api/shop/purchase', async (req, res) => {
         const userId = req.body.userId;
         const item = req.body.item;
 
-        const result = await shopService.purchase(item.id, userId);
-
-        console.log("Successfully purched");
+        await shopService.purchase(item.id, userId);
         res.json("Item purchased successfully", 200);
     } catch (error) {
         console.error('Error while retrieving shop items', error);
@@ -46,11 +44,7 @@ app.post('/api/shop/purchase', async (req, res) => {
 // Start the server
 export function startHttpServer(port) {
     const PORT = port;
-    const server = app.listen(PORT, () => {
-        console.log(`[ACHIEVEMENT SERVICE] Server listening on port ${PORT}`);
-    });
-
-    console.log(`[ACHIEVEMENT SERVICE] Server listening on port ${PORT}`);
+    const server = app.listen(PORT, () => {});
 
     process.on('SIGTERM', () => { app.close(() => { process.exit(0); }); });
     process.on('SIGINT', () => { app.close(() => { process.exit(0); }); });

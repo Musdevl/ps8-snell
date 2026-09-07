@@ -37,8 +37,15 @@
     cursor: pointer;
 }
 
-#interaction-canvas {
+/* Calque du projecteur (tutoriel) : au-dessus des pièces et du laser,
+   sous le calque d'interaction, et transparent aux clics. */
+#highlight-canvas {
     z-index: 4;
+    pointer-events: none;
+}
+
+#interaction-canvas {
+    z-index: 5;
 }
 
 .arrow {

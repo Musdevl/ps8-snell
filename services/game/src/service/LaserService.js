@@ -58,6 +58,7 @@ export function shootBeam(board, colorTurn, players = []) {
                 if (PieceService.getColor(currentCase) === COLORS.BLACK) black_triange_shooted += 1;
 
                 board.killSlot(row, col);
+                killedPiecePosition.push([row, col]);
                 Logger.debug("Laser tue triangle en " + row + " " + col);
             }
             else {

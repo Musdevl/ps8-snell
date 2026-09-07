@@ -55,9 +55,7 @@ app.use((req, res) => res.status(404).json({ error: "Route not found" }));
 // Start the server
 export function startHttpServer(port) {
     const PORT = port;
-    const server = app.listen(PORT, () => {
-        console.log(`[MAIL SERVICE] Server listening on port ${PORT}`);
-    });
+    const server = app.listen(PORT, () => { });
 
     process.on("SIGTERM", () => { server.close(() => { process.exit(0); }); });
     process.on("SIGINT", () => { server.close(() => { process.exit(0); }); });

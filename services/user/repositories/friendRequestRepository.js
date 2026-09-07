@@ -10,7 +10,6 @@ let FRcollection;
 export async function initDatabase() {
     try {
         await client.connect();
-        console.log('[REPO] - Connecté à MongoDB');
         db = client.db(dbName);
         FRcollection = db.collection('friendRequest');
     } catch (error) {
@@ -26,7 +25,6 @@ export async function saveFriendRequest(userId, friendId) {
             friendId,
             createdAt: new Date()
         });
-        console.log("[REPO] - Added a new friend request : ", result);
         return result;
     } catch (error) {
         console.error('[REPO] - Erreur lors de la sauvegarde:', error);
@@ -73,7 +71,6 @@ export async function createFriendRequest(userId, friendId) {
 export async function closeDatabase() {
     try {
         await client.close();
-        console.log('[REPO] - Connexion MongoDB fermée');
     } catch (error) {
         console.error('[REPO] - Erreur lors de la fermeture:', error);
     }

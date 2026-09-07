@@ -102,7 +102,7 @@ class SocialBar extends HTMLElement {
         userService.onFriendRequest(async (data) => await this.addFriendRequestCard(data.from));
         userService.onFriendRemove(async (data) => await this.loadFriends());
 
-        this.shadowRoot.querySelector('#buy-coins-btn').addEventListener('click', async (e) => {
+        this.shadowRoot.querySelector('.snell-coin-section').addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();

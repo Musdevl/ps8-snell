@@ -2,6 +2,7 @@ import { GATEWAY_URL } from "../../../env.js";
 import { COLORS } from "../../../enum/Colors.js";
 import * as uint16Utils from "../../../utils/Uint16Utils.js";
 import { authFetch } from "../../../services/account-service.js";
+import * as accountService from "../../../services/account-service.js";
 
 const params = new URLSearchParams(window.location.search);
 const puzzle_id = params.get("id");
@@ -82,6 +83,8 @@ async function waitForBoard() {
 
 async function setupGame() {
 
+    setupSoundBtn();
+
     // Setup les composants
     const puzzle_title = document.querySelector('.puzzle-title');
     puzzle_title.innerHTML += `
@@ -104,6 +107,8 @@ async function setupGame() {
     await setupPlayerInfoForPuzzle(blackPlayerInfoComponent, COLORS.BLACK);
     boardComponent.setPlayerColor(COLORS.WHITE);
 
+
+
     leave_btn.addEventListener("click", () => {
         showModal({
             message: "Leave puzzle ?",
@@ -114,6 +119,37 @@ async function setupGame() {
             }
         });
     });
+}
+
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 
@@ -238,7 +274,7 @@ async function startPuzzle() {
 }
 
 function playSound(sound) {
-    sound.play().catch(() => { });
+    if (accountService.hasSound()) sound.play().catch(() => { });
 }
 
 async function nextPuzzleStep() {
@@ -250,13 +286,13 @@ async function nextPuzzleStep() {
     if (puzzle_step_index >= puzzle.steps.length - 1) {
         showModal({
             message: "Congratulations, you finished the puzzle !",
-            confirmLabel: "Leave",
-            cancelLabel: "Next",
+            confirmLabel: "Next",
+            cancelLabel: "Leave",
             onConfirm: () => {
-                window.location.replace(`/`);
+                window.location.replace(`/pages/game/puzzle/index.html?id=${++puzzle.id}`)
             },
             onCancel: () => {
-                window.location.replace(`/pages/game/puzzle/index.html?id=${++puzzle.id}`)
+                window.location.replace(`/`);
             }
         });
 

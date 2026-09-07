@@ -35,9 +35,7 @@ app.get('/api/achievements/blank', (req, res) => {
 // Start the server
 export function startHttpServer(port) {
     const PORT = port;
-    const server = app.listen(PORT, () => {
-        console.log(`[ACHIEVEMENT SERVICE] Server listening on port ${PORT}`);
-    });
+    const server = app.listen(PORT, () => {});
 
     process.on('SIGTERM', () => { app.close(() => { process.exit(0); }); });
     process.on('SIGINT', () => { app.close(() => { process.exit(0); }); });

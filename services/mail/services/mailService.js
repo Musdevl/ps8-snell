@@ -22,7 +22,6 @@ export async function send(to, mail) {
         text: mail.text,
     });
 
-    console.log(`[MAIL SERVICE] - "${mail.subject}" envoyé à ${to}`);
     return info;
 }
 

@@ -92,7 +92,6 @@ app.post('/api/chat/friend/message', async (req, res) => {
 app.post('/api/chat/friend', async (req, res) => {
     try {
         const { user1, user2 } = req.body;
-        console.log("[CHAT SERVICE] -- ", user1, user2)
         let id = friendChatRepo.initFriendChat(user1, user2);
         res.json({ id });
     } catch (error) {
@@ -119,7 +118,7 @@ app.get("/api/chat/global", async (req, res) => {
         res.json({ messages: result });
     } catch (error) {
         res.json({ error: 'Error while retrieving global chat' }, 400);
-        console.log(error)
+        console.log(`[CHAT SERVICE] ${error}`)
     }
 });
 
@@ -160,9 +159,7 @@ export function updateOnlineIds(new_list) {
 // Start the server
 export function startHttpServer() {
     const PORT = 8003;
-    const server = app.listen(PORT, () => {
-        console.log(`[CHAT_SERVICE] Server listening on port ${PORT}`);
-    });
+    const server = app.listen(PORT, () => {});
 
     process.on('SIGTERM', () => { app.close(() => { process.exit(0); }); });
     process.on('SIGINT', () => { app.close(() => { process.exit(0); }); });
