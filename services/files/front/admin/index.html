@@ -8,24 +8,26 @@
     <style>
         :root {
             --bg: #0d0f11;
-            --ink: #e6e8ea;
-            --ink-dim: #9aa3ab;
-            --ink-mute: #6b747c;
-            --rule: #1e2429;
-            --accent: #2f81f7;
-            --ok: #3fb950;
-            --warn: #d29922;
-            --crit: #f85149;
+            --row: #14191d;
+            --ink: #eef1f3;
+            --ink-dim: #b3bcc4;
+            --ink-mute: #828d96;
+            --rule: #222a30;
+            --rule-strong: #38434c;
+            --accent: #3d8bfd;
+            --ok: #46c45a;
+            --warn: #e0a52b;
+            --crit: #fa5f57;
         }
 
         * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            padding: 16px 20px 40px;
+            padding: 18px 24px 56px;
             background: var(--bg);
             color: var(--ink);
-            font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
             font-variant-numeric: tabular-nums;
         }
 
@@ -35,32 +37,33 @@
             display: flex;
             align-items: baseline;
             justify-content: space-between;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--rule);
+            gap: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--rule-strong);
         }
 
         header h1 {
             margin: 0;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
-            letter-spacing: .14em;
+            letter-spacing: .18em;
             text-transform: uppercase;
         }
 
-        header .meta { color: var(--ink-mute); }
+        header .meta { color: var(--ink-mute); font-size: 12px; }
 
         /* ── Bandeau de compteurs ────────────────────────────────────────── */
 
         .kpis {
             display: flex;
             flex-wrap: wrap;
-            border-bottom: 1px solid var(--rule);
+            border-bottom: 1px solid var(--rule-strong);
         }
 
         .kpi {
-            flex: 1 1 130px;
-            padding: 14px 20px 14px 0;
-            margin-right: 20px;
+            flex: 1 1 150px;
+            padding: 18px 24px 18px 0;
+            margin-right: 24px;
             border-right: 1px solid var(--rule);
         }
 
@@ -68,109 +71,101 @@
 
         .kpi .label {
             color: var(--ink-mute);
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: .1em;
             text-transform: uppercase;
         }
 
         .kpi .value {
-            font-size: 26px;
-            line-height: 1.25;
+            font-size: 34px;
+            line-height: 1.2;
             font-weight: 500;
+            letter-spacing: -.01em;
         }
 
-        .kpi .unit {
-            font-size: 13px;
-            color: var(--ink-dim);
-        }
+        .kpi .unit { font-size: 16px; color: var(--ink-dim); }
 
         /* ── Sections ────────────────────────────────────────────────────── */
 
-        section { margin-top: 26px; }
+        section {
+            margin-top: 34px;
+            padding-top: 16px;
+            border-top: 2px solid var(--rule-strong);
+        }
 
         h2 {
-            margin: 0 0 10px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid var(--rule);
-            font-size: 10px;
+            margin: 0 0 14px;
+            font-size: 11px;
             font-weight: 600;
-            letter-spacing: .12em;
+            letter-spacing: .16em;
             text-transform: uppercase;
             color: var(--ink-dim);
         }
 
-        .cols {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 40px;
-        }
-
-        .cols > * { flex: 1 1 360px; }
+        /* Deux sections côte à côte tant que la place le permet, empilées sinon. */
+        .cols { display: flex; flex-wrap: wrap; gap: 0 56px; }
+        .cols > * { flex: 1 1 400px; }
 
         /* ── Tableaux ────────────────────────────────────────────────────── */
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        table { width: 100%; border-collapse: collapse; }
 
         th {
-            padding: 0 12px 5px 0;
+            padding: 0 14px 8px 0;
             text-align: left;
             font-weight: 400;
-            font-size: 10px;
+            font-size: 11px;
             letter-spacing: .1em;
             text-transform: uppercase;
             color: var(--ink-mute);
+            border-bottom: 1px solid var(--rule-strong);
         }
 
         td {
-            padding: 5px 12px 5px 0;
-            border-top: 1px solid var(--rule);
+            padding: 8px 14px 8px 0;
+            border-bottom: 1px solid var(--rule);
             white-space: nowrap;
         }
 
-        td.num, th.num { text-align: right; padding-right: 16px; }
+        tbody tr:hover td { background: var(--row); }
+
+        td.num, th.num { text-align: right; padding-right: 18px; }
 
         .dim { color: var(--ink-dim); }
         .mute { color: var(--ink-mute); }
 
         /* ── Jauges ──────────────────────────────────────────────────────── */
 
-        .gauge { display: flex; align-items: center; gap: 12px; padding: 7px 0; }
+        .gauge { display: flex; align-items: center; gap: 14px; padding: 9px 0; }
         .gauge .name { width: 46px; color: var(--ink-dim); }
-        .gauge .track { flex: 1; height: 4px; background: var(--rule); }
-        .gauge .fill { height: 100%; background: var(--ok); }
-        .gauge .read { width: 190px; text-align: right; }
+        /* display:block obligatoire : une jauge inline ignore width et height. */
+        .gauge .track { display: block; flex: 1; height: 8px; background: var(--rule); }
+        .gauge .fill { display: block; height: 100%; background: var(--ok); }
+        .gauge .read { width: 210px; text-align: right; }
 
         .fill.warn { background: var(--warn); }
         .fill.crit { background: var(--crit); }
 
         /* Jauge compacte, dans une cellule de tableau */
-        .bar { display: inline-block; width: 54px; height: 4px; background: var(--rule); vertical-align: middle; }
+        .bar { display: block; width: 64px; height: 6px; background: var(--rule); }
         .bar > i { display: block; height: 100%; background: var(--accent); }
 
         /* ── Série d'inscriptions ────────────────────────────────────────── */
 
-        .series {
-            display: flex;
-            align-items: flex-end;
-            gap: 6px;
-            height: 74px;
-            padding-top: 14px;
-        }
-
+        .series { display: flex; align-items: flex-end; gap: 8px; height: 96px; }
         .series .day { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
-        .series .col { background: var(--accent); border-radius: 2px 2px 0 0; min-height: 1px; }
+        .series .col { display: block; background: var(--accent); border-radius: 2px 2px 0 0; min-height: 2px; }
         .series .col.empty { background: var(--rule); }
-        .series .top { font-size: 10px; color: var(--ink-dim); text-align: center; padding-bottom: 3px; }
+        .series .top { font-size: 12px; color: var(--ink-dim); text-align: center; padding-bottom: 5px; }
 
-        .series-axis { display: flex; gap: 6px; padding-top: 5px; border-top: 1px solid var(--rule); }
-        .series-axis span { flex: 1; text-align: center; font-size: 10px; color: var(--ink-mute); }
+        .series-axis { display: flex; gap: 8px; padding-top: 7px; border-top: 1px solid var(--rule-strong); }
+        .series-axis span { flex: 1; text-align: center; font-size: 11px; color: var(--ink-mute); }
+
+        .legend { padding-top: 12px; color: var(--ink-mute); font-size: 12px; }
 
         /* ── États ───────────────────────────────────────────────────────── */
 
-        .dot { display: inline-block; width: 6px; height: 6px; margin-right: 7px; vertical-align: 1px; background: var(--ink-mute); }
+        .dot { display: inline-block; width: 8px; height: 8px; margin-right: 9px; vertical-align: 1px; background: var(--ink-mute); }
         .dot.up { background: var(--ok); }
         .dot.down { background: var(--crit); }
 
@@ -181,7 +176,7 @@
 <body>
     <header>
         <h1>Snell &middot; monitoring</h1>
-        <span class="meta">maj <span id="clock">--:--:--</span> &middot; 3s</span>
+        <span class="meta">maj <span id="clock">--:--:--</span> &middot; toutes les 3s</span>
     </header>
 
     <div class="kpis" id="kpis"></div>
@@ -278,7 +273,7 @@
                 <div class="series-axis">
                     ${data.perDay.map(day => `<span>${day.date.slice(8)}/${day.date.slice(5, 7)}</span>`).join('')}
                 </div>
-                <div class="mute" style="padding-top:8px">
+                <div class="legend">
                     total ${data.total} &middot; période ${data.period} &middot; pic ${peak}/jour
                 </div>`);
         }
@@ -308,9 +303,11 @@
                     render('system', `
                         ${gauge('cpu', data.load.percent, `${data.load.percent}% de ${data.cpus} coeurs`)}
                         ${gauge('ram', data.memory.percent, `${mo(data.memory.used)} / ${mo(data.memory.total)}`)}
-                        <table style="margin-top:10px">
-                            <tr><td class="dim">uptime</td><td>${Math.floor(data.uptime / 86400)}j ${Math.floor(data.uptime % 86400 / 3600)}h</td></tr>
-                            <tr><td class="dim">load avg</td><td>${data.load['1m']} &middot; ${data.load['5m']} &middot; ${data.load['15m']} <span class="mute">(1/5/15 min)</span></td></tr>
+                        <table style="margin-top:14px">
+                            <tbody>
+                                <tr><td class="dim">uptime</td><td>${Math.floor(data.uptime / 86400)}j ${Math.floor(data.uptime % 86400 / 3600)}h</td></tr>
+                                <tr><td class="dim">load avg</td><td>${data.load['1m']} &middot; ${data.load['5m']} &middot; ${data.load['15m']} <span class="mute">(1/5/15 min)</span></td></tr>
+                            </tbody>
                         </table>`);
                 })
                 .catch(error => fail('system', error));
@@ -322,27 +319,31 @@
 
                     render('containers', `
                         <table>
-                            <tr>
-                                <th>service</th>
-                                <th>état</th>
-                                <th class="num">cpu</th>
-                                <th>&nbsp;</th>
-                                <th class="num">ram</th>
-                                <th>image</th>
-                            </tr>
-                            ${list.containers.map(container => {
-                                const stat = byId.get(container.id);
-                                const cpu = stat ? stat.cpu.percent : null;
+                            <thead>
+                                <tr>
+                                    <th>service</th>
+                                    <th>état</th>
+                                    <th class="num">cpu</th>
+                                    <th>&nbsp;</th>
+                                    <th class="num">ram</th>
+                                    <th>image</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${list.containers.map(container => {
+                                    const stat = byId.get(container.id);
+                                    const cpu = stat ? stat.cpu.percent : null;
 
-                                return `<tr>
-                                    <td><span class="dot ${container.running ? 'up' : 'down'}"></span>${container.name}</td>
-                                    <td class="${container.running ? 'dim' : 'error'}">${container.status}</td>
-                                    <td class="num">${cpu === null ? '<span class="mute">—</span>' : cpu + ' %'}</td>
-                                    <td><span class="bar"><i style="width:${Math.min(cpu || 0, 100)}%"></i></span></td>
-                                    <td class="num">${stat ? mo(stat.memory.usage) : '<span class="mute">—</span>'}</td>
-                                    <td class="mute">${container.image}</td>
-                                </tr>`;
-                            }).join('')}
+                                    return `<tr>
+                                        <td><span class="dot ${container.running ? 'up' : 'down'}"></span>${container.name}</td>
+                                        <td class="${container.running ? 'dim' : 'error'}">${container.status}</td>
+                                        <td class="num">${cpu === null ? '<span class="mute">—</span>' : cpu + ' %'}</td>
+                                        <td><span class="bar"><i style="width:${Math.min(cpu || 0, 100)}%"></i></span></td>
+                                        <td class="num">${stat ? mo(stat.memory.usage) : '<span class="mute">—</span>'}</td>
+                                        <td class="mute">${container.image}</td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
                         </table>`);
                 })
                 .catch(error => fail('containers', error));
