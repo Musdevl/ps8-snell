@@ -410,3 +410,42 @@ export async function getLeaderboard() {
 export async function getUserRank(userId) {
     return await userRepo.getUserRank(userId);
 }
+
+// Users connectés = ceux qui ont une socket ouverte vers la gateway.
+// La map vit en mémoire : elle repart à zéro à chaque redémarrage du service.
+export function getOnlineUsers() {
+    return {
+        count: userId_socketId_Map.size,
+        userIds: [...userId_socketId_Map.keys()],
+    };
+}
+
+// Compteurs d'inscriptions sur les "days" derniers jours (jour courant inclus).
+export async function getRegistrationStats(days = 7) {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const since = new Date(startOfToday);
+    since.setDate(since.getDate() - (days - 1));
+
+    const [total, today, period, perDay] = await Promise.all([
+        userRepo.countUsers(),
+        userRepo.countUsersSince(startOfToday),
+        userRepo.countUsersSince(since),
+        userRepo.countRegistrationsPerDay(since),
+    ]);
+
+    // Mongo ne renvoie que les jours qui ont au moins une inscription : on
+    // complète les trous à 0 pour que la série soit directement affichable.
+    const counts = new Map(perDay.map((day) => [day.date, day.count]));
+    const series = [];
+
+    for (let i = 0; i < days; i++) {
+        const date = new Date(since);
+        date.setDate(date.getDate() + i);
+        const key = date.toISOString().slice(0, 10);
+        series.push({ date: key, count: counts.get(key) || 0 });
+    }
+
+    return { total, today, days, period, perDay: series };
+}

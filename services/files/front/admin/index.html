@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snell - Admin</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #111; color: #eee; }
+        h1 { font-size: 18px; }
+        h2 { font-size: 14px; margin: 24px 0 8px; color: #888; text-transform: uppercase; }
+        table { border-collapse: collapse; }
+        td, th { padding: 3px 14px 3px 0; text-align: left; }
+        th { color: #888; font-weight: normal; }
+        .big { font-size: 28px; }
+        .down { color: #e05252; }
+        .up { color: #52e07a; }
+        .error { color: #e05252; }
+    </style>
+</head>
+
+<body>
+    <h1>Snell — admin <span id="clock" style="color:#888"></span></h1>
+
+    <h2>Users</h2>
+    <div>connectés : <span class="big" id="online">…</span></div>
+
+    <h2>Inscriptions</h2>
+    <div id="registrations">…</div>
+
+    <h2>Serveur</h2>
+    <div id="system">…</div>
+
+    <h2>Containers</h2>
+    <div id="containers">…</div>
+
+    <script type="module">
+        import { GATEWAY_URL } from '../env.js';
+
+        // Les stats containers coûtent ~1s côté Docker : on rafraîchit doucement.
+        const REFRESH_MS = 3000;
+
+        async function get(path) {
+            const res = await fetch(`${GATEWAY_URL}/api/admin${path}`);
+            if (!res.ok) throw new Error(`${path} → ${res.status}`);
+            return await res.json();
+        }
+
+        function render(id, html) {
+            document.getElementById(id).innerHTML = html;
+        }
+
+        function fail(id, error) {
+            render(id, `<span class="error">${error.message}</span>`);
+        }
+
+        function mo(bytes) {
+            return `${Math.round(bytes / 1024 / 1024)} Mo`;
+        }
+
+        async function refresh() {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+
+            get('/online')
+                .then(data => render('online', data.count))
+                .catch(error => fail('online', error));
+
+            get('/registrations?days=7')
+                .then(data => render('registrations', `
+                    total : <b>${data.total}</b> — aujourd'hui : <b>${data.today}</b> — 7 derniers jours : <b>${data.period}</b>
+                    <table>
+                        ${data.perDay.map(day => `<tr><td>${day.date}</td><td>${day.count}</td></tr>`).join('')}
+                    </table>`))
+                .catch(error => fail('registrations', error));
+
+            get('/system')
+                .then(data => render('system', `
+                    <table>
+                        <tr><td>uptime</td><td>${Math.round(data.uptime / 3600)} h</td></tr>
+                        <tr><td>cpu</td><td>${data.cpus} coeurs — charge ${data.load.percent}% (${data.load['1m']} / ${data.load['5m']} / ${data.load['15m']})</td></tr>
+                        <tr><td>ram</td><td>${mo(data.memory.used)} / ${mo(data.memory.total)} (${data.memory.percent}%)</td></tr>
+                    </table>`))
+                .catch(error => fail('system', error));
+
+            // Les deux routes containers sont séparées : la liste est instantanée,
+            // les stats non. On affiche la liste, puis on la complète.
+            Promise.all([get('/containers'), get('/containers/stats')])
+                .then(([list, stats]) => {
+                    const byId = new Map(stats.containers.map(container => [container.id, container]));
+
+                    render('containers', `
+                        <table>
+                            <tr><th>nom</th><th>état</th><th>cpu</th><th>ram</th><th>image</th></tr>
+                            ${list.containers.map(container => {
+                                const stat = byId.get(container.id);
+                                return `<tr>
+                                    <td>${container.name}</td>
+                                    <td class="${container.running ? 'up' : 'down'}">${container.status}</td>
+                                    <td>${stat ? stat.cpu.percent + '%' : '—'}</td>
+                                    <td>${stat ? mo(stat.memory.usage) : '—'}</td>
+                                    <td>${container.image}</td>
+                                </tr>`;
+                            }).join('')}
+                        </table>`);
+                })
+                .catch(error => fail('containers', error));
+        }
+
+        refresh();
+        setInterval(refresh, REFRESH_MS);
+    </script>
+</body>
+
+</html>

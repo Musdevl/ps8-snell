@@ -311,3 +311,26 @@ export async function setPasswordAndClearToken(userId, hashedPassword) {
         $unset: { reset_token: "", reset_token_expires: "" },
     });
 }
+
+// ── Statistiques d'inscription ───────────────────────────────────────────────
+
+export async function countUsers() {
+    return await usersCollection.countDocuments({});
+}
+
+export async function countUsersSince(date) {
+    return await usersCollection.countDocuments({ createdAt: { $gte: date } });
+}
+
+// Nombre d'inscriptions par jour, du plus ancien au plus récent.
+// Les comptes créés avant l'ajout du champ createdAt n'ont pas de date : ils
+// sont ignorés ici, mais restent comptés dans countUsers().
+export async function countRegistrationsPerDay(since) {
+    const days = await usersCollection.aggregate([
+        { $match: { createdAt: { $gte: since } } },
+        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
+        { $sort: { _id: 1 } },
+    ]).toArray();
+
+    return days.map((day) => ({ date: day._id, count: day.count }));
+}
