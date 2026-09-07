@@ -221,6 +221,7 @@ async function renderHistory() {
     list.innerHTML = '';
 
     history.forEach(game => {
+        console.log(game);
         const isWhite = game.whiteId === profileUserId;
         const opponentId = isWhite ? game.blackId : game.whiteId;
         const isDraw = game.winnerId === 'DRAW';
@@ -232,7 +233,7 @@ async function renderHistory() {
         el.innerHTML = `
             <span class="game-players">
                 <span class="me">${username}</span>
-                <span class="sep">vs</span>
+                <span class="sep">VS</span>
                 ${opponentMap[opponentId] ?? opponentId}
             </span>
         `;
