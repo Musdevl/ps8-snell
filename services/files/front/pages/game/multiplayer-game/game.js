@@ -58,7 +58,7 @@ async function waitForBoard() {
     waiting_room = document.querySelector(".waiting-section");
     game_container = document.querySelector('.game-container');
     leave_btn = document.querySelector(".leave-btn");
-    chat_btn = document.querySelector(".chat-btn");
+    chat_btn = document.querySelector(".mobile-chat");
     leave_chat_btn = document.querySelector(".mobile-chat-leave");
 
     modal = document.getElementById('game-modal');
@@ -78,6 +78,7 @@ async function setupGame() {
     setupSocketEvents();
     setupBoardEvents();
     setupControls();
+    setupSoundBtn();
 
     await whitePlayerInfoComponent.setColor(COLORS.WHITE);
     await blackPlayerInfoComponent.setColor(COLORS.BLACK);
@@ -87,12 +88,46 @@ async function setupGame() {
     setupEndMessage(endMessage);
 }
 
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
 function setupSocketEvents() {
     socket.on('start', async (data) => {
         await onGameReady(data);
 
         const whitePlayerInfo = await getUserInformation(data.white);
         const blackPlayerInfo = await getUserInformation(data.black);
+        
+        const chat = document.querySelector('.chat-container')
+        chat.style.display = "block";
 
         if (accountService.getUserId() === data.white) {
             userId = data.white;
@@ -244,7 +279,8 @@ function setupControls() {
         chat.classList.add("slide-in");
     });
 
-    leave_chat_btn.addEventListener("click", () => {
+    const chat_component = document.querySelector('chat-component');
+    chat_component.addEventListener("leave-chat", () => {
         if (!gameId) return;
         const chat = document.querySelector('.chat-container');
         chat.classList.remove("slide-in");
@@ -378,9 +414,10 @@ async function startNewGame() {
     socket.emit("join", { gameType: GAME_TYPE, userId, gameMode });
 
     waiting_room.style.display = "flex";
-    game_container.style.filter = "blur(6px)";
+    // game_container.style.filter = "blur(6px)";
 
     boardComponent.clear();
+
     await whitePlayerInfoComponent.clear();
     await blackPlayerInfoComponent.clear();
 

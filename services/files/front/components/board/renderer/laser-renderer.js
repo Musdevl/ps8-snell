@@ -41,7 +41,7 @@ export class LaserRenderer {
 
     playSound() {
         const sound = new Audio(`${GATEWAY_URL}/assets/themes/${this.theme}/sounds/explosion.mp3`);
-        sound.play().catch(() => { });
+        if (accountService.hasSound()) { sound.play().catch(() => { }); }
     }
 
     animate(positions, killedPositions = [], duration = 300, onComplete = null) {

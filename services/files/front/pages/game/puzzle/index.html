@@ -16,15 +16,22 @@
 </head>
 
 <body>
-    <button class="leave-btn option-btn">
-        <span class="leave-text">Leave</span>
-        <svg class="mobile-leave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 19-7-7 7-7"></path>
-            <path d="M19 12H5"></path>
-        </svg>
-    </button>
-    <h1 class="puzzle-title"></h1>
+    <div class="head-btn-container">
+        <button class="leave-btn option-btn">
+            <span class="leave-text">Leave</span>
+            <svg class="mobile-leave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 19-7-7 7-7"></path>
+                <path d="M19 12H5"></path>
+            </svg>
+        </button>
+        <h1 class="puzzle-title"></h1>
+        <div class="sound-ico-container">
+            <img id="loud-btn" class="sound-ico" src="/assets/loud.svg" alt="loud-ico">
+            <img id="mute-btn" class="sound-ico" src="/assets/mute.svg" alt="mute-ico">
+        </div>
+    </div>
+
     <div class="game-container">
         <div class="game-box">
             <main>
@@ -33,6 +40,11 @@
                 <player-info class="white player-info"></player-info>
             </main>
         </div>
+    </div>
+
+    <div class="sound-ico-container">
+        <img id="loud-ico" class="sound-ico" src="/assets/loud.svg" alt="loud-ico">
+        <img id="mute-ico" class="sound-ico" src="/assets/mute.svg" alt="mute-ico">
     </div>
 
     <div id="game-modal" class="option-container">

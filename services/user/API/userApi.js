@@ -375,7 +375,6 @@ app.post("/api/user/history", async (req, res) => {
     try {
         let { userId, game } = req.body;
         await UserApiHandler.addGameHistory(userId, game);
-        console.log("History posted successfully", userId, JSON.stringify(game));
         res.json({ message: 'History posted successfully' }, 200);
     }
     catch (error) {

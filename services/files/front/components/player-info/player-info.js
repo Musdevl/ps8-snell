@@ -371,7 +371,7 @@ class PlayerInfo extends HTMLElement {
         this.timerEl.classList.toggle('timer--low', this.time <= 30 && this.color === this.colorTurn);
         if (this.time <= 30 && this.color === this.colorTurn && !this.low_timers_sound_played) {
             this.low_timer_sound.currentTime = 0;
-            this.low_timer_sound.play().catch((e) => { console.error("Audio blocked:", e); });
+            if(accountService.hasSound()) this.low_timer_sound.play().catch((e) => { console.error("Audio blocked:", e); });
             this.low_timers_sound_played = true;
         }
     }
@@ -398,9 +398,9 @@ class PlayerInfo extends HTMLElement {
     async clear() {
         this.clearRotationCell();
         await this.updateInventory([]);
-        this.username.innerHTML = "Player Name";
-        this.player_avatar.src = "";
-        this.elo.innerHTML = "0";
+        this.username.innerHTML = "...";
+        this.player_avatar.src = "/assets/profiles.gif";
+        this.elo.innerHTML = "";
         this.time = 600;
     }
 

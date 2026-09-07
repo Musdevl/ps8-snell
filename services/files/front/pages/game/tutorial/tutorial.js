@@ -2,7 +2,7 @@ import { GATEWAY_URL } from "../../../env.js";
 import { COLORS } from "../../../enum/Colors.js";
 import * as uint16Utils from "../../../utils/Uint16Utils.js";
 import { TUTORIAL_STEPS } from "../../../utils/TutorialSteps.js";
-import { authFetch } from "../../../services/account-service.js";
+import * as accountService from "../../../services/account-service.js";
 
 let boardComponent;
 let whitePlayerInfoComponent;
@@ -85,6 +85,8 @@ async function setupGame() {
 
     boardComponent.setPlayerColor(COLORS.WHITE);
 
+    setupSoundBtn();
+
     leave_btn.addEventListener("click", () => {
         showModal({
             message: "Leave the tutorial ?",
@@ -106,8 +108,39 @@ async function setupGame() {
     tutorial_previous = document.querySelector('.previous-btn');
 
     tutorial_next.addEventListener('click', async () => await nextTutorielStep());
-
     tutorial_previous.addEventListener('click', async () => await previousTutorielStep());
+
+}
+
+
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
 
 }
 
@@ -410,7 +443,9 @@ async function renderTutorialStep() {
 }
 
 function playSound(sound) {
-    sound.play().catch(() => { });
+    if (accountService.hasSound()) {
+        sound.play().catch(() => { });
+    }
 }
 
 // Lancer l'initialisation quand le DOM est prêt
