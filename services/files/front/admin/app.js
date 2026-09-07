@@ -5,7 +5,10 @@ const REFRESH_MS = 3000;
 
 // Dernières valeurs connues : le bandeau se redessine d'un bloc, mais ses
 // compteurs viennent de deux routes qui ne répondent pas en même temps.
-const kpis = { online: null, total: null, today: null, load: null, memory: null };
+const kpis = { online: null, games: null, total: null, today: null, load: null, memory: null };
+
+// Les modes viennent du gameType du service game ; libellés lisibles côté page.
+const GAME_MODES = { MULTI: 'multijoueur', AI: 'contre IA', LOCAL: 'local' };
 
 async function get(path) {
     const res = await fetch(`${GATEWAY_URL}/api/admin${path}`);
@@ -43,6 +46,7 @@ function gauge(name, percent, reading) {
 function renderKpis() {
     const cells = [
         { label: 'users connectés', value: kpis.online },
+        { label: 'parties en cours', value: kpis.games },
         { label: 'inscrits', value: kpis.total },
         { label: "inscrits aujourd'hui", value: kpis.today },
         { label: 'charge cpu', value: kpis.load, unit: '%' },
@@ -75,6 +79,29 @@ function renderSeries(data) {
         <div class="legend">
             total ${data.total} &middot; période ${data.period} &middot; pic ${peak}/jour
         </div>`);
+}
+
+function renderGames(data) {
+    // Un mode sans partie n'apparaît pas dans la réponse : on part de la liste
+    // connue pour que les lignes ne dansent pas d'un rafraîchissement à l'autre.
+    const modes = Object.keys(GAME_MODES);
+    const extra = Object.keys(data.byMode).filter(mode => !modes.includes(mode));
+
+    render('games', `
+        <table>
+            <tbody>
+                ${[...modes, ...extra].map(mode => `
+                    <tr>
+                        <td class="dim">${GAME_MODES[mode] || mode}</td>
+                        <td class="num">${data.byMode[mode] || 0}</td>
+                    </tr>`).join('')}
+                <tr>
+                    <td class="dim">file d'attente</td>
+                    <td class="num">${data.queue}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="legend">${data.total} partie(s) en cours</div>`);
 }
 
 function renderSystem(data) {
@@ -127,6 +154,14 @@ function refresh() {
     get('/online')
         .then(data => { kpis.online = data.count; renderKpis(); })
         .catch(() => { kpis.online = null; renderKpis(); });
+
+    get('/games')
+        .then(data => {
+            kpis.games = data.total;
+            renderKpis();
+            renderGames(data);
+        })
+        .catch(error => { kpis.games = null; renderKpis(); fail('games', error); });
 
     get('/registrations?days=7')
         .then(data => {

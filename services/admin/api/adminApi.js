@@ -2,6 +2,7 @@ import { badExpress } from '../../helpers/badExpress.js';
 import * as dockerService from '../services/dockerService.js';
 import * as userService from '../services/userService.js';
 import * as systemService from '../services/systemService.js';
+import * as gameService from '../services/gameService.js';
 
 const app = new badExpress();
 
@@ -48,6 +49,18 @@ app.get('/api/admin/online', async (req, res) => {
     } catch (error) {
         console.error('[ADMIN API] - Erreur lors de la récupération des users connectés', error);
         res.json({ error: 'Error while retrieving online users', message: error.message }, 500);
+    }
+});
+
+// GET /api/admin/games
+app.get('/api/admin/games', async (req, res) => {
+    try {
+        const games = await gameService.getLiveGames();
+
+        res.json(games, 200);
+    } catch (error) {
+        console.error('[ADMIN API] - Erreur lors de la récupération des parties', error);
+        res.json({ error: 'Error while retrieving live games', message: error.message }, 500);
     }
 });
 

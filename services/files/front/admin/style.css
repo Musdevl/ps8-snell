@@ -85,8 +85,8 @@ h2 {
 .grow > div { flex: 1 1 auto; min-height: 0; overflow: auto; }
 
 /* Deux sections côte à côte tant que la place le permet, empilées sinon. */
-.cols { display: flex; flex-wrap: wrap; gap: 0 56px; }
-.cols > * { flex: 1 1 400px; }
+.cols { display: flex; flex-wrap: wrap; gap: 0 48px; }
+.cols > * { flex: 1 1 330px; }
 
 /* ── Tableaux ────────────────────────────────────────────────────────────── */
 
