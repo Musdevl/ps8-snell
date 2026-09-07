@@ -102,6 +102,10 @@ async function loadProfile() {
 
     } catch (err) {
         console.error(err);
+        notificationService.notify("User not found", "error");
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        await sleep(1000);
+        window.location.replace(`/`);
     }
 }
 
