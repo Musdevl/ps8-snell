@@ -1,5 +1,6 @@
 import { badExpress } from '../../helpers/badExpress.js';
 import { gatewayConnection, formatToSend } from '../src/shared.js';
+import * as MatchmakingManager from '../src/manager/MatchmakingManager.js';
 
 
 const app = new badExpress();
@@ -91,6 +92,18 @@ app.post('/api/game/forward-message', async (req, res) => {
     }
 
 })
+
+// GET /api/game/stats/live
+app.get('/api/game/stats/live', (req, res) => {
+    try {
+        const live = gameManager.getLiveGames();
+
+        res.json({ ...live, queue: MatchmakingManager.queueSize() }, 200);
+    } catch (error) {
+        console.error('Error while retrieving live games:', error);
+        res.json({ error: 'Error while retrieving live games', message: error.message }, 503);
+    }
+});
 
 // Start the server
 export function startHttpServer(port, newGameManager) {
