@@ -246,7 +246,7 @@ async function renderHistory() {
             </div>
             <div class="actions-container">
             <span class="game-history-field">
-                ${game.actions_count}
+                ${Math.max(0, game.actions_count-2)}
                 </span>
             </div>
             <div class="date-container">

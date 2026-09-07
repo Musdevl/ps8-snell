@@ -56,7 +56,7 @@ const puzzle_13 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(13, "No Name", game, puzzle_steps, PUZZLE_DIFFICULTY.CHAMPION, playerColor);
+        return new Puzzle(13, "Réflexion Parfaite", game, puzzle_steps, PUZZLE_DIFFICULTY.CHAMPION, playerColor);
     }
 }
 
@@ -107,7 +107,7 @@ const puzzle_14 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(14, "No Name", game, puzzle_steps, PUZZLE_DIFFICULTY.CHAMPION, playerColor);
+        return new Puzzle(14, "Sans Issue", game, puzzle_steps, PUZZLE_DIFFICULTY.CHAMPION, playerColor);
     }
 }
 
