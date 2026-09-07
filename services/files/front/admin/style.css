@@ -1,0 +1,159 @@
+:root {
+    --bg: #0d0f11;
+    --row: #14191d;
+    --ink: #eef1f3;
+    --ink-dim: #b3bcc4;
+    --ink-mute: #828d96;
+    --rule: #222a30;
+    --rule-strong: #38434c;
+    --accent: #3d8bfd;
+    --ok: #46c45a;
+    --warn: #e0a52b;
+    --crit: #fa5f57;
+}
+
+* { box-sizing: border-box; }
+
+/* La page tient dans la fenêtre : seul le tableau des containers, dont la
+   hauteur dépend du nombre de services, défile dans sa propre zone. */
+body {
+    height: 100dvh;
+    margin: 0;
+    padding: 4px 24px 18px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Bandeau de compteurs ────────────────────────────────────────────────── */
+
+.kpis {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--rule-strong);
+}
+
+.kpi {
+    flex: 1 1 150px;
+    padding: 14px 24px 14px 0;
+    margin-right: 24px;
+    border-right: 1px solid var(--rule);
+}
+
+.kpi:last-child { border-right: 0; }
+
+.kpi .label {
+    color: var(--ink-mute);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.kpi .value {
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 500;
+    letter-spacing: -.01em;
+}
+
+.kpi .unit { font-size: 16px; color: var(--ink-dim); }
+
+/* ── Sections ────────────────────────────────────────────────────────────── */
+
+section {
+    margin-top: 22px;
+    padding-top: 14px;
+    border-top: 2px solid var(--rule-strong);
+}
+
+h2 {
+    margin: 0 0 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+}
+
+/* Seule zone extensible : elle absorbe la hauteur restante. min-height:0
+   lève la taille plancher d'un enfant flex, sans quoi rien ne défile. */
+.grow { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.grow > div { flex: 1 1 auto; min-height: 0; overflow: auto; }
+
+/* Deux sections côte à côte tant que la place le permet, empilées sinon. */
+.cols { display: flex; flex-wrap: wrap; gap: 0 56px; }
+.cols > * { flex: 1 1 400px; }
+
+/* ── Tableaux ────────────────────────────────────────────────────────────── */
+
+table { width: 100%; border-collapse: collapse; }
+
+th {
+    padding: 0 14px 8px 0;
+    text-align: left;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    /* box-shadow plutôt que border-bottom : une bordure sur un th sticky
+       se décolle de la cellule au défilement. */
+    box-shadow: inset 0 -1px 0 var(--rule-strong);
+}
+
+/* En-tête de colonnes figé pendant le défilement du tableau. */
+thead th { position: sticky; top: 0; background: var(--bg); }
+
+td {
+    padding: 8px 14px 8px 0;
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+}
+
+tbody tr:hover td { background: var(--row); }
+
+td.num, th.num { text-align: right; padding-right: 18px; }
+
+.dim { color: var(--ink-dim); }
+.mute { color: var(--ink-mute); }
+
+/* ── Jauges ──────────────────────────────────────────────────────────────── */
+
+.gauge { display: flex; align-items: center; gap: 14px; padding: 9px 0; }
+.gauge .name { width: 46px; color: var(--ink-dim); }
+/* display:block obligatoire : une jauge inline ignore width et height. */
+.gauge .track { display: block; flex: 1; height: 8px; background: var(--rule); }
+.gauge .fill { display: block; height: 100%; background: var(--ok); }
+.gauge .read { width: 210px; text-align: right; }
+
+.fill.warn { background: var(--warn); }
+.fill.crit { background: var(--crit); }
+
+/* Jauge compacte, dans une cellule de tableau */
+.bar { display: block; width: 64px; height: 6px; background: var(--rule); }
+.bar > i { display: block; height: 100%; background: var(--accent); }
+
+/* ── Série d'inscriptions ────────────────────────────────────────────────── */
+
+.series { display: flex; align-items: flex-end; gap: 8px; height: 84px; }
+.series .day { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+.series .col { display: block; background: var(--accent); border-radius: 2px 2px 0 0; min-height: 2px; }
+.series .col.empty { background: var(--rule); }
+.series .top { font-size: 12px; color: var(--ink-dim); text-align: center; padding-bottom: 5px; }
+
+.series-axis { display: flex; gap: 8px; padding-top: 7px; border-top: 1px solid var(--rule-strong); }
+.series-axis span { flex: 1; text-align: center; font-size: 11px; color: var(--ink-mute); }
+
+.legend { padding-top: 12px; color: var(--ink-mute); font-size: 12px; }
+
+/* ── États ───────────────────────────────────────────────────────────────── */
+
+.dot { display: inline-block; width: 8px; height: 8px; margin-right: 9px; vertical-align: 1px; background: var(--ink-mute); }
+.dot.up { background: var(--ok); }
+.dot.down { background: var(--crit); }
+
+.error { color: var(--crit); }
