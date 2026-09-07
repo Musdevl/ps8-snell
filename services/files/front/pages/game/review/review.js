@@ -349,9 +349,14 @@ function showGameOverModalOnce() {
     setTimeout(() => {
         showModal({
             message: game_result ? `Game over — ${game_result}` : "Game Over ?",
-            confirmLabel: "Leave",
-            cancelLabel: "Cancel",
+            confirmLabel: "Restart",
+            cancelLabel: "Leave",
             onConfirm: () => {
+                goToState(0);
+                closeModal();
+                startPlayback();
+            },
+            onCancel: () => {
                 window.location.replace(`/`);
             }
         });

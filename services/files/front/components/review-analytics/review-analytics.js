@@ -197,7 +197,7 @@ class ReviewAnalytics extends HTMLElement {
         if (!current) return;
 
         current.classList.add('selected');
-        current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        // current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 
 }

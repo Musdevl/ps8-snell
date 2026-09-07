@@ -176,13 +176,13 @@ async function nextTutorielStep() {
 
         showModal({
             message: "Congratulations, you finished the tutorial !",
-            confirmLabel: "Leave",
-            cancelLabel: "Do it again",
+            confirmLabel: "Do it again",
+            cancelLabel: "Leave",
             onConfirm: () => {
-                window.location.replace(`/`);
+                window.location.replace('/pages/game/tutorial/index.html');
             },
             onCancel: () => {
-                window.location.replace('/pages/game/tutorial/index.html');
+                window.location.replace(`/`);
             }
         });
 

@@ -2,6 +2,7 @@ import { GATEWAY_URL } from "../../../env.js";
 import { COLORS } from "../../../enum/Colors.js";
 import * as uint16Utils from "../../../utils/Uint16Utils.js";
 import { authFetch } from "../../../services/account-service.js";
+import * as accountService from "../../../services/account-service.js";
 
 const params = new URLSearchParams(window.location.search);
 const puzzle_id = params.get("id");
@@ -82,6 +83,8 @@ async function waitForBoard() {
 
 async function setupGame() {
 
+    setupSoundBtn();
+
     // Setup les composants
     const puzzle_title = document.querySelector('.puzzle-title');
     puzzle_title.innerHTML += `
@@ -105,7 +108,6 @@ async function setupGame() {
     boardComponent.setPlayerColor(COLORS.WHITE);
 
 
-    setupSoundBtn();
 
     leave_btn.addEventListener("click", () => {
         showModal({
@@ -284,13 +286,13 @@ async function nextPuzzleStep() {
     if (puzzle_step_index >= puzzle.steps.length - 1) {
         showModal({
             message: "Congratulations, you finished the puzzle !",
-            confirmLabel: "Leave",
-            cancelLabel: "Next",
+            confirmLabel: "Next",
+            cancelLabel: "Leave",
             onConfirm: () => {
-                window.location.replace(`/`);
+                window.location.replace(`/pages/game/puzzle/index.html?id=${++puzzle.id}`)
             },
             onCancel: () => {
-                window.location.replace(`/pages/game/puzzle/index.html?id=${++puzzle.id}`)
+                window.location.replace(`/`);
             }
         });
 
