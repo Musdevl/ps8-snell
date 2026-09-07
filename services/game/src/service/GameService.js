@@ -118,7 +118,7 @@ export function endGame(game, winner) {
     game.isGameOver = true;
     game.stopTimer();
 
-    if (game.gameType === "MULTI" && !game.isReview) {
+    if ((game.gameType === "MULTI") && !game.isReview) {
 
         const white_player = game.players.find((p) => p.color === COLORS.WHITE);
         const black_player = game.players.find((p) => p.color === COLORS.BLACK);
@@ -153,7 +153,7 @@ export function endGame(game, winner) {
             addGameToHistory(white_player.userId, winnerId, game),
             addGameToHistory(black_player.userId, winnerId, game),
             saveGame(game, winnerId)
-        ]).then(r => console.log("Game saved successfully"));
+        ]).then(r => console.log("[GAME SERVICE] Game saved successfully"));
     }
 
 
@@ -171,7 +171,7 @@ async function saveGame(game, winnerId) {
         const black_player_id = game.getPlayerByColor(COLORS.BLACK).userId
 
         // Save the game
-        const res = await gameRepository.saveGame(game.id, initGrid, actions, white_player_id, black_player_id, winnerId);
+        const res = await gameRepository.saveGame(game.id, game.gameType, initGrid, actions, white_player_id, black_player_id, winnerId);
     } catch (error) {
         console.log("[GAME SERVICE] - Error while saving the game");
     }
@@ -184,7 +184,7 @@ export async function addGameToHistory(userId, winnerId, game) {
     const white_player = game.players.find((p) => p.color === COLORS.WHITE);
     const black_player = game.players.find((p) => p.color === COLORS.BLACK);
 
-    let gameJson = { whiteId: white_player.userId, blackId: black_player.userId, gameId: game.id, winnerId: winnerId };
+    let gameJson = { whiteId: white_player.userId, blackId: black_player.userId, gameId: game.id, gameType: game.gameType, winnerId: winnerId, actions_count: game.actions.length, startDate: game.startDate };
 
     const res = await fetch(`${USER_SERVICE_URL}/api/user/history`, {
         method: "POST",

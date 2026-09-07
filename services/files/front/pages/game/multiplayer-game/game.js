@@ -125,7 +125,7 @@ function setupSocketEvents() {
 
         const whitePlayerInfo = await getUserInformation(data.white);
         const blackPlayerInfo = await getUserInformation(data.black);
-        
+
         const chat = document.querySelector('.chat-container')
         chat.style.display = "block";
 
@@ -420,6 +420,8 @@ async function startNewGame() {
 
     await whitePlayerInfoComponent.clear();
     await blackPlayerInfoComponent.clear();
+    whitePlayerInfoComponent.resetRotationCell();
+    blackPlayerInfoComponent.resetRotationCell();
 
     game_chat.clearContent();
     endMessage.clear();

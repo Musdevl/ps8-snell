@@ -46,60 +46,6 @@ async function loadProfile() {
         const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${profileUserId}`);
         user = await res.json();
 
-        if (!res.ok) {
-            window.location.replace(`/`);
-            return;
-        }
-
-        chatId = user.friends.find(f => f.friendId === accountService.getUserId())?.chatId ?? null;
-
-        setAchievements(user.achievements);
-
-        const isOwnProfile = accountService.getUserId() === profileUserId;
-        if (isOwnProfile) {
-            document.querySelector('.profile-right').style.display = 'none';
-        }
-
-        await chat.readyPromise;
-        chat.disableOptionButtons();
-
-        await renderProfile();
-        await renderHistory();
-
-        document.querySelector("#mobile-logout-btn").addEventListener("click", async () => {
-            await accountService.logout();
-            window.location.replace(`/pages/home/play`);
-        });
-
-        if (profileUserId !== accountService.getUserId()) {
-
-
-            const tabProfile = document.querySelector('#tab-profile');
-            const tabChat = document.querySelector('#tab-chat');
-            const profile_left = document.querySelector('.profile-left');
-            const profile_right = document.querySelector('.profile-right');
-
-            tabProfile.addEventListener('click', () => {
-                tabProfile.classList.add('active');
-                tabChat.classList.remove('active');
-                profile_left.style.display = 'block';
-                profile_right.style.display = 'none';
-            });
-
-            tabChat.addEventListener('click', async () => {
-                tabChat.classList.add('active');
-                tabProfile.classList.remove('active');
-                profile_left.style.display = 'none';
-                profile_right.style.display = 'flex';
-            });
-
-            document.querySelector('#mobile-logout-btn').style.display = "none"
-
-        } else {
-            document.querySelector('.tabs').style.display = "none";
-        }
-
-
     } catch (err) {
         console.error(err);
         notificationService.notify("User not found", "error");
@@ -107,6 +53,56 @@ async function loadProfile() {
         await sleep(1000);
         window.location.replace(`/`);
     }
+
+    chatId = user.friends.find(f => f.friendId === accountService.getUserId())?.chatId ?? null;
+
+    setAchievements(user.achievements);
+
+    const isOwnProfile = accountService.getUserId() === profileUserId;
+    if (isOwnProfile) {
+        document.querySelector('.profile-right').style.display = 'none';
+    }
+
+    await chat.readyPromise;
+    chat.disableOptionButtons();
+
+    await renderProfile();
+    await renderHistory();
+
+    document.querySelector("#mobile-logout-btn").addEventListener("click", async () => {
+        await accountService.logout();
+        window.location.replace(`/pages/home/play`);
+    });
+
+    if (profileUserId !== accountService.getUserId()) {
+
+        const tabProfile = document.querySelector('#tab-profile');
+        const tabChat = document.querySelector('#tab-chat');
+        const profile_left = document.querySelector('.profile-left');
+        const profile_right = document.querySelector('.profile-right');
+
+        tabProfile.addEventListener('click', () => {
+            tabProfile.classList.add('active');
+            tabChat.classList.remove('active');
+            profile_left.style.display = 'block';
+            profile_right.style.display = 'none';
+        });
+
+        tabChat.addEventListener('click', async () => {
+            tabChat.classList.add('active');
+            tabProfile.classList.remove('active');
+            profile_left.style.display = 'none';
+            profile_right.style.display = 'flex';
+        });
+
+        document.querySelector('#mobile-logout-btn').style.display = "none"
+
+    } else {
+        document.querySelector('.tabs').style.display = "none";
+    }
+
+
+
 }
 
 async function fetchUserId(username) {
@@ -221,7 +217,6 @@ async function renderHistory() {
     list.innerHTML = '';
 
     history.forEach(game => {
-        console.log(game);
         const isWhite = game.whiteId === profileUserId;
         const opponentId = isWhite ? game.blackId : game.whiteId;
         const isDraw = game.winnerId === 'DRAW';
@@ -229,19 +224,59 @@ async function renderHistory() {
         const resultClass = isDraw ? 'draw' : (won ? 'win' : 'loss');
 
         const el = document.createElement('div');
-        el.className = `game-card ${resultClass}`;
+        el.className = `game-card`;
         el.innerHTML = `
-            <span class="game-players">
-                <span class="me">${username}</span>
-                <span class="sep">VS</span>
-                ${opponentMap[opponentId] ?? opponentId}
-            </span>
+            <div class="game-type-container">
+            ${get_game_ico(game.gameType)}
+            </div>
+            <div class="game-players">
+                <div class="player-container">
+                <div class=${isWhite ? "white-rect" : "black-rect"}></div>
+                <span class="me player-name">${username}</span>
+                </div>
+
+                <div class="player-container">
+                <div class=${isWhite ? "black-rect" : "white-rect"}></div>
+                <span class="player-name">${opponentMap[opponentId] ?? opponentId}</span>
+                </div>
+                
+            </div>
+            <div class="result-container">
+                <img class="result-ico" src="/assets/${resultClass}.svg" alt="result">
+            </div>
+            <div class="actions-container">
+            <span class="game-history-field">
+                ${game.actions_count}
+                </span>
+            </div>
+            <div class="date-container">
+            <span class="game-history-field">
+                ${formatDate(game.startDate)}
+                </span>
+                </div>
+            </div>
         `;
         el.addEventListener('click', () => {
             window.location.href = `/pages/game/review/${game.gameId}`;
         });
         list.appendChild(el);
     });
+}
+
+function get_game_ico(gameType) {
+    switch (gameType) {
+        case "MULTI":
+            return `<img class="game-type-ico" src="/assets/multiplayer.svg" alt="multi-ico">`
+        case "AI":
+            return `<img class="game-type-ico" src="/assets/bot.svg" alt="bot-ico">`
+        default:
+            return "";
+    }
+}
+
+function formatDate(date) {
+    const splited = date.split('T');
+    return `${splited[0]} - ${splited[1].split(".")[0]}`
 }
 
 async function renderInventory() {
