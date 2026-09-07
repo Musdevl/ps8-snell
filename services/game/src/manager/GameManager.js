@@ -211,6 +211,22 @@ export class GameManager extends EventEmitter {
         }
     }
 
+    // Parties en cours, réparties par mode. La map games garde aussi les parties
+    // terminées : le filtre sur isGameOver est ce qui distingue "en cours".
+    getLiveGames() {
+        const byMode = {};
+        let total = 0;
+
+        for (const game of this.games.values()) {
+            if (game.isGameOver || game.isReview) continue;
+
+            byMode[game.gameType] = (byMode[game.gameType] || 0) + 1;
+            total++;
+        }
+
+        return { total, byMode };
+    }
+
     tryReconnect(playerInfo, gameType) {
         // ToDo: Fetch userId from the jwtToken
         for (const game of this.games.values()) {

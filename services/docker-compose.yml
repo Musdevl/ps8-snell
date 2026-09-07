@@ -13,6 +13,7 @@ services:
       - ACHIEVEMENT_SERVICE_URL=http://achievement:8004
       - SHOP_SERVICE_URL=http://shop:8005
       - AI_SERVICE_URL=http://ai:8020
+      - ADMIN_SERVICE_URL=http://admin:8007
       # La gateway ne lit ses certificats que si ENV=prod. Le volume est
       # monté dans tous les cas : sans effet en dev, prêt à être utilisé en
       # prod des que le projet aura un domaine + certificats valides.
@@ -129,6 +130,21 @@ services:
     networks:
       - app-network
 
+  admin:
+    build:
+      context: .
+      dockerfile: admin/Dockerfile
+    ports:
+      - "8007:8007"
+    environment:
+      - GATEWAY_URL=http://gateway:8000
+      - USER_SERVICE_URL=http://user:8010
+      - GAME_SERVICE_URL=http://game:8002
+    volumes:
+      # Lecture seule : le service ne fait qu'interroger l'API Docker.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - app-network
   # Sauvegardes chiffrées (AES-256) de MongoDB.
   # Le conteneur ne sert rien : il héberge un cron qui lance backup.sh
   # tous les jours à 2h du matin, et fournit les outils mongodump /

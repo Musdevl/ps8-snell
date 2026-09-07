@@ -16,6 +16,7 @@ const URLS = {
     chat: process.env.CHAT_SERVICE_URL || "http://localhost:8003",
     ai: process.env.AI_SERVICE_URL || "http://localhost:8020",
     shop: process.env.SHOP_SERVICE_URL || "http://localhost:8005",
+    admin: process.env.ADMIN_SERVICE_URL || "http://localhost:8007",
 };
 
 const proxy = httpProxy.createProxyServer();
@@ -36,6 +37,8 @@ const PUBLIC_ROUTES = [
     '/api/user/hard-reset-password',
     '/api/chat/global',
     '/api/shop',
+    '/api/admin',
+    '/admin',
     '/assets/',
     '/pages/home/',
     '/services/',
@@ -158,6 +161,16 @@ const requestHandler = (req, res) => {
                     );
                 }
 
+                if (parts[2] === "admin") {
+                    return proxy.web(req, res,
+                        { target: URLS.admin },
+                        err => {
+                            res.statusCode = 502;
+                            return res.end("Error: admin api unreachable");
+                        }
+                    );
+                }
+
                 res.statusCode = 404;
                 return res.end("Unknown API domain");
 
@@ -227,7 +240,7 @@ userNamespace.on('connection', socket => {
     }));
 
     socket.on('disconnect', () => {
-        userNamespace.emit('disconnection', { clientId: socket.id });
+        userClient.emit('disconnection', { clientId: socket.id });
     });
 
     socket.on("user-ws-service", ({ webSocketIds, event, data }) => {
