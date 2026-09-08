@@ -191,6 +191,71 @@ async function setupGame() {
 
 }
 
+/**
+ * Aligne les états et les coups, et remplit `game_states` / `game_result`.
+ *
+ * Le serveur empile l'état initial PUIS rejoue toutes les actions sauvegardées
+ * — or la liste sauvegardée commence par "INIT", une action qui ne fait rien et
+ * qui produit donc un doublon de la position de départ. Elle se termine
+ * symétriquement par le résultat ("White won", "DRAW"…), qui n'est pas rejoué
+ * et ne produit donc aucun état.
+ *
+ * On retire ces deux intrus ici, une fois pour toutes. Après quoi l'invariant
+ * tient tout seul dans le reste du fichier :
+ *
+ *      game_states.length === moves.length + 1
+ *      moves[k - 1]  a produit  game_states[k]
+ *
+ * @returns {string[]} les coups réellement joués, dans l'ordre
+ */
+function extractStatesAndMoves(raw) {
+    const states = (raw.grid_states ?? []).map(state => uint16Utils.normalizeGameState(state));
+    const actions = [...(raw.actions ?? [])];
+
+    const hasInitAction = actions[0] === "INIT";
+
+    game_states = hasInitAction ? states.slice(1) : states;
+
+    const moves = hasInitAction ? actions.slice(1) : actions;
+
+    // Ce qui dépasse en fin de liste n'a pas d'état : c'est l'issue de partie.
+    game_result = null;
+    while (moves.length > game_states.length - 1) {
+        game_result = moves.pop();
+    }
+
+    return moves;
+}
+
+
+async function generateEvaluationList() {
+    // Une requête par position, mais toutes en parallèle : en séquentiel la
+    // review met plusieurs secondes à s'afficher sur une longue partie.
+    return Promise.all(game_states.map(state => evaluatePosition(state)));
+}
+
+
+function lastStateIndex() {
+    return Math.max(0, game_states.length - 1);
+}
+
+/**
+ * Seul point d'entrée pour changer de position : plateau, eval-bar et
+ * surlignage du coup sont mis à jour ensemble, ils ne peuvent pas diverger.
+ */
+async function goToState(index) {
+    const target = Math.min(Math.max(index, 0), lastStateIndex());
+
+    if (has_rendered && target === state_index) return;
+
+    // On n'anime que la lecture en avant, coup par coup. En marche arrière ou
+    // sur un saut direct, le plateau affiché n'est pas celui d'où part le coup :
+    // l'animation jouerait un déplacement depuis une position qui n'a jamais
+    // existé.
+    const animate = has_rendered && target === state_index + 1;
+
+    state_index = target;
+    has_rendered = true;
 
 function setupSoundBtn() {
     try {
