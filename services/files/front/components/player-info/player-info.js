@@ -371,7 +371,7 @@ class PlayerInfo extends HTMLElement {
         this.timerEl.classList.toggle('timer--low', this.time <= 30 && this.color === this.colorTurn);
         if (this.time <= 30 && this.color === this.colorTurn && !this.low_timers_sound_played) {
             this.low_timer_sound.currentTime = 0;
-            if(accountService.hasSound()) this.low_timer_sound.play().catch((e) => { console.error("Audio blocked:", e); });
+            if (accountService.hasSound()) this.low_timer_sound.play().catch((e) => { console.error("Audio blocked:", e); });
             this.low_timers_sound_played = true;
         }
     }
@@ -387,6 +387,8 @@ class PlayerInfo extends HTMLElement {
         this.low_timer_sound.load();
     }
 
+
+
     resetRotationCell() {
         this.clearRotationCell();
         this.shadowRoot.querySelector('.facing-cell-container').style.opacity = "1";
@@ -394,6 +396,7 @@ class PlayerInfo extends HTMLElement {
 
     setPlayerName(playerName) { this.username.textContent = playerName; }
     setPlayerAvatar(playerAvatar) { this.player_avatar.src = playerAvatar; }
+    setPlayerElo(elo) { this.elo.textContent = elo; }
 
     async clear() {
         this.clearRotationCell();

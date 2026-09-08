@@ -189,10 +189,28 @@ async function renderFriends() {
 
 async function renderHistory() {
     const history = user.history ?? [];
-    const list = document.getElementById('history');
+    const table = document.getElementById('history');
+
+    // Header dans un thead dédié
+    table.innerHTML = `
+        <thead>
+            <tr class="history-header">
+                <th class="game-type-col history-header-col"></th>
+                <th class="players-col history-header-col">Players</th>
+                <th class="result-col history-header-col">Result</th>
+                <th class="actions-col history-header-col">Actions</th>
+                <th class="date-col history-header-col">Date</th>
+            </tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+    `;
+
+    const tbody = document.getElementById('history-body');
 
     if (history.length === 0) {
-        list.innerHTML = '<span class="missing">No games played yet.</span>';
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = `<td colspan="6" class="missing">No games played yet.</td>`;
+        tbody.appendChild(emptyRow);
         return;
     }
 
@@ -214,7 +232,7 @@ async function renderHistory() {
         )
     );
 
-    list.innerHTML = '';
+    let is_odd = true;
 
     history.forEach(game => {
         const isWhite = game.whiteId === profileUserId;
@@ -223,43 +241,35 @@ async function renderHistory() {
         const won = game.winnerId === profileUserId;
         const resultClass = isDraw ? 'draw' : (won ? 'win' : 'loss');
 
-        const el = document.createElement('div');
-        el.className = `game-card`;
+        const el = document.createElement('tr');
+        el.className = `history-item ${is_odd ? "odd-item" : ""}`;
         el.innerHTML = `
-            <div class="game-type-container">
-            ${get_game_ico(game.gameType)}
-            </div>
-            <div class="game-players">
+            <td class="game-type-col">${get_game_ico(game.gameType)}</td>
+            <td class="players-col">
                 <div class="player-container">
-                <div class=${isWhite ? "white-rect" : "black-rect"}></div>
-                <span class="me player-name">${username}</span>
+                    <div class="${isWhite ? "white-rect" : "black-rect"}"></div>
+                    <span class="me player-name">${username}</span>
                 </div>
-
                 <div class="player-container">
-                <div class=${isWhite ? "black-rect" : "white-rect"}></div>
-                <span class="player-name">${opponentMap[opponentId] ?? opponentId}</span>
+                    <div class="${isWhite ? "black-rect" : "white-rect"}"></div>
+                    <span class="player-name">${opponentMap[opponentId] ?? opponentId}</span>
                 </div>
-                
-            </div>
-            <div class="result-container">
+            </td>
+            <td class="result-col">
                 <img class="result-ico" src="/assets/${resultClass}.svg" alt="result">
-            </div>
-            <div class="actions-container">
-            <span class="game-history-field">
-                ${Math.max(0, game.actions_count-2)}
-                </span>
-            </div>
-            <div class="date-container">
-            <span class="game-history-field">
-                ${formatDate(game.startDate)}
-                </span>
-                </div>
-            </div>
+            </td>
+            <td class="actions-col">
+                <span class="game-history-field">${Math.max(0, game.actions_count - 2)}</span>
+            </td>
+            <td class="date-col">
+                <span class="game-history-field">${formatDate(game.startDate)}</span>
+            </td>
         `;
         el.addEventListener('click', () => {
             window.location.href = `/pages/game/review/${game.gameId}`;
         });
-        list.appendChild(el);
+        tbody.appendChild(el);
+        is_odd = !is_odd;
     });
 }
 

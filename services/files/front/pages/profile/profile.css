@@ -41,10 +41,6 @@ main {
 }
 
 .profile-right {
-    /* position: absolute;
-    width: 20%;
-    top: 0;
-    right: 0; */
     height: 100%;
     width: 50%;
 }
@@ -385,116 +381,109 @@ main {
    GAME HISTORY
    ============================================================ */
 #history {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
     max-height: 40%;
     min-height: 40%;
     overflow-y: auto;
+    overflow-x: auto;
     scrollbar-color: #232220 #3a3734;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #262522;
 }
 
-
+/* -- Header -- */
 .history-header {
-    display: flex;
-    align-items: center;
-    gap: 2em;
-    padding: 12px 16px;
-    background: #262522;
-    border: 1px solid #3a3632;
-    border-radius: 6px;
+    background: transparent;
 }
 
-.history-header-item {
-    font-weight: 600;
-}
-
-.game-type-header,
-.game-type-container {
-    width: 5%;
-}
-
-.players-header,
-.game-players {
-    width: 15%;
-}
-
-.result-header,
-.result-container {
-    width: 5%;
-}
-
-.actions-header,
-.actions-container {
-    width: 5%;
-}
-
-.date-header,
-.date-container {
-    width: 20%;
-}
-
-
-.game-type-container,
-.result-container,
-.actions-container {
-    display: flex;
-    justify-content: center;
-}
-
-.game-card {
-    display: flex;
-    align-items: center;
-    gap: 2em;
-    padding: 12px 16px;
-    background: #262522;
-    border: 1px solid #3a3632;
-    border-radius: 6px;
-    transition: background 0.1s;
-    cursor: pointer;
-}
-
-.game-card:hover {
-    background: #2e2b28;
-}
-
-.game-card.win {
-    border-left-color: #5dbd7d;
-}
-
-.game-card.loss {
-    border-left-color: #c25050;
-}
-
-.game-card.draw {
-    border-left-color: #979087;
-}
-
-.game-players {
+.history-header-col {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: #262522;
+    ;
+    text-align: left;
+    padding: 1.5em 1em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     font-size: 14px;
+    box-shadow: 0 1px 0 #3a3632;
+}
+
+.game-type-col {
+    width: 5%;
+    text-align: center;
+}
+
+.players-col {
+    width: 40%;
+}
+
+.result-col {
+    width: 10%;
+    text-align: center;
+}
+
+.actions-col {
+    width: 10%;
+    text-align: center;
+}
+
+.date-col {
+    width: 35%;
+    text-align: center;
+}
+
+/* -- Rows -- */
+.history-item {
+    background: #262522;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.history-item:hover {
+    background: rgba(57, 54, 50, 1)
+}
+
+.history-item td {
+    padding: 12px 16px;
+    vertical-align: middle;
+}
+
+.history-item td.game-type-col,
+.history-item td.result-col,
+.history-item td.actions-col {
+    text-align: center;
+}
+
+.game-players,
+.players-col {
     font-weight: 600;
-    display: flex;
-    gap: 0.5em;
-    flex-direction: column;
-}
-
-.game-players .me {
     color: #fff;
-}
-
-.game-players .sep {
-    color: #fff;
-    margin: 0 6px;
-}
-
-.player-name {
-    min-width: 6em;
 }
 
 .player-container {
     display: flex;
     align-items: center;
-    gap: 1em;
+    gap: 0.75em;
+}
+
+.player-name {
+    color: #d4cfc9;
+}
+
+.me.player-name {
+    color: #fff;
+}
+
+.history-item .missing,
+tbody td.missing {
+    background: #262522;
+    border-radius: 6px;
+    border: 1px solid #3a3632;
+    padding: 2rem 0;
+    text-align: center;
 }
 
 /* ============================================================
@@ -827,11 +816,15 @@ chat-component .chat-wrapper {
 
 }
 
-.history-container{
+.history-container {
     display: flex;
     flex-direction: column;
     overflow-x: auto;
+    border: 1px solid #3a3632;
+    border-radius: 10px;
 }
+
+
 
 nav-bar {
     display: none;
@@ -944,33 +937,28 @@ nav-bar {
     }
 
 
-    .history-header-item {
+    .history-header-col {
         font-weight: 600;
     }
 
-    .game-type-header,
-    .game-type-container {
-        width: 5em;
+    .game-type-col {
+        width: 3em;
     }
 
-    .players-header,
-    .game-players {
-        width: 15em;
+    .players-col {
+        width: 10em;
     }
 
-    .result-header,
-    .result-container {
-        width: 5em;
+    .result-col {
+        width: 3em;
     }
 
-    .actions-header,
-    .actions-container {
-        width: 5em;
+    .actions-col {
+        width: 3em;
     }
 
-    .date-header,
-    .date-container {
-        width: 20em;
+    .date-col {
+        width: 12em;
     }
 
 
@@ -1027,6 +1015,10 @@ nav-bar {
     border: 4px solid #3a3632;
     border-top-color: #68b844;
     animation: spin 0.8s linear infinite;
+}
+
+.odd-item{
+    background-color: rgb(44, 42, 39);
 }
 
 @keyframes spin {

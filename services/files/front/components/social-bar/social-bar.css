@@ -147,7 +147,7 @@
 }
 
 .friend:hover {
-    background: #2e2b28;
+    background: rgba(57, 54, 50, 1)
 }
 
 .friend:hover .friend-btn-section {
@@ -514,7 +514,7 @@
 }
 
 .leaderboard-entry:hover {
-    background: #2e2b28;
+    background: rgba(57, 54, 50, 1)
 }
 
 .leaderboard-rank {

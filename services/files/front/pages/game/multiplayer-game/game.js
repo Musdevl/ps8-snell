@@ -423,6 +423,14 @@ async function startNewGame() {
     whitePlayerInfoComponent.resetRotationCell();
     blackPlayerInfoComponent.resetRotationCell();
 
+    const profile_picture = accountService.getProfilePicture().picture;
+    const userName = accountService.getUserName();
+    const elo = accountService.getElo();
+
+    whitePlayerInfoComponent.setPlayerAvatar(profile_picture);
+    whitePlayerInfoComponent.setPlayerName(userName);
+    whitePlayerInfoComponent.setPlayerElo(elo);
+
     game_chat.clearContent();
     endMessage.clear();
 }
