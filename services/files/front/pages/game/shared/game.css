@@ -11,6 +11,7 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
+    gap: 2em;
     color: white;
     font-family: 'Segoe UI', sans-serif;
 }
@@ -19,7 +20,7 @@ main {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    height: 80%;
+    /* height: 80%; */
     width: 100%;
     max-width: 100%;
 }
@@ -63,6 +64,7 @@ chat-component {
 }
 
 .chat-container {
+    display: none;
     height: 100%;
 }
 
@@ -100,15 +102,17 @@ end-message {
    Buttons (leave / chat)
    ─────────────────────────────────────────────────────────────────────── */
 
+.head-btn-container {
+    display: flex;
+    justify-content: space-between;
+    width: 95%;
+    align-items: center;
+}
+
 .leave-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
     background-color: #3c3a37;
     color: #bababa;
-    box-shadow: 0 4px 0 #2a2825;
-    min-width: 9rem;
-    display: flex;
+    box-shadow: 0 4px 0 #000;
     justify-content: center;
     align-items: center;
     border-radius: 5px;
@@ -130,17 +134,8 @@ end-message {
     transform: translateX(10px);
 }
 
-.chat-btn {
+.mobile-chat {
     display: none;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    color: white;
-    box-shadow: none;
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 100;
 }
 
 .mobile-leave,
@@ -183,6 +178,7 @@ end-message {
     gap: 25px;
     font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif;
     text-align: center;
+    max-width: 30%;
 }
 
 .option-box p {
@@ -210,6 +206,7 @@ end-message {
     justify-content: center;
     align-items: center;
     border-radius: 5px;
+    height: 3rem;
     font-family: 'Rajdhani', sans-serif;
     font-size: 18px;
     font-weight: 800;
@@ -236,7 +233,7 @@ end-message {
 .cancel-btn {
     background-color: #3c3a37;
     color: #bababa;
-    box-shadow: 0 4px 0 #2a2825;
+    box-shadow: 0 4px 0 #000;
 }
 
 .cancel-btn:hover {
@@ -471,6 +468,45 @@ end-message {
     gap: 1em;
 }
 
+.sound-ico-container {
+    display: flex;
+    gap: 1em
+}
+
+
+
+.sound-ico {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    width: 1.5rem;
+    height: 2rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    border-bottom: 4px solid #000000;
+    background-color: #3a3734;
+    color: white;
+    transition: active 0.5s ease-in-out;
+
+    &:hover {
+        opacity: 0.60;
+    }
+
+    &:active {
+        border-bottom: 1px solid #000;
+    }
+}
+
+
+.win-animation {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+}
 
 /* ───────────────────────────────────────────────────────────────────────
    Mobile
@@ -501,10 +537,7 @@ end-message {
 
     main.flipped {
         flex-direction: column-reverse;
-    }
-
-    .black {
-        border-top: 1px solid #454340;
+        justify-content: flex-end;
     }
 
     /* Chat (mobile) */
@@ -529,15 +562,14 @@ end-message {
     }
 
     chat-component {
+        display: flex;
         position: fixed;
         top: 0;
         left: 0;
         height: 95%;
-        display: flex;
         background: #262522;
         width: 100%;
         z-index: 1109;
-        padding-top: 10%;
         overflow-y: auto;
         scrollbar-color: #232220 #3a3734;
     }
@@ -561,20 +593,28 @@ end-message {
         display: none;
     }
 
-    .mobile-leave {
+    .mobile-leave,
+    .mobile-chat {
         display: flex;
-        height: 1.5em;
-        width: 1.5em;
-        padding: 1em;
-        position: fixed;
-        top: 0;
-        left: 0;
-    }
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        width: 1.5rem;
+        height: 2rem;
+        padding: 0.5rem 1.5rem;
+        border-radius: 6px;
+        border-bottom: 4px solid #000000;
+        background-color: #3a3734;
+        color: white;
+        transition: active 0.5s ease-in-out;
 
-    .chat-btn {
-        display: flex;
-        padding: 1em;
-        right: 0;
+        &:hover {
+            opacity: 0.60;
+        }
+
+        &:active {
+            border-bottom: 1px solid #000;
+        }
     }
 
     .mobile-chat {
@@ -678,9 +718,7 @@ end-message {
     }
 
     .option-btn {
-        min-width: 6rem;
-        padding: 10px 17px;
-        font-size: 12px;
+        font-size: 1em;
     }
 }
 
@@ -713,4 +751,16 @@ end-message {
     .puzzle-title {
         font-size: 1em;
     }
+
+    .win-animation {
+        display: none;
+        position: absolute;
+        bottom: auto;
+        top: 0;
+        left: 0;
+        rotate: 180deg;
+        width: 100%;
+        z-index: 50;
+    }
+
 }

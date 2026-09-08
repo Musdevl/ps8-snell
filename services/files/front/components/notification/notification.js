@@ -118,7 +118,7 @@ class NotificationBar extends HTMLElement {
 
     playAchievementSound() {
         this.achievement_sound.currentTime = 0;
-        this.achievement_sound.play().catch(() => { });
+        if(accountService.hasSound()) this.achievement_sound.play().catch(() => { });
     }
 }
 

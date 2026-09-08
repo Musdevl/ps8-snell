@@ -21,6 +21,8 @@ class Chat extends HTMLElement {
 
     forfeit_button;
 
+    leave_chat_btn;
+
 
     constructor() {
         super();
@@ -38,6 +40,8 @@ class Chat extends HTMLElement {
         this.emote_section = null;
 
         this.draw_button = null;
+
+        this.leave_chat_btn = null;
 
         this.forfeit_button = null;
 
@@ -66,10 +70,9 @@ class Chat extends HTMLElement {
         });
 
         this.send_message_btn = this.shadowRoot.querySelector('.send-message-btn');
-
         this.chat_content = this.shadowRoot.querySelector('.chat-section');
-
         this.emote_section = this.shadowRoot.querySelector('.emote-section');
+        this.leave_chat_btn = this.shadowRoot.querySelector('.mobile-leave-chat');
 
         this.emote_section.addEventListener('wheel', e => {
             e.preventDefault();
@@ -87,6 +90,15 @@ class Chat extends HTMLElement {
             if (val && val.trim() !== '') {
                 this.sendMessage(this.userInput.value, "text");
             }
+        })
+
+        this.leave_chat_btn.addEventListener("click", () => {
+            this.dispatchEvent(new CustomEvent("leave-chat"), {
+                detail: {
+                    bubbles: true,
+                    composed: true
+                }
+            })
         })
 
         this.forfeit_button = this.shadowRoot.querySelector('.forfeit-btn');
@@ -118,9 +130,7 @@ class Chat extends HTMLElement {
     }
 
     sendMessage(value, kind) {
-
         const message = { value, kind };
-
         this.dispatchEvent(new CustomEvent("send-message", {
             detail: {
                 message: message,

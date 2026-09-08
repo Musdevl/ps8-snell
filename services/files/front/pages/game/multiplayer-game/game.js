@@ -29,6 +29,7 @@ let modal;
 let modal_message;
 let modal_confirm;
 let modal_cancel;
+let user_color;
 
 await accountService.checkAuth();
 
@@ -58,7 +59,7 @@ async function waitForBoard() {
     waiting_room = document.querySelector(".waiting-section");
     game_container = document.querySelector('.game-container');
     leave_btn = document.querySelector(".leave-btn");
-    chat_btn = document.querySelector(".chat-btn");
+    chat_btn = document.querySelector(".mobile-chat");
     leave_chat_btn = document.querySelector(".mobile-chat-leave");
 
     modal = document.getElementById('game-modal');
@@ -78,6 +79,7 @@ async function setupGame() {
     setupSocketEvents();
     setupBoardEvents();
     setupControls();
+    setupSoundBtn();
 
     await whitePlayerInfoComponent.setColor(COLORS.WHITE);
     await blackPlayerInfoComponent.setColor(COLORS.BLACK);
@@ -87,12 +89,46 @@ async function setupGame() {
     setupEndMessage(endMessage);
 }
 
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
 function setupSocketEvents() {
     socket.on('start', async (data) => {
         await onGameReady(data);
 
         const whitePlayerInfo = await getUserInformation(data.white);
         const blackPlayerInfo = await getUserInformation(data.black);
+
+        const chat = document.querySelector('.chat-container')
+        chat.style.display = "block";
 
         if (accountService.getUserId() === data.white) {
             userId = data.white;
@@ -244,7 +280,8 @@ function setupControls() {
         chat.classList.add("slide-in");
     });
 
-    leave_chat_btn.addEventListener("click", () => {
+    const chat_component = document.querySelector('chat-component');
+    chat_component.addEventListener("leave-chat", () => {
         if (!gameId) return;
         const chat = document.querySelector('.chat-container');
         chat.classList.remove("slide-in");
@@ -358,10 +395,33 @@ async function handleUpdate(data) {
     if (data.status !== "CONTINUE") {
         console.log("[GAME] - Game Over:", data.status);
         closeModal();
-        endMessage.loadMessage(data.status);
+        const hasWon =
+            (data.status === "BLACK" && user_color === COLORS.BLACK) ||
+            (data.status === "WHITE" && user_color === COLORS.WHITE);
+
+        if (hasWon) playWinAnimation();
+
         whitePlayerInfoComponent.stopTimer();
         blackPlayerInfoComponent.stopTimer();
+        setTimeout(() => {
+            endMessage.loadMessage(data.status)
+        }, 700);
     }
+}
+
+
+function playWinAnimation() {
+    const confetti = document.querySelector('.win-animation');
+    const baseSrc = confetti.getAttribute('src').split('?')[0];
+
+    // On cache d'abord (utile si l'animation a déjà tourné une fois avant)
+    confetti.style.display = "none";
+    confetti.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+
+    // Puis on l'affiche
+    requestAnimationFrame(() => {
+        confetti.style.display = "block";
+    });
 }
 
 async function updatePlayerInfo(playerInfo, colorTurn, inventory, time, isStarting = false) {
@@ -378,11 +438,22 @@ async function startNewGame() {
     socket.emit("join", { gameType: GAME_TYPE, userId, gameMode });
 
     waiting_room.style.display = "flex";
-    game_container.style.filter = "blur(6px)";
+    // game_container.style.filter = "blur(6px)";
 
     boardComponent.clear();
+
     await whitePlayerInfoComponent.clear();
     await blackPlayerInfoComponent.clear();
+    whitePlayerInfoComponent.resetRotationCell();
+    blackPlayerInfoComponent.resetRotationCell();
+
+    const profile_picture = accountService.getProfilePicture().picture;
+    const userName = accountService.getUserName();
+    const elo = accountService.getElo();
+
+    whitePlayerInfoComponent.setPlayerAvatar(profile_picture);
+    whitePlayerInfoComponent.setPlayerName(userName);
+    whitePlayerInfoComponent.setPlayerElo(elo);
 
     game_chat.clearContent();
     endMessage.clear();
@@ -390,26 +461,25 @@ async function startNewGame() {
 
 function setPlayerColor(white_id, black_id) {
     const main = document.querySelector('main');
-    let color = null;
-
     if (white_id === userId) {
-        color = COLORS.WHITE;
+        user_color = COLORS.WHITE;
         blackPlayerInfoComponent.disableRotation();
         main.classList.remove('flipped');
     } else if (black_id === userId) {
-        color = COLORS.BLACK;
+        user_color = COLORS.BLACK;
         whitePlayerInfoComponent.disableRotation();
         blackPlayerInfoComponent.reverse();
         main.classList.add('flipped');
     }
 
-    boardComponent.setPlayerColor(color);
-    boardComponent.setBoardOrientation(color);
-    whitePlayerInfoComponent.setPlayerColor(color);
-    blackPlayerInfoComponent.setPlayerColor(color);
-    whitePlayerInfoComponent.setBoardOrientation(color);
-    blackPlayerInfoComponent.setBoardOrientation(color);
-    endMessage.setColor(color);
+    boardComponent.setPlayerColor(user_color);
+    boardComponent.setBoardOrientation(user_color);
+    whitePlayerInfoComponent.setPlayerColor(user_color);
+    blackPlayerInfoComponent.setPlayerColor(user_color);
+    whitePlayerInfoComponent.setBoardOrientation(user_color);
+    blackPlayerInfoComponent.setBoardOrientation(user_color);
+    endMessage.setColor(user_color);
+
 }
 
 

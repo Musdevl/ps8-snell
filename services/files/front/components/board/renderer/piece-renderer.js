@@ -248,12 +248,13 @@ export class PiecesRenderer {
 
     playActionSound() {
         this.actionSound.currentTime = 0;
-        this.actionSound.play().catch(() => { });
+        if (accountService.hasSound())
+            this.actionSound.play().catch(() => { });
     }
 
     playRotateSound() {
         this.rotateSound.currentTime = 0;
-        this.rotateSound.play().catch(() => { });
+        if (accountService.hasSound()) this.rotateSound.play().catch(() => { });
     }
 
 

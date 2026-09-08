@@ -375,7 +375,6 @@ app.post("/api/user/history", async (req, res) => {
     try {
         let { userId, game } = req.body;
         await UserApiHandler.addGameHistory(userId, game);
-        console.log("History posted successfully", userId, JSON.stringify(game));
         res.json({ message: 'History posted successfully' }, 200);
     }
     catch (error) {
@@ -483,6 +482,28 @@ app.get('/api/user/leaderboard/{userId}', async (req, res) => {
         res.json({ rank });
     } catch (e) {
         res.json({ error: e.message }, 500);
+    }
+});
+
+// GET /api/user/stats/online
+app.get('/api/user/stats/online', (req, res) => {
+    try {
+        res.json(UserApiHandler.getOnlineUsers(), 200);
+    } catch (error) {
+        console.error('Error getting online users:', error);
+        res.json({ error: 'Error getting online users', message: error.message }, 400);
+    }
+});
+
+// GET /api/user/stats/registrations?days=7
+app.get('/api/user/stats/registrations', async (req, res) => {
+    try {
+        const days = Number(req.query?.days) || 7;
+        const stats = await UserApiHandler.getRegistrationStats(days);
+        res.json(stats, 200);
+    } catch (error) {
+        console.error('Error getting registration stats:', error);
+        res.json({ error: 'Error getting registration stats', message: error.message }, 400);
     }
 });
 

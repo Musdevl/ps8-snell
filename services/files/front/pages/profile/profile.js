@@ -46,63 +46,63 @@ async function loadProfile() {
         const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${profileUserId}`);
         user = await res.json();
 
-        if (!res.ok) {
-            window.location.replace(`/`);
-            return;
-        }
-
-        chatId = user.friends.find(f => f.friendId === accountService.getUserId())?.chatId ?? null;
-
-        setAchievements(user.achievements);
-
-        const isOwnProfile = accountService.getUserId() === profileUserId;
-        if (isOwnProfile) {
-            document.querySelector('.profile-right').style.display = 'none';
-        }
-
-        await chat.readyPromise;
-        chat.disableOptionButtons();
-
-        await renderProfile();
-        await renderHistory();
-
-        document.querySelector("#mobile-logout-btn").addEventListener("click", async () => {
-            await accountService.logout();
-            window.location.replace(`/pages/home/play`);
-        });
-
-        if (profileUserId !== accountService.getUserId()) {
-
-
-            const tabProfile = document.querySelector('#tab-profile');
-            const tabChat = document.querySelector('#tab-chat');
-            const profile_left = document.querySelector('.profile-left');
-            const profile_right = document.querySelector('.profile-right');
-
-            tabProfile.addEventListener('click', () => {
-                tabProfile.classList.add('active');
-                tabChat.classList.remove('active');
-                profile_left.style.display = 'block';
-                profile_right.style.display = 'none';
-            });
-
-            tabChat.addEventListener('click', async () => {
-                tabChat.classList.add('active');
-                tabProfile.classList.remove('active');
-                profile_left.style.display = 'none';
-                profile_right.style.display = 'flex';
-            });
-
-            document.querySelector('#mobile-logout-btn').style.display = "none"
-
-        } else {
-            document.querySelector('.tabs').style.display = "none";
-        }
-
-
     } catch (err) {
         console.error(err);
+        notificationService.notify("User not found", "error");
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        await sleep(1000);
+        window.location.replace(`/`);
     }
+
+    chatId = user.friends.find(f => f.friendId === accountService.getUserId())?.chatId ?? null;
+
+    setAchievements(user.achievements);
+
+    const isOwnProfile = accountService.getUserId() === profileUserId;
+    if (isOwnProfile) {
+        document.querySelector('.profile-right').style.display = 'none';
+    }
+
+    await chat.readyPromise;
+    chat.disableOptionButtons();
+
+    await renderProfile();
+    await renderHistory();
+
+    document.querySelector("#mobile-logout-btn").addEventListener("click", async () => {
+        await accountService.logout();
+        window.location.replace(`/pages/home/play`);
+    });
+
+    if (profileUserId !== accountService.getUserId()) {
+
+        const tabProfile = document.querySelector('#tab-profile');
+        const tabChat = document.querySelector('#tab-chat');
+        const profile_left = document.querySelector('.profile-left');
+        const profile_right = document.querySelector('.profile-right');
+
+        tabProfile.addEventListener('click', () => {
+            tabProfile.classList.add('active');
+            tabChat.classList.remove('active');
+            profile_left.style.display = 'block';
+            profile_right.style.display = 'none';
+        });
+
+        tabChat.addEventListener('click', async () => {
+            tabChat.classList.add('active');
+            tabProfile.classList.remove('active');
+            profile_left.style.display = 'none';
+            profile_right.style.display = 'flex';
+        });
+
+        document.querySelector('#mobile-logout-btn').style.display = "none"
+
+    } else {
+        document.querySelector('.tabs').style.display = "none";
+    }
+
+
+
 }
 
 async function fetchUserId(username) {
@@ -188,11 +188,29 @@ async function renderFriends() {
 }
 
 async function renderHistory() {
-    const history = user.history ?? [];
-    const list = document.getElementById('history');
+    const history = [...(user.history ?? [])].reverse();
+    const table = document.getElementById('history');
+
+    // Header dans un thead dédié
+    table.innerHTML = `
+        <thead>
+            <tr class="history-header">
+                <th class="game-type-col history-header-col"></th>
+                <th class="players-col history-header-col">Players</th>
+                <th class="result-col history-header-col">Result</th>
+                <th class="actions-col history-header-col">Actions</th>
+                <th class="date-col history-header-col">Date</th>
+            </tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+    `;
+
+    const tbody = document.getElementById('history-body');
 
     if (history.length === 0) {
-        list.innerHTML = '<span class="missing">No games played yet.</span>';
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = `<td colspan="6" class="missing">No games played yet.</td>`;
+        tbody.appendChild(emptyRow);
         return;
     }
 
@@ -214,29 +232,62 @@ async function renderHistory() {
         )
     );
 
-    list.innerHTML = '';
+    let is_odd = true;
 
     history.forEach(game => {
+        if ((game.actions_count-2) <= 0) return;
         const isWhite = game.whiteId === profileUserId;
         const opponentId = isWhite ? game.blackId : game.whiteId;
         const isDraw = game.winnerId === 'DRAW';
         const won = game.winnerId === profileUserId;
         const resultClass = isDraw ? 'draw' : (won ? 'win' : 'loss');
 
-        const el = document.createElement('div');
-        el.className = `game-card ${resultClass}`;
+        const el = document.createElement('tr');
+        el.className = `history-item ${is_odd ? "odd-item" : ""}`;
         el.innerHTML = `
-            <span class="game-players">
-                <span class="me">${username}</span>
-                <span class="sep">vs</span>
-                ${opponentMap[opponentId] ?? opponentId}
-            </span>
+            <td class="game-type-col">${get_game_ico(game.gameType)}</td>
+            <td class="players-col">
+                <div class="player-container">
+                    <div class="${isWhite ? "white-rect" : "black-rect"}"></div>
+                    <span class="me player-name">${username}</span>
+                </div>
+                <div class="player-container">
+                    <div class="${isWhite ? "black-rect" : "white-rect"}"></div>
+                    <span class="player-name">${opponentMap[opponentId] ?? opponentId}</span>
+                </div>
+            </td>
+            <td class="result-col">
+                <img class="result-ico" src="/assets/${resultClass}.svg" alt="result">
+            </td>
+            <td class="actions-col">
+                <span class="game-history-field">${Math.max(0, game.actions_count - 2)}</span>
+            </td>
+            <td class="date-col">
+                <span class="game-history-field">${formatDate(game.startDate)}</span>
+            </td>
         `;
         el.addEventListener('click', () => {
             window.location.href = `/pages/game/review/${game.gameId}`;
         });
-        list.appendChild(el);
+        tbody.appendChild(el);
+        is_odd = !is_odd;
     });
+}
+
+function get_game_ico(gameType) {
+    switch (gameType) {
+        case "MULTI":
+            return `<img class="game-type-ico" src="/assets/multiplayer.svg" alt="multi-ico">`
+        case "AI":
+            return `<img class="game-type-ico" src="/assets/bot.svg" alt="bot-ico">`
+        default:
+            return "";
+    }
+}
+
+function formatDate(date) {
+    const splited = date.split('T');
+    return `${splited[0]} - ${splited[1].split(".")[0]}`
 }
 
 async function renderInventory() {

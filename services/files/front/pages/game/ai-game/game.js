@@ -19,6 +19,8 @@ let modal_message;
 let modal_confirm;
 let modal_cancel;
 
+let user_color;
+
 await accountService.checkAuth();
 
 // Initialisation
@@ -86,6 +88,7 @@ async function setupGame() {
     });
 
     // Setting up 
+    setupSoundBtn();
     setupPlayerInfoEvents(whitePlayerInfoComponent);
     setupPlayerInfoEvents(blackPlayerInfoComponent);
     setupBoardComponentEvents(boardComponent);
@@ -95,6 +98,37 @@ async function setupGame() {
     startNewGame();
 }
 
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+}
 
 // ─── Application ordonnée des états de partie ────────────────────────────────
 // Quand on joue les noirs, le serveur envoie deux évènements coup sur coup :
@@ -305,10 +339,31 @@ async function handleUpdate(data) {
 
     await setPlayerColor(data.white, data.black, boardComponent);
 
-
     if (data.status !== "CONTINUE") {
-        endMessage.loadMessage(data.status);
+        console.log("[GAME] - Game Over: ", data.status);
+        const hasWon =
+            (data.status === "BLACK" && color === COLORS.BLACK) ||
+            (data.status === "WHITE" && color === COLORS.WHITE);
+
+        if (hasWon) playWinAnimation();
+        setTimeout(() => {
+            endMessage.loadMessage(data.status)
+        }, 700);
     };
+}
+
+function playWinAnimation() {
+    const confetti = document.querySelector('.win-animation');
+    const baseSrc = confetti.getAttribute('src').split('?')[0];
+
+    // On cache d'abord (utile si l'animation a déjà tourné une fois avant)
+    confetti.style.display = "none";
+    confetti.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+
+    // Puis on l'affiche
+    requestAnimationFrame(() => {
+        confetti.style.display = "block";
+    });
 }
 
 async function updatePlayerInfo(playerInfo, colorTurn, inventory, time) {
@@ -332,27 +387,26 @@ function startNewGame() {
 
 async function setPlayerColor(white_id, black_id) {
     const main = document.querySelector('main');
-    let color = null;
     if (white_id === userId) {
-        color = COLORS.WHITE;
+        user_color = COLORS.WHITE;
         blackPlayerInfoComponent.disableRotation();
         main.classList.remove('flipped');
     }
     else if (black_id === userId) {
-        color = COLORS.BLACK;
+        user_color = COLORS.BLACK;
         whitePlayerInfoComponent.disableRotation();
         blackPlayerInfoComponent.reverse();
         // main.flipped existe deja dans shared/game.css : il renvoie le
         // panneau du joueur de son cote, comme en multijoueur.
         main.classList.add('flipped');
     }
-    boardComponent.setPlayerColor(color);
-    boardComponent.setBoardOrientation(color);
-    whitePlayerInfoComponent.setPlayerColor(color);
-    blackPlayerInfoComponent.setPlayerColor(color);
-    whitePlayerInfoComponent.setBoardOrientation(color);
-    blackPlayerInfoComponent.setBoardOrientation(color);
-    await endMessage.setColor(color);
+    boardComponent.setPlayerColor(user_color);
+    boardComponent.setBoardOrientation(user_color);
+    whitePlayerInfoComponent.setPlayerColor(user_color);
+    blackPlayerInfoComponent.setPlayerColor(user_color);
+    whitePlayerInfoComponent.setBoardOrientation(user_color);
+    blackPlayerInfoComponent.setBoardOrientation(user_color);
+    await endMessage.setColor(user_color);
 }
 
 // Lancer l'initialisation quand le DOM est prêt

@@ -137,7 +137,7 @@ button {
         margin-bottom: 12px;
     }
 
-    .button-group{
+    .button-group {
         flex-direction: column;
     }
 
@@ -148,7 +148,7 @@ button {
     button {
         padding: 14px;
         width: 100%;
-        font-size: 12px;
+        font-size: 1em;
         font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif;
     }
 

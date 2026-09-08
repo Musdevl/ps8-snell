@@ -196,10 +196,6 @@ async function renderChat() {
     });
 }
 
-function playSound(sound) {
-    sound.play().catch((e) => { console.log(e) });
-}
-
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 await renderChat();

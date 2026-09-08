@@ -72,6 +72,11 @@ function getPlayersInRange(player) {
     });
 }
 
+// Joueurs actuellement en file d'attente de matchmaking.
+export function queueSize() {
+    return players.length;
+}
+
 export function remove(player) {
     const before = players.length;
     players = players.filter(p => p.userId !== player.userId);

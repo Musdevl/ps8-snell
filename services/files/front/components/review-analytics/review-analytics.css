@@ -16,8 +16,13 @@
     align-items: center;
     height: 5rem;
     font-size: 1.3rem;
+    font-weight: 600;
     color: white;
-    border-bottom: 1px solid #3a3734;
+}
+
+.review-ico {
+    height: 2em;
+    width: 2em;
 }
 
 .action-item {
@@ -58,7 +63,8 @@
 .player-section {
     grid-row: 1;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
+    gap: 2em;
     align-items: center;
 }
 
@@ -109,14 +115,16 @@
 
 @media (max-width:64em) {
 
-    .player-section,
-    .action-section {
+    .player-section {
         display: none;
     }
+
+
 
     .review-wrapper {
         display: flex;
         justify-content: space-evenly;
+        flex-direction: column-reverse;
         width: 100%;
     }
 

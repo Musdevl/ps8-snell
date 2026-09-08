@@ -56,7 +56,7 @@ const puzzle_15 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(15, "NO NAME", game, puzzle_steps, PUZZLE_DIFFICULTY.LEGEND, playerColor);
+        return new Puzzle(15, "Miroir Fatal", game, puzzle_steps, PUZZLE_DIFFICULTY.LEGEND, playerColor);
     }
 }
 
@@ -107,7 +107,7 @@ const puzzle_14 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(16, "No Name", game, puzzle_steps, PUZZLE_DIFFICULTY.LEGEND, playerColor);
+        return new Puzzle(16, "Dernier Rayon", game, puzzle_steps, PUZZLE_DIFFICULTY.LEGEND, playerColor);
     }
 }
 

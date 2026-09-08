@@ -166,6 +166,8 @@ async function setupGame() {
 
     // Setting up
 
+    setupSoundBtn();
+
     // Récuperer la review de la game et setup les params
 
     const splitedPathName = window.location.pathname.split("/");
@@ -186,6 +188,38 @@ async function setupGame() {
 
     whitePlayerInfoComponent.setPlayerInfo(whitePlayerInfo)
     blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo)
+
+}
+
+
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
 
 }
 
@@ -315,9 +349,14 @@ function showGameOverModalOnce() {
     setTimeout(() => {
         showModal({
             message: game_result ? `Game over — ${game_result}` : "Game Over ?",
-            confirmLabel: "Leave",
-            cancelLabel: "Cancel",
+            confirmLabel: "Restart",
+            cancelLabel: "Leave",
             onConfirm: () => {
+                goToState(0);
+                closeModal();
+                startPlayback();
+            },
+            onCancel: () => {
                 window.location.replace(`/`);
             }
         });

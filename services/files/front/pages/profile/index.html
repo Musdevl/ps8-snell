@@ -26,9 +26,9 @@
     </div>
     <main>
 
-        <div id="loader">Loading...</div>
-
-
+        <div id="loader">
+            <div class="spinner"></div>
+        </div>
 
         <div id="profile" class="hidden">
             <div class="profile-left">
@@ -78,7 +78,16 @@
                 </section>
                 <section class="section">
                     <div class="section-title">Multiplayer Match history</div>
-                    <div id="history">
+                    <div class="history-container">
+                        <!-- <div class="history-header">
+                            <div class="game-type-header history-header-item"></div>
+                            <div class="players-header history-header-item">Players</div>
+                            <div class="result-header history-header-item">Result</div>
+                            <div class="actions-header history-header-item">Actions</div>
+                            <div class="Date history-header-item">Date</div>
+                        </div> -->
+                        <table id="history">
+                        </table>
                     </div>
                 </section>
 
