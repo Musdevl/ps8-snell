@@ -112,9 +112,7 @@ end-message {
 .leave-btn {
     background-color: #3c3a37;
     color: #bababa;
-    box-shadow: 0 4px 0 #2a2825;
-    min-width: 9rem;
-    display: flex;
+    box-shadow: 0 4px 0 #000;
     justify-content: center;
     align-items: center;
     border-radius: 5px;
@@ -235,7 +233,7 @@ end-message {
 .cancel-btn {
     background-color: #3c3a37;
     color: #bababa;
-    box-shadow: 0 4px 0 #2a2825;
+    box-shadow: 0 4px 0 #000;
 }
 
 .cancel-btn:hover {
@@ -501,6 +499,15 @@ end-message {
 }
 
 
+.win-animation {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+}
+
 /* ───────────────────────────────────────────────────────────────────────
    Mobile
    ─────────────────────────────────────────────────────────────────────── */
@@ -744,4 +751,16 @@ end-message {
     .puzzle-title {
         font-size: 1em;
     }
+
+    .win-animation {
+        display: none;
+        position: absolute;
+        bottom: auto;
+        top: 0;
+        left: 0;
+        rotate: 180deg;
+        width: 100%;
+        z-index: 50;
+    }
+
 }

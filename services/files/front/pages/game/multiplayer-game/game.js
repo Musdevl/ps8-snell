@@ -29,6 +29,7 @@ let modal;
 let modal_message;
 let modal_confirm;
 let modal_cancel;
+let user_color;
 
 await accountService.checkAuth();
 
@@ -394,10 +395,33 @@ async function handleUpdate(data) {
     if (data.status !== "CONTINUE") {
         console.log("[GAME] - Game Over:", data.status);
         closeModal();
-        endMessage.loadMessage(data.status);
+        const hasWon =
+            (data.status === "BLACK" && user_color === COLORS.BLACK) ||
+            (data.status === "WHITE" && user_color === COLORS.WHITE);
+
+        if (hasWon) playWinAnimation();
+
         whitePlayerInfoComponent.stopTimer();
         blackPlayerInfoComponent.stopTimer();
+        setTimeout(() => {
+            endMessage.loadMessage(data.status)
+        }, 700);
     }
+}
+
+
+function playWinAnimation() {
+    const confetti = document.querySelector('.win-animation');
+    const baseSrc = confetti.getAttribute('src').split('?')[0];
+
+    // On cache d'abord (utile si l'animation a déjà tourné une fois avant)
+    confetti.style.display = "none";
+    confetti.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+
+    // Puis on l'affiche
+    requestAnimationFrame(() => {
+        confetti.style.display = "block";
+    });
 }
 
 async function updatePlayerInfo(playerInfo, colorTurn, inventory, time, isStarting = false) {
@@ -437,26 +461,25 @@ async function startNewGame() {
 
 function setPlayerColor(white_id, black_id) {
     const main = document.querySelector('main');
-    let color = null;
-
     if (white_id === userId) {
-        color = COLORS.WHITE;
+        user_color = COLORS.WHITE;
         blackPlayerInfoComponent.disableRotation();
         main.classList.remove('flipped');
     } else if (black_id === userId) {
-        color = COLORS.BLACK;
+        user_color = COLORS.BLACK;
         whitePlayerInfoComponent.disableRotation();
         blackPlayerInfoComponent.reverse();
         main.classList.add('flipped');
     }
 
-    boardComponent.setPlayerColor(color);
-    boardComponent.setBoardOrientation(color);
-    whitePlayerInfoComponent.setPlayerColor(color);
-    blackPlayerInfoComponent.setPlayerColor(color);
-    whitePlayerInfoComponent.setBoardOrientation(color);
-    blackPlayerInfoComponent.setBoardOrientation(color);
-    endMessage.setColor(color);
+    boardComponent.setPlayerColor(user_color);
+    boardComponent.setBoardOrientation(user_color);
+    whitePlayerInfoComponent.setPlayerColor(user_color);
+    blackPlayerInfoComponent.setPlayerColor(user_color);
+    whitePlayerInfoComponent.setBoardOrientation(user_color);
+    blackPlayerInfoComponent.setBoardOrientation(user_color);
+    endMessage.setColor(user_color);
+
 }
 
 

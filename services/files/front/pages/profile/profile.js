@@ -188,7 +188,7 @@ async function renderFriends() {
 }
 
 async function renderHistory() {
-    const history = user.history ?? [];
+    const history = [...(user.history ?? [])].reverse();
     const table = document.getElementById('history');
 
     // Header dans un thead dédié
@@ -235,6 +235,7 @@ async function renderHistory() {
     let is_odd = true;
 
     history.forEach(game => {
+        if ((game.actions_count-2) <= 0) return;
         const isWhite = game.whiteId === profileUserId;
         const opponentId = isWhite ? game.blackId : game.whiteId;
         const isDraw = game.winnerId === 'DRAW';
