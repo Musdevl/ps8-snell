@@ -332,7 +332,7 @@ async function nextPuzzleStep() {
                     window.location.replace(`/`);
                 }
             });
-        }, 700)
+        }, 1000)
 
 
         return;

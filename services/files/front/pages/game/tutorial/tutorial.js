@@ -202,7 +202,7 @@ async function nextTutorielStep() {
                     window.location.replace(`/`);
                 }
             });
-        });
+        }, 1000);
 
         return;
     }
