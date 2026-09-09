@@ -317,17 +317,23 @@ async function nextPuzzleStep() {
     await handleUpdate(puzzle.game_states[puzzle_step_index], false)
 
     if (puzzle_step_index >= puzzle.steps.length - 1) {
-        showModal({
-            message: "Congratulations, you finished the puzzle !",
-            confirmLabel: "Next",
-            cancelLabel: "Leave",
-            onConfirm: () => {
-                window.location.replace(`/pages/game/puzzle/index.html?id=${++puzzle.id}`)
-            },
-            onCancel: () => {
-                window.location.replace(`/`);
-            }
-        });
+
+        playWinAnimation();
+
+        setTimeout(() => {
+            showModal({
+                message: "Congratulations, you finished the puzzle !",
+                confirmLabel: "Next",
+                cancelLabel: "Leave",
+                onConfirm: () => {
+                    window.location.replace(`/pages/game/puzzle/index.html?id=${++puzzle.id}`)
+                },
+                onCancel: () => {
+                    window.location.replace(`/`);
+                }
+            });
+        }, 700)
+
 
         return;
     }
@@ -338,6 +344,22 @@ async function nextPuzzleStep() {
         puzzle_step_index++;
         await handleUpdate(puzzle.game_states[puzzle_step_index], false)
     }
+}
+
+
+
+function playWinAnimation() {
+    const confetti = document.querySelector('.win-animation');
+    const baseSrc = confetti.getAttribute('src').split('?')[0];
+
+    // On cache d'abord (utile si l'animation a déjà tourné une fois avant)
+    confetti.style.display = "none";
+    confetti.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+
+    // Puis on l'affiche
+    requestAnimationFrame(() => {
+        confetti.style.display = "block";
+    });
 }
 
 // Lancer l'initialisation quand le DOM est prêt

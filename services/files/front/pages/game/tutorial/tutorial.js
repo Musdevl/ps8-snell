@@ -171,19 +171,37 @@ async function previousTutorielStep() {
     tutorial_next.disabled = landingStep.blocking;
 }
 
+
+function playWinAnimation() {
+    const confetti = document.querySelector('.win-animation');
+    const baseSrc = confetti.getAttribute('src').split('?')[0];
+
+    // On cache d'abord (utile si l'animation a déjà tourné une fois avant)
+    confetti.style.display = "none";
+    confetti.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+
+    // Puis on l'affiche
+    requestAnimationFrame(() => {
+        confetti.style.display = "block";
+    });
+}
+
 async function nextTutorielStep() {
     if (tutorial_index >= tutorial_steps.length - 1) {
 
-        showModal({
-            message: "Congratulations, you finished the tutorial !",
-            confirmLabel: "Do it again",
-            cancelLabel: "Leave",
-            onConfirm: () => {
-                window.location.replace('/pages/game/tutorial/index.html');
-            },
-            onCancel: () => {
-                window.location.replace(`/`);
-            }
+        playWinAnimation();
+        setTimeout(() => {
+            showModal({
+                message: "Congratulations, you finished the tutorial !",
+                confirmLabel: "Do it again",
+                cancelLabel: "Leave",
+                onConfirm: () => {
+                    window.location.replace('/pages/game/tutorial/index.html');
+                },
+                onCancel: () => {
+                    window.location.replace(`/`);
+                }
+            });
         });
 
         return;
