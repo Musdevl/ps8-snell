@@ -99,7 +99,7 @@ class Board extends HTMLElement {
                 this._onResize();
             });
         });
-       
+
         this._resizeObserver.observe(document.documentElement);
 
 
@@ -229,6 +229,10 @@ class Board extends HTMLElement {
         if (this.boardRenderer?.setFlipped(color === COLORS.BLACK)) {
             this.boardRenderer.renderGrid(this.gridState);
         }
+    }
+
+    drawMistake(row, col) {
+        this.boardRenderer.drawMistake(row, col);
     }
 
     selectPiece(position) {

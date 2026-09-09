@@ -215,6 +215,16 @@ async function nextTutorielStep() {
     tutorial_next.disabled = step.blocking;
 }
 
+function flashMistake() {
+    // Le composant custom element lui-même (this) reçoit la classe
+    boardComponent.classList.remove('mistake'); // reset si un flash était déjà en cours
+    void boardComponent.offsetWidth; // force un reflow pour permettre de rejouer l'animation
+    boardComponent.classList.add('mistake');
+
+    boardComponent.addEventListener('animationend', () => {
+        boardComponent.classList.remove('mistake');
+    }, { once: true });
+}
 
 function setupBoardComponentEvents(boardComponent) {
     // Component event setup
@@ -243,6 +253,7 @@ function setupBoardComponentEvents(boardComponent) {
             playSound(correct_action);
         }
         else {
+            flashMistake();
             playSound(incorrect_action)
         }
     });

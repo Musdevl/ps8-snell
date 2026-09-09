@@ -80,10 +80,6 @@
 
 
 @media (max-width: 64em) {
-    :host {
-        width: 100%;
-    }
-
     body {
         overflow: hidden;
     }

@@ -164,13 +164,24 @@ function setupSoundBtn() {
 
 }
 
+function flashMistake() {
+    // Le composant custom element lui-même (this) reçoit la classe
+    boardComponent.classList.remove('mistake'); // reset si un flash était déjà en cours
+    void boardComponent.offsetWidth; // force un reflow pour permettre de rejouer l'animation
+    boardComponent.classList.add('mistake');
+
+    boardComponent.addEventListener('animationend', () => {
+        boardComponent.classList.remove('mistake');
+    }, { once: true });
+}
 
 function setupBoardComponentEvents(boardComponent) {
     // Component event setup
     boardComponent.addEventListener("action", e => {
+        // try {
         let action = e.detail.action;
-
-        if (action.split("/")[0] === "PLACE") {
+        const splitted_actions = action.split("/");
+        if (splitted_actions[0] === "PLACE") {
             if (boardComponent.colorTurn === COLORS.WHITE && whitePlayerInfoComponent.getSelectedInventoryCell())
                 action += `,${whitePlayerInfoComponent.getSelectedInventoryCell().direction}`;
             else if (boardComponent.colorTurn === COLORS.BLACK && blackPlayerInfoComponent.getSelectedInventoryCell())
@@ -186,8 +197,18 @@ function setupBoardComponentEvents(boardComponent) {
             playSound(correct_action);
         }
         else {
+            // const position = splitted_actions[1].split(",")
+            // boardComponent.drawMistake(Number(position[0].split("")[0]), Number(position[0].split("")[1]))
+            flashMistake();
             playSound(incorrect_action)
+            // setTimeout(() => {
+            //     boardComponent.clearHighlightedCells();
+            // }, 2000);
         }
+        // } catch (error) {
+        //     console.log(error);
+        // }
+
     });
 
 
