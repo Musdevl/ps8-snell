@@ -19,6 +19,10 @@ const puzzle_3 =
             "ROTATE/97,48", // WHITE
         ];
 
+        const hints = [
+            [[9, 7]]
+        ]
+
         const board = new Board();
 
         const white_shooter = pieceService.createPiece(PIECE.SHOOTER, COLORS.WHITE, DIRECTIONS.WEST)
@@ -55,7 +59,7 @@ const puzzle_3 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(3, "Angle caché", game, puzzle_steps, PUZZLE_DIFFICULTY.STONE);
+        return new Puzzle(3, "Angle caché", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.STONE);
     }
 }
 
@@ -66,6 +70,10 @@ const puzzle_4 =
         const puzzle_steps = [
             "ROTATE/97,48", // WHITE
         ];
+
+        const hints = [
+            [[9, 7]]
+        ]
 
         const board = new Board();
 
@@ -101,7 +109,7 @@ const puzzle_4 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(4, "Rayon fatal", game, puzzle_steps, PUZZLE_DIFFICULTY.STONE);
+        return new Puzzle(4, "Rayon fatal", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.STONE);
     }
 }
 

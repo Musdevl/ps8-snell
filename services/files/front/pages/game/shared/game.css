@@ -473,10 +473,16 @@ end-message {
     gap: 1em
 }
 
-
+.hint-ico {
+    display: flex;
+}
 
 .sound-ico {
     display: none;
+}
+
+.hint-ico,
+.sound-ico {
     justify-content: center;
     align-items: center;
     cursor: pointer;

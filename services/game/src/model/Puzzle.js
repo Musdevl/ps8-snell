@@ -9,14 +9,16 @@ export class Puzzle {
     name;
     game;
     steps;
+    hints;
     difficulty;
     game_states;
     playerColor;
 
-    constructor(id, name = "", game, steps = [], difficulty, playerColor = COLORS.WHITE) {
+    constructor(id, name = "", game, steps = [], hints = [], difficulty, playerColor = COLORS.WHITE) {
         this.id = id;
         this.game = game;
         this.steps = steps;
+        this.hints = hints;
         this.name = name;
         this.difficulty = difficulty;
         this.game_states = [];

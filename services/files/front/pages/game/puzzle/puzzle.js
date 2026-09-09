@@ -101,11 +101,23 @@ async function setupGame() {
     setupBoardComponentEvents(boardComponent);
 
     await setupPlayerInfoForPuzzle(whitePlayerInfoComponent, COLORS.WHITE);
-
     whitePlayerInfoComponent.setPlayerColor(COLORS.WHITE);
     setupPlayerInfoEvents(whitePlayerInfoComponent);
     await setupPlayerInfoForPuzzle(blackPlayerInfoComponent, COLORS.BLACK);
     boardComponent.setPlayerColor(COLORS.WHITE);
+
+    const hint_btn = document.getElementById("hint-btn");
+    hint_btn.addEventListener("click", () => {
+        try {
+            const cells = puzzle.hints[puzzle_step_index];
+            boardComponent.highlightCells(cells);
+            setTimeout(() => {
+                boardComponent.clearHighlightedCells();
+            }, 2000)
+        } catch (error) {
+            console.log(error);
+        }
+    })
 
 
 

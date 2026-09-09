@@ -20,6 +20,11 @@ const puzzle_13 =
             "PLACE/91,0",  // WHITE
         ];
 
+
+        const hints = [
+            [[9, 1]]
+        ]
+
         const board = new Board();
 
         const white_shooter = pieceService.createPiece(PIECE.SHOOTER, COLORS.WHITE, DIRECTIONS.WEST)
@@ -56,7 +61,7 @@ const puzzle_13 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(13, "Réflexion Parfaite", game, puzzle_steps, PUZZLE_DIFFICULTY.CHAMPION, playerColor);
+        return new Puzzle(13, "Réflexion Parfaite", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.CHAMPION, playerColor);
     }
 }
 
@@ -68,6 +73,10 @@ const puzzle_14 =
         const puzzle_steps = [
             "ROTATE/97,48", // WHITE
         ];
+
+        const hints = [
+            [[9, 7]]
+        ]
 
         const board = new Board();
 
@@ -107,7 +116,7 @@ const puzzle_14 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(14, "Sans Issue", game, puzzle_steps, PUZZLE_DIFFICULTY.CHAMPION, playerColor);
+        return new Puzzle(14, "Sans Issue", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.CHAMPION, playerColor);
     }
 }
 
