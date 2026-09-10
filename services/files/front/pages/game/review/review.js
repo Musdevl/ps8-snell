@@ -104,7 +104,10 @@ async function setupGame() {
     await blackPlayerInfoComponent.setColor(COLORS.BLACK);
 
     whitePlayerInfoComponent.disableRotation();
+    whitePlayerInfoComponent.disableElo();
+
     blackPlayerInfoComponent.disableRotation();
+    blackPlayerInfoComponent.disableElo();
 
     whitePlayerInfoComponent.disableTimer();
     blackPlayerInfoComponent.disableTimer();
@@ -183,8 +186,23 @@ async function setupGame() {
     white_player_id = raw.white_player_id;
     black_player_id = raw.black_player_id;
 
-    let whitePlayerInfo = await getUserInformation(white_player_id);
-    let blackPlayerInfo = await getUserInformation(black_player_id);
+    let whitePlayerInfo;
+    let blackPlayerInfo;
+
+    console.log(raw);
+
+    if (raw.gameType === "AI") {
+        if (raw.aiColor === COLORS.WHITE) {
+            whitePlayerInfo = await getAiInformation(white_player_id);
+            blackPlayerInfo = await getUserInformation(black_player_id);
+        } else {
+            whitePlayerInfo = await getUserInformation(white_player_id);
+            blackPlayerInfo = await getAiInformation(black_player_id);
+        }
+    } else {
+        whitePlayerInfo = await getUserInformation(white_player_id);
+        blackPlayerInfo = await getUserInformation(black_player_id);
+    }
 
     whitePlayerInfoComponent.setPlayerInfo(whitePlayerInfo)
     blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo)
@@ -354,7 +372,6 @@ function showGameOverModalOnce() {
             onConfirm: () => {
                 goToState(0);
                 closeModal();
-                startPlayback();
             },
             onCancel: () => {
                 window.location.replace(`/`);
@@ -484,6 +501,26 @@ async function getUserInformation(userId) {
         console.error('Failed to fetch user information:', error);
     }
 }
+
+
+async function getAiInformation(aiId) {
+    try {
+        const response = await accountService.authFetch(`${GATEWAY_URL}/api/ais/${aiId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error(`Error while getting user information: ${response.status}`);
+        const res = await response.json();
+        return {
+            _id: res.ai.id,
+            username: res.ai.name,
+            picture: { picture: res.ai.path }
+        }
+    } catch (error) {
+        console.error('Failed to fetch user information:', error);
+    }
+}
+
 
 // Lancer l'initialisation quand le DOM est prêt
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

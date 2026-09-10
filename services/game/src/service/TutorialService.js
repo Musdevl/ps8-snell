@@ -20,8 +20,8 @@ export const tutorial_actions = [
 
 export function initTutorial() {
 
-    const white_player_mock = playerService.createPlayer(COLORS.WHITE, undefined, undefined);
-    const black_player_mock = playerService.createPlayer(COLORS.BLACK, undefined, undefined);
+    const white_player_mock = playerService.createPlayer(COLORS.WHITE, undefined, undefined, "NONE");
+    const black_player_mock = playerService.createPlayer(COLORS.BLACK, undefined, undefined, "NONE");
 
     const tutorial_board = boardService.initTutorialBoard(new Board());
 

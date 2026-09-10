@@ -1,6 +1,7 @@
 import * as UserService from "../../services/user-service.js";
 import * as accountService from "../../services/account-service.js";
 import * as notificationService from "../../services/notification-service.js";
+import { COLORS } from "../../enum/Colors.js";
 import { GATEWAY_URL } from "../../env.js";
 
 // ─── Constants & DOM ────────────────────────────────────────────────────────
@@ -218,26 +219,26 @@ async function renderHistory() {
         history.map(g => g.whiteId === profileUserId ? g.blackId : g.whiteId)
     )];
 
-    const opponentMap = Object.fromEntries(
-        await Promise.all(
-            opponentIds.map(async id => {
-                try {
-                    const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${id}`);
-                    const info = await res.json();
-                    return [id, info.username ?? id];
-                } catch {
-                    return [id, id];
-                }
-            })
-        )
-    );
+    // const opponentMap = Object.fromEntries(
+    //     await Promise.all(
+    //         opponentIds.map(async id => {
+    //             try {
+    //                 const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${id}`);
+    //                 const info = await res.json();
+    //                 return [id, info.username ?? id];
+    //             } catch {
+    //                 return [id, id];
+    //             }
+    //         })
+    //     )
+    // );
 
     let is_odd = true;
 
     history.forEach(game => {
-        if ((game.actions_count-2) <= 0) return;
+        if ((game.actions_count - 2) <= 0) return;
         const isWhite = game.whiteId === profileUserId;
-        const opponentId = isWhite ? game.blackId : game.whiteId;
+
         const isDraw = game.winnerId === 'DRAW';
         const won = game.winnerId === profileUserId;
         const resultClass = isDraw ? 'draw' : (won ? 'win' : 'loss');
@@ -253,7 +254,7 @@ async function renderHistory() {
                 </div>
                 <div class="player-container">
                     <div class="${isWhite ? "black-rect" : "white-rect"}"></div>
-                    <span class="player-name">${opponentMap[opponentId] ?? opponentId}</span>
+                    <span class="player-name">${isWhite ? game.blackName : game.whiteName}</span>
                 </div>
             </td>
             <td class="result-col">

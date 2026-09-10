@@ -38,8 +38,8 @@ export function computeGameReview(gameReview) {
     const game_states = [];
 
     // Mock players without websocketIds
-    const white_player_mock = PlayerService.createPlayer(COLORS.WHITE, undefined, gameReview.white_player_id);
-    const black_player_mock = PlayerService.createPlayer(COLORS.BLACK, undefined, gameReview.black_player_id);
+    const white_player_mock = PlayerService.createPlayer(COLORS.WHITE, undefined, gameReview.white_player_id, "NONE");
+    const black_player_mock = PlayerService.createPlayer(COLORS.BLACK, undefined, gameReview.black_player_id, "NONE");
 
     // Create a new game
     const initBoard = reconstructBoard(gameReview.initGrid)
@@ -118,44 +118,73 @@ export function endGame(game, winner) {
     game.isGameOver = true;
     game.stopTimer();
 
-    if ((game.gameType === "MULTI") && !game.isReview) {
+    if ((game.gameType === "MULTI" || game.gameType === "AI") && !game.isReview) {
 
-        const white_player = game.players.find((p) => p.color === COLORS.WHITE);
-        const black_player = game.players.find((p) => p.color === COLORS.BLACK);
+        let winnerId;
 
-        const white_gain = game.gain[COLORS.WHITE];
-        const black_gain = game.gain[COLORS.BLACK];
+        if (game.gameType === "MULTI") {
+            const white_player = game.players.find((p) => p.color === COLORS.WHITE);
+            const black_player = game.players.find((p) => p.color === COLORS.BLACK);
 
-        let finalWhiteElo, finalBlackElo, winnerId;
+            const white_gain = game.gain[COLORS.WHITE];
+            const black_gain = game.gain[COLORS.BLACK];
 
-        // Détermination des scores selon l'issue
-        if (winner === "WHITE") {
-            winnerId = white_player.userId;
-            finalWhiteElo = white_gain.win;
-            finalBlackElo = black_gain.loss;
-            game.setLastAction("White won")
-        } else if (winner === "BLACK") {
-            winnerId = black_player.userId;
-            finalWhiteElo = white_gain.loss;
-            finalBlackElo = black_gain.win;
-            game.setLastAction("Black won")
-        } else { // DRAW
-            winnerId = "DRAW";
-            finalWhiteElo = white_gain.draw;
-            finalBlackElo = black_gain.draw;
-            game.setLastAction("DRAW")
+            let finalWhiteElo, finalBlackElo;
+
+            // Détermination des scores selon l'issue
+            if (winner === "WHITE") {
+                winnerId = white_player.userId;
+                finalWhiteElo = white_gain.win;
+                finalBlackElo = black_gain.loss;
+                game.setLastAction("White won")
+            } else if (winner === "BLACK") {
+                winnerId = black_player.userId;
+                finalWhiteElo = white_gain.loss;
+                finalBlackElo = black_gain.win;
+                game.setLastAction("Black won")
+            } else { // DRAW
+                winnerId = "DRAW";
+                finalWhiteElo = white_gain.draw;
+                finalBlackElo = black_gain.draw;
+                game.setLastAction("DRAW")
+            }
+
+            // On lance les deux appels en parallèle pour plus de rapidité
+            Promise.all([
+                updatePlayerElo(white_player.userId, finalWhiteElo),
+                updatePlayerElo(black_player.userId, finalBlackElo),
+                addGameToHistory(white_player.userId, winnerId, game),
+                addGameToHistory(black_player.userId, winnerId, game),
+                saveGame(game, winnerId)
+            ]).then(r => console.log("[GAME SERVICE] Game saved successfully"));
         }
 
-        // On lance les deux appels en parallèle pour plus de rapidité
-        Promise.all([
-            updatePlayerElo(white_player.userId, finalWhiteElo),
-            updatePlayerElo(black_player.userId, finalBlackElo),
-            addGameToHistory(white_player.userId, winnerId, game),
-            addGameToHistory(black_player.userId, winnerId, game),
-            saveGame(game, winnerId)
-        ]).then(r => console.log("[GAME SERVICE] Game saved successfully"));
-    }
+        else if (game.gameType === "AI") {
+            const white_player = game.players.find((p) => p.color === COLORS.WHITE);
+            const black_player = game.players.find((p) => p.color === COLORS.BLACK);
 
+            // Détermination des scores selon l'issue
+            if (winner === "WHITE") {
+                winnerId = white_player.userId;
+                game.setLastAction("White won")
+            } else if (winner === "BLACK") {
+                winnerId = black_player.userId;
+                game.setLastAction("Black won")
+            } else { // DRAW
+                winnerId = "DRAW";
+                game.setLastAction("DRAW")
+            }
+
+            const player_to_add_history = white_player.webSocketId === "NONE" ? black_player : white_player;
+
+            // On lance les deux appels en parallèle pour plus de rapidité
+            Promise.all([
+                addGameToHistory(player_to_add_history.userId, winnerId, game),
+                saveGame(game, winnerId)
+            ]).then(r => console.log("[GAME SERVICE] Game saved successfully"));
+        }
+
+    }
 
     return winner;
 }
@@ -163,7 +192,6 @@ export function endGame(game, winner) {
 async function saveGame(game, winnerId) {
 
     try {
-
         // Retrieve all informations from the game
         const initGrid = game.initGrid;
         const actions = game.actions;
@@ -171,7 +199,7 @@ async function saveGame(game, winnerId) {
         const black_player_id = game.getPlayerByColor(COLORS.BLACK).userId
 
         // Save the game
-        const res = await gameRepository.saveGame(game.id, game.gameType, initGrid, actions, white_player_id, black_player_id, winnerId);
+        const res = await gameRepository.saveGame(game.id, game.gameType, initGrid, actions, white_player_id, black_player_id, winnerId, game.aiColor);
     } catch (error) {
         console.log("[GAME SERVICE] - Error while saving the game");
     }
@@ -184,7 +212,7 @@ export async function addGameToHistory(userId, winnerId, game) {
     const white_player = game.players.find((p) => p.color === COLORS.WHITE);
     const black_player = game.players.find((p) => p.color === COLORS.BLACK);
 
-    let gameJson = { whiteId: white_player.userId, blackId: black_player.userId, gameId: game.id, gameType: game.gameType, winnerId: winnerId, actions_count: game.actions.length, startDate: game.startDate };
+    let gameJson = { whiteId: white_player.userId, whiteName: white_player.userName, blackId: black_player.userId, blackName: black_player.userName, gameId: game.id, gameType: game.gameType, winnerId: winnerId, actions_count: game.actions.length, startDate: game.startDate, gameInitTimers: game.initTimers };
 
     const res = await fetch(`${USER_SERVICE_URL}/api/user/history`, {
         method: "POST",

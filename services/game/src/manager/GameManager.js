@@ -25,12 +25,7 @@ export class GameManager extends EventEmitter {
         let white_player;
         let black_player;
 
-        if (gameType === "AI") {
-            ({ white_player, black_player } = this._createAiGamePlayers(player_1_info, player_2_info));
-        } else {
-            white_player = PlayerService.createPlayer(COLORS.WHITE, player_1_info.webSocketId, player_1_info.userId);
-            black_player = PlayerService.createPlayer(COLORS.BLACK, player_2_info.webSocketId, player_2_info.userId);
-        }
+        ({ white_player, black_player } = await this._createGamePlayers(gameType, player_1_info, player_2_info))
 
         const game = gameService.createGame(gameType, gameTime);
 
@@ -62,6 +57,12 @@ export class GameManager extends EventEmitter {
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
+
+        if (gameType === "AI") {
+            let ai = game.players.find(p => p.webSocketId === "NONE");
+            game.setAiColor(ai.color);
+        }
+
         this.games.set(game.id, game);
         gameService.launchGame(game);
 
@@ -79,7 +80,9 @@ export class GameManager extends EventEmitter {
             grid_states: gameService.computeGameReview(gameReview),
             actions: gameReview.actions,
             white_player_id: gameReview.white_player_id,
-            black_player_id: gameReview.black_player_id
+            black_player_id: gameReview.black_player_id,
+            gameType: gameReview.gameType,
+            aiColor: gameReview.aiColor
         }
     }
 
@@ -327,16 +330,41 @@ export class GameManager extends EventEmitter {
         return Math.random() < 0.5 ? COLORS.WHITE : COLORS.BLACK;
     }
 
-    _createAiGamePlayers(player_1_info, player_2_info) {
-        const player_1_color = this._resolvePlayerColor(player_1_info.playerColor);
-        const player_2_color = player_1_color === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+    async _createGamePlayers(gameType, player_1_info, player_2_info) {
+        if (gameType === "AI") {
 
-        const player_1 = PlayerService.createPlayer(player_1_color, player_1_info.webSocketId, player_1_info.userId);
-        const player_2 = PlayerService.createPlayer(player_2_color, "NONE", player_2_info.userId);
+            const player_1_color = this._resolvePlayerColor(player_1_info.playerColor);
+            const player_2_color = player_1_color === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
 
-        return player_1_color === COLORS.WHITE
-            ? { white_player: player_1, black_player: player_2 }
-            : { white_player: player_2, black_player: player_1 };
+            let res = await fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_1_info.userId}`);
+            const profile = await res.json();
+            const player_1 = PlayerService.createPlayer(player_1_color, player_1_info.webSocketId, player_1_info.userId, profile.username);
+
+            res = await fetch(`${this.AI_SERVICE_URL}/api/ais/${player_2_info.userId}`)
+            const content = await res.json();
+            const player_2 = PlayerService.createPlayer(player_2_color, "NONE", player_2_info.userId, content.ai.name);
+
+            return player_1_color === COLORS.WHITE
+                ? { white_player: player_1, black_player: player_2 }
+                : { white_player: player_2, black_player: player_1 };
+
+        } else if (gameType === "MULTI") {
+            let res = await fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_1_info.userId}`);
+            let profile = await res.json();
+            const white_player = PlayerService.createPlayer(COLORS.WHITE, player_1_info.webSocketId, player_1_info.userId, profile?.username);
+
+            res = await fetch(`${this.USER_SERVICE_URL}/api/user/info/${player_2_info.userId}`);
+            profile = await res.json();
+            const black_player = PlayerService.createPlayer(COLORS.BLACK, player_2_info.webSocketId, player_2_info.userId, profile?.username);
+
+            return { white_player, black_player };
+
+        } else {
+            const white_player = PlayerService.createPlayer(COLORS.WHITE, player_1_info.webSocketId, player_1_info.userId);
+            const black_player = PlayerService.createPlayer(COLORS.BLACK, player_2_info.webSocketId, player_2_info.userId);
+            return { white_player, black_player };
+        }
+
     }
 }
 
