@@ -4,7 +4,7 @@ import * as achievementService from "../services/achievementService.js";
 const app = new badExpress();
 
 // POST /api/game
-app.post('/api/achievement/in-game', async (req, res) => {
+app.post('/api/achievements/in-game', async (req, res) => {
     try {
 
         const previous = req.body.previous_game_state;
@@ -20,14 +20,14 @@ app.post('/api/achievement/in-game', async (req, res) => {
     }
 });
 
-app.get('/api/achievements/blank', (req, res) => {
+app.get('/api/achievements', (req, res) => {
     try {
 
-        res.json(JSON.stringify({achievements: achievementService.getBlankAchievements()}), 200);
+        res.json(achievementService.getAllAchievements(), 200);
 
     } catch (error) {
-        console.log('Error while retrieving blank achievements', error)
-        res.json({ error: 'Error while retrieving blank achievements' }, 400);
+        console.log('Error while retrieving achievements', error)
+        res.json({ error: 'Error while retrieving achievements' }, 400);
     }
 })
 

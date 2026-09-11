@@ -287,7 +287,7 @@ export class GameManager extends EventEmitter {
 
     async lookForAchievement(previous_game_state, next_game_state) {
         try {
-            await fetch(`${this.ACHIEVEMENT_SERVICE_URL}/api/achievement/in-game`,
+            await fetch(`${this.ACHIEVEMENT_SERVICE_URL}/api/achievements/in-game`,
                 {
                     method: 'POST',
                     body: JSON.stringify({

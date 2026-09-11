@@ -212,7 +212,18 @@ export async function addGameToHistory(userId, winnerId, game) {
     const white_player = game.players.find((p) => p.color === COLORS.WHITE);
     const black_player = game.players.find((p) => p.color === COLORS.BLACK);
 
-    let gameJson = { whiteId: white_player.userId, whiteName: white_player.userName, blackId: black_player.userId, blackName: black_player.userName, gameId: game.id, gameType: game.gameType, winnerId: winnerId, actions_count: game.actions.length, startDate: game.startDate, gameInitTimers: game.initTimers };
+    let gameJson = { 
+        whiteId: white_player.userId, 
+        whiteName: white_player.userName, 
+        blackId: black_player.userId, 
+        blackName: black_player.userName, 
+        gameId: game.id, 
+        gameType: game.gameType, 
+        winnerId: winnerId, 
+        actions_count: game.actions.length, 
+        startDate: game.startDate, 
+        initTimer: game.initTimer 
+    };
 
     const res = await fetch(`${USER_SERVICE_URL}/api/user/history`, {
         method: "POST",

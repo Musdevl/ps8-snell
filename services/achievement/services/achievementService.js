@@ -1,4 +1,4 @@
-import { in_game_achievements, blank_achievemnets } from "../achivements/in_game_achievements.js";
+import { in_game_achievements, all_achievements } from "../achivements/in_game_achievements.js";
 import { COLORS } from "../enum/Colors.js"
 
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL || "http://localhost:8010"
@@ -28,7 +28,7 @@ export async function searchInGameAchievements(previous_game_state, next_game_st
 
 async function achievementComplete(userId, achievement) {
     try {
-        await fetch(`${USER_SERVICE_URL}/api/user/achievement`,
+        await fetch(`${USER_SERVICE_URL}/api/user/achievements`,
             {
                 method: "POST",
                 body: JSON.stringify({
@@ -43,4 +43,4 @@ async function achievementComplete(userId, achievement) {
     }
 }
 
-export function getBlankAchievements() { return blank_achievemnets; }
+export function getAllAchievements() { return all_achievements; }

@@ -42,7 +42,7 @@ export class Game extends EventEmitter {
             [COLORS.WHITE]: timeLimit,
             [COLORS.BLACK]: timeLimit
         };
-        this.initTimers = timeLimit;
+        this.initTimer = timeLimit;
         this.eloGain = {
             [COLORS.WHITE]: {
                 win: 0,

@@ -173,39 +173,44 @@ async function setupGame() {
 
     // Récuperer la review de la game et setup les params
 
-    const splitedPathName = window.location.pathname.split("/");
-    gameId = splitedPathName[splitedPathName.length - 1];
+    try {
+        const splitedPathName = window.location.pathname.split("/");
+        gameId = splitedPathName[splitedPathName.length - 1];
 
-    const res = await accountService.authFetch(`${GATEWAY_URL}/api/game/review/${gameId}`);
-    const raw = await res.json();
+        const res = await accountService.authFetch(`${GATEWAY_URL}/api/game/review/${gameId}`);
+        const raw = await res.json();
 
-    const moves = extractStatesAndMoves(raw);
+        const moves = extractStatesAndMoves(raw);
 
-    review_analytics.setActions(moves);
+        review_analytics.setActions(moves);
 
-    white_player_id = raw.white_player_id;
-    black_player_id = raw.black_player_id;
+        white_player_id = raw.white_player_id;
+        black_player_id = raw.black_player_id;
 
-    let whitePlayerInfo;
-    let blackPlayerInfo;
+        let whitePlayerInfo;
+        let blackPlayerInfo;
 
-    console.log(raw);
-
-    if (raw.gameType === "AI") {
-        if (raw.aiColor === COLORS.WHITE) {
-            whitePlayerInfo = await getAiInformation(white_player_id);
-            blackPlayerInfo = await getUserInformation(black_player_id);
+        if (raw.gameType === "AI") {
+            if (raw.aiColor === COLORS.WHITE) {
+                whitePlayerInfo = await getAiInformation(white_player_id);
+                blackPlayerInfo = await getUserInformation(black_player_id);
+            } else {
+                whitePlayerInfo = await getUserInformation(white_player_id);
+                blackPlayerInfo = await getAiInformation(black_player_id);
+            }
         } else {
             whitePlayerInfo = await getUserInformation(white_player_id);
-            blackPlayerInfo = await getAiInformation(black_player_id);
+            blackPlayerInfo = await getUserInformation(black_player_id);
         }
-    } else {
-        whitePlayerInfo = await getUserInformation(white_player_id);
-        blackPlayerInfo = await getUserInformation(black_player_id);
+
+        whitePlayerInfoComponent.setPlayerInfo(whitePlayerInfo)
+        blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo)
+        
+    } catch (error) {
+        console.log(error);
     }
 
-    whitePlayerInfoComponent.setPlayerInfo(whitePlayerInfo)
-    blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo)
+
 
 }
 
