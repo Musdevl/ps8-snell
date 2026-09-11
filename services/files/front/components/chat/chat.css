@@ -199,6 +199,84 @@
     opacity: 0.85;
 }
 
+/* Indicateur "X est en train d'ecrire" (style iMessage) */
+
+.typing-indicator {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem 0.5rem 1rem;
+}
+
+.typing-indicator[hidden] {
+    display: none;
+}
+
+.typing-avatars {
+    display: flex;
+}
+
+/* Plusieurs redacteurs : les avatars se chevauchent legerement */
+.typing-avatars>.chat-profile-picture:not(:first-child) {
+    margin-left: -0.75rem;
+    border: 2px solid #232220;
+}
+
+.typing-bubble {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    background-color: #3a3734;
+    animation: typing-pop 0.2s ease-out;
+}
+
+.typing-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: #EEEED2;
+    opacity: 0.4;
+    animation: typing-bounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+
+    30% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}
+
+@keyframes typing-pop {
+    from {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 .send-message-btn {
     display: none;
 }

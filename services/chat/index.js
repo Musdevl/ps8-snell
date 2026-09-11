@@ -27,6 +27,15 @@ const gatewayConnection = ioClient(`${GATEWAY_URL}/chat`, {
 
 
 
+// On envoie toujours la liste complete : le front remplace son etat, pas de desynchro possible.
+function broadcastTyping() {
+    gatewayConnection.emit("chat-ws-service", {
+        event: "typing-chat-global",
+        webSocketIds: State.onlineSocketId,
+        data: { users: State.getTypingUsers() }
+    });
+}
+
 ioServer.on('connection', (socket) => {
 
     socket.on("register", ({socketId}) => {
@@ -37,7 +46,19 @@ ioServer.on('connection', (socket) => {
     socket.on("disconnection", ({socketId}) =>{
         State.removeSocketId(socketId);
         chatApi.updateOnlineIds(State.onlineSocketId);
+        // Si l'utilisateur quitte la page en plein milieu d'une saisie, l'indicateur doit disparaitre.
+        if (State.clearTyping(socketId)) broadcastTyping();
     })
+
+    socket.on("typing", ({ clientId, isTyping, userId, username, picture }) => {
+        if (!clientId || !userId) return;
+        if (isTyping) {
+            State.setTyping(clientId, { userId, username, picture });
+        } else if (!State.clearTyping(clientId)) {
+            return; // rien n'a change, inutile de broadcaster
+        }
+        broadcastTyping();
+    });
 
     socket.on("disconnect", () => {});
 });

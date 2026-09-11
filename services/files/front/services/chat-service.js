@@ -1,4 +1,5 @@
 import { GATEWAY_URL } from "../env.js";
+import * as accountService from "./account-service.js";
 import { authFetch } from "./account-service.js";
 
 await new Promise((resolve, reject) => {
@@ -16,6 +17,19 @@ socket.on('connect_error', (error) => { console.error('[ChatService] Socket conn
 
 export function onMessage(callback) {
     socket.on('message-chat-global', callback);
+}
+
+export function onTyping(callback) {
+    socket.on('typing-chat-global', callback);
+}
+
+export function sendTyping(isTyping) {
+    socket.emit('typing', {
+        isTyping,
+        userId: accountService.getUserId(),
+        username: accountService.getUserName(),
+        picture: accountService.getProfilePicture()?.picture
+    });
 }
 
 

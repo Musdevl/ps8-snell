@@ -296,10 +296,14 @@ const chatNamespace = io.of("/chat");
 chatNamespace.on('connection', socket => {
     chatClient.emit("register", { socketId: socket.id });
 
-    const eventToRedirect = [];
+    const eventToRedirect = ['typing'];
 
     eventToRedirect.forEach(event => socket.on(event, data => {
-        chatNamespace.emit(event, { clientId: socket.id, ...data });
+        try {
+            chatClient.emit(event, { clientId: socket.id, ...data });
+        } catch (error) {
+            console.log(error);
+        }
     }));
 
     socket.on("disconnect", () => {
