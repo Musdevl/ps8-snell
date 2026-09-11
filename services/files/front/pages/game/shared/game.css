@@ -473,10 +473,16 @@ end-message {
     gap: 1em
 }
 
-
+.hint-ico {
+    display: flex;
+}
 
 .sound-ico {
     display: none;
+}
+
+.hint-ico,
+.sound-ico {
     justify-content: center;
     align-items: center;
     cursor: pointer;
@@ -507,6 +513,29 @@ end-message {
     width: 100%;
     z-index: 50;
 }
+
+game-board {
+    /* nécessaire pour que le liseré ait un support propre */
+    position: relative;
+    border-radius: 10px;
+}
+
+game-board.mistake {
+    animation: mistakeFlash 1s ease-out;
+}
+
+@keyframes mistakeFlash {
+    0% {
+        box-shadow: 0 0 4px 0 rgb(209 57 57 / 85%);
+    }
+
+    100% {
+        box-shadow: 0 0 4px 20px rgba(255, 72, 72, 0);
+    }
+}
+
+
+
 
 /* ───────────────────────────────────────────────────────────────────────
    Mobile
@@ -763,4 +792,18 @@ end-message {
         z-index: 50;
     }
 
+
+    game-board.mistake {
+        animation: mistakeFlashMobile 1s ease-out;
+    }
+
+    @keyframes mistakeFlashMobile {
+    0% {
+        box-shadow: 0 0 4px 3px rgb(209 57 57 / 85%);
+    }
+
+    100% {
+        box-shadow: 0 0 4px 13px rgba(255, 72, 72, 0);
+    }
+}
 }

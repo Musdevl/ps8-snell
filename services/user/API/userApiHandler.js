@@ -25,9 +25,9 @@ export async function createUser(email, username, password) {
 
     const hashed_password = await bcrypt.hash(password, saltRounds);
 
-    const achievement_request = await fetch(`${ACHIEVEMENT_SERVICE_URL}/api/achievements/blank`);
+    // const achievement_request = await fetch(`${ACHIEVEMENT_SERVICE_URL}/api/achievements/blank`);
 
-    const content = await achievement_request.json();
+    // const content = await achievement_request.json();
 
 
     await userRepo.saveUser({
@@ -44,7 +44,7 @@ export async function createUser(email, username, password) {
         emotes: [...default_emotes],
         selected_emotes: [...default_emotes],
         game_history: [],
-        achievements: JSON.parse(content).achievements,
+        completed_achievements: [],
         selected_theme: default_theme,
         themes: [default_theme],
         snell_coins: 2500
@@ -129,16 +129,21 @@ export async function hardResetPassword(email, newPassword) {
     await userRepo.saveUser({ ...user, password: hashed_password });
 }
 export async function addGameHistory(userId, game_history) {
+
     if (game_history.winnerId === "DRAW") {
 
         await userRepo.incrementDraw(userId);
     }
-    else if (game_history.winnerId === userId) {
-        await userRepo.incrementWin(userId);
+
+    else if (game_history.gameType === "MULTI") {
+        if (game_history.winnerId === userId) {
+            await userRepo.incrementWin(userId);
+        }
+        else {
+            await userRepo.incrementLoss(userId);
+        }
     }
-    else {
-        await userRepo.incrementLoss(userId);
-    }
+
     await userRepo.pushInHistory(userId, game_history);
 }
 
@@ -278,7 +283,7 @@ export async function getUserInformation(userId) {
         friends: user.friends,
         friendsRequests: (friendRequest ?? []).map(fr => fr.userId),
         history: user.game_history,
-        achievements: user.achievements,
+        completed_achievements: user.completed_achievements,
         emotes: user.emotes,
         selected_emotes: user.selected_emotes,
         profile_picture_list: user.profile_picture_list,

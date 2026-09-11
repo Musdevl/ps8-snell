@@ -269,6 +269,17 @@ main {
     color: #c8a84b;
 } */
 
+.game-type-ico-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-timer {
+    color: #d4cfc9;
+    font-size: 0.875em;
+}
+
 .friend-card img {
     width: 2rem;
     height: 2rem;
@@ -363,8 +374,10 @@ main {
 }
 
 .achievement-picture {
-    width: 5rem;
-    height: 5rem;
+    max-width: 5em;
+    min-width: 5rem;
+    max-height: 5em;
+    min-height: 5rem;
     object-fit: cover;
     border-radius: 8px;
     border: 5px solid #1e1c1a;
@@ -470,11 +483,17 @@ main {
 }
 
 .player-name {
-    color: #d4cfc9;
+    color: #fff;
 }
 
 .me.player-name {
     color: #fff;
+}
+
+.player-containers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
 }
 
 .history-item .missing,

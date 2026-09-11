@@ -171,20 +171,38 @@ async function previousTutorielStep() {
     tutorial_next.disabled = landingStep.blocking;
 }
 
+
+function playWinAnimation() {
+    const confetti = document.querySelector('.win-animation');
+    const baseSrc = confetti.getAttribute('src').split('?')[0];
+
+    // On cache d'abord (utile si l'animation a déjà tourné une fois avant)
+    confetti.style.display = "none";
+    confetti.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+
+    // Puis on l'affiche
+    requestAnimationFrame(() => {
+        confetti.style.display = "block";
+    });
+}
+
 async function nextTutorielStep() {
     if (tutorial_index >= tutorial_steps.length - 1) {
 
-        showModal({
-            message: "Congratulations, you finished the tutorial !",
-            confirmLabel: "Do it again",
-            cancelLabel: "Leave",
-            onConfirm: () => {
-                window.location.replace('/pages/game/tutorial/index.html');
-            },
-            onCancel: () => {
-                window.location.replace(`/`);
-            }
-        });
+        playWinAnimation();
+        setTimeout(() => {
+            showModal({
+                message: "Congratulations, you finished the tutorial !",
+                confirmLabel: "Do it again",
+                cancelLabel: "Leave",
+                onConfirm: () => {
+                    window.location.replace('/pages/game/tutorial/index.html');
+                },
+                onCancel: () => {
+                    window.location.replace(`/`);
+                }
+            });
+        }, 1000);
 
         return;
     }
@@ -215,6 +233,16 @@ async function nextTutorielStep() {
     tutorial_next.disabled = step.blocking;
 }
 
+function flashMistake() {
+    // Le composant custom element lui-même (this) reçoit la classe
+    boardComponent.classList.remove('mistake'); // reset si un flash était déjà en cours
+    void boardComponent.offsetWidth; // force un reflow pour permettre de rejouer l'animation
+    boardComponent.classList.add('mistake');
+
+    boardComponent.addEventListener('animationend', () => {
+        boardComponent.classList.remove('mistake');
+    }, { once: true });
+}
 
 function setupBoardComponentEvents(boardComponent) {
     // Component event setup
@@ -243,6 +271,7 @@ function setupBoardComponentEvents(boardComponent) {
             playSound(correct_action);
         }
         else {
+            flashMistake();
             playSound(incorrect_action)
         }
     });

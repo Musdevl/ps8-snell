@@ -101,11 +101,23 @@ async function setupGame() {
     setupBoardComponentEvents(boardComponent);
 
     await setupPlayerInfoForPuzzle(whitePlayerInfoComponent, COLORS.WHITE);
-
     whitePlayerInfoComponent.setPlayerColor(COLORS.WHITE);
     setupPlayerInfoEvents(whitePlayerInfoComponent);
     await setupPlayerInfoForPuzzle(blackPlayerInfoComponent, COLORS.BLACK);
     boardComponent.setPlayerColor(COLORS.WHITE);
+
+    const hint_btn = document.getElementById("hint-btn");
+    hint_btn.addEventListener("click", () => {
+        try {
+            const cells = puzzle.hints[puzzle_step_index];
+            boardComponent.highlightCells(cells);
+            setTimeout(() => {
+                boardComponent.clearHighlightedCells();
+            }, 2000)
+        } catch (error) {
+            console.log(error);
+        }
+    })
 
 
 
@@ -152,13 +164,24 @@ function setupSoundBtn() {
 
 }
 
+function flashMistake() {
+    // Le composant custom element lui-même (this) reçoit la classe
+    boardComponent.classList.remove('mistake'); // reset si un flash était déjà en cours
+    void boardComponent.offsetWidth; // force un reflow pour permettre de rejouer l'animation
+    boardComponent.classList.add('mistake');
+
+    boardComponent.addEventListener('animationend', () => {
+        boardComponent.classList.remove('mistake');
+    }, { once: true });
+}
 
 function setupBoardComponentEvents(boardComponent) {
     // Component event setup
     boardComponent.addEventListener("action", e => {
+        // try {
         let action = e.detail.action;
-
-        if (action.split("/")[0] === "PLACE") {
+        const splitted_actions = action.split("/");
+        if (splitted_actions[0] === "PLACE") {
             if (boardComponent.colorTurn === COLORS.WHITE && whitePlayerInfoComponent.getSelectedInventoryCell())
                 action += `,${whitePlayerInfoComponent.getSelectedInventoryCell().direction}`;
             else if (boardComponent.colorTurn === COLORS.BLACK && blackPlayerInfoComponent.getSelectedInventoryCell())
@@ -174,8 +197,18 @@ function setupBoardComponentEvents(boardComponent) {
             playSound(correct_action);
         }
         else {
+            // const position = splitted_actions[1].split(",")
+            // boardComponent.drawMistake(Number(position[0].split("")[0]), Number(position[0].split("")[1]))
+            flashMistake();
             playSound(incorrect_action)
+            // setTimeout(() => {
+            //     boardComponent.clearHighlightedCells();
+            // }, 2000);
         }
+        // } catch (error) {
+        //     console.log(error);
+        // }
+
     });
 
 
@@ -284,17 +317,23 @@ async function nextPuzzleStep() {
     await handleUpdate(puzzle.game_states[puzzle_step_index], false)
 
     if (puzzle_step_index >= puzzle.steps.length - 1) {
-        showModal({
-            message: "Congratulations, you finished the puzzle !",
-            confirmLabel: "Next",
-            cancelLabel: "Leave",
-            onConfirm: () => {
-                window.location.replace(`/pages/game/puzzle/index.html?id=${++puzzle.id}`)
-            },
-            onCancel: () => {
-                window.location.replace(`/`);
-            }
-        });
+
+        playWinAnimation();
+
+        setTimeout(() => {
+            showModal({
+                message: "Congratulations, you finished the puzzle !",
+                confirmLabel: "Next",
+                cancelLabel: "Leave",
+                onConfirm: () => {
+                    window.location.replace(`/pages/game/puzzle/index.html?id=${++puzzle.id}`)
+                },
+                onCancel: () => {
+                    window.location.replace(`/`);
+                }
+            });
+        }, 1000)
+
 
         return;
     }
@@ -305,6 +344,22 @@ async function nextPuzzleStep() {
         puzzle_step_index++;
         await handleUpdate(puzzle.game_states[puzzle_step_index], false)
     }
+}
+
+
+
+function playWinAnimation() {
+    const confetti = document.querySelector('.win-animation');
+    const baseSrc = confetti.getAttribute('src').split('?')[0];
+
+    // On cache d'abord (utile si l'animation a déjà tourné une fois avant)
+    confetti.style.display = "none";
+    confetti.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+
+    // Puis on l'affiche
+    requestAnimationFrame(() => {
+        confetti.style.display = "block";
+    });
 }
 
 // Lancer l'initialisation quand le DOM est prêt

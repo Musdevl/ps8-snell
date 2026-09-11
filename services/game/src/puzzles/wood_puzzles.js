@@ -20,6 +20,10 @@ const puzzle_1 =
             "ROTATE/97,48", // WHITE
         ];
 
+        const hints = [
+            [[9, 7]]
+        ]
+
         const board = new Board();
 
         const white_shooter = pieceService.createPiece(PIECE.SHOOTER, COLORS.WHITE, DIRECTIONS.WEST)
@@ -56,7 +60,7 @@ const puzzle_1 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(1, "Premier tir", game, puzzle_steps, PUZZLE_DIFFICULTY.WOOD, playerColor);
+        return new Puzzle(1, "Premier tir", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.WOOD, playerColor);
     }
 }
 
@@ -68,6 +72,10 @@ const puzzle_2 =
         const puzzle_steps = [
             "PLACE/90,0", // WHITE
         ];
+
+        const hints = [
+            [[9, 0]]
+        ]
 
         const board = new Board();
 
@@ -105,7 +113,7 @@ const puzzle_2 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(2, "Double réflexion", game, puzzle_steps, PUZZLE_DIFFICULTY.WOOD, playerColor);
+        return new Puzzle(2, "Double réflexion", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.WOOD, playerColor);
     }
 }
 
@@ -113,5 +121,4 @@ const puzzle_2 =
 export const wood_puzzles = [
     puzzle_1.initPuzzle(),
     puzzle_2.initPuzzle(),
-
 ]

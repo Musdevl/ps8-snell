@@ -1,6 +1,7 @@
 import * as UserService from "../../services/user-service.js";
 import * as accountService from "../../services/account-service.js";
 import * as notificationService from "../../services/notification-service.js";
+import { COLORS } from "../../enum/Colors.js";
 import { GATEWAY_URL } from "../../env.js";
 
 // ─── Constants & DOM ────────────────────────────────────────────────────────
@@ -56,7 +57,19 @@ async function loadProfile() {
 
     chatId = user.friends.find(f => f.friendId === accountService.getUserId())?.chatId ?? null;
 
-    setAchievements(user.achievements);
+    console.log(user);
+
+    try {
+        const res = await accountService.authFetch(`${GATEWAY_URL}/api/achievements`)
+
+        const all_achievements = await res.json();
+
+        setAchievements(all_achievements, user.completed_achievements);
+    } catch (err) {
+        console.error(err);
+        notificationService.notify("Failed to fetch achievements");
+    }
+
 
     const isOwnProfile = accountService.getUserId() === profileUserId;
     if (isOwnProfile) {
@@ -218,26 +231,12 @@ async function renderHistory() {
         history.map(g => g.whiteId === profileUserId ? g.blackId : g.whiteId)
     )];
 
-    const opponentMap = Object.fromEntries(
-        await Promise.all(
-            opponentIds.map(async id => {
-                try {
-                    const res = await accountService.authFetch(`${GATEWAY_URL}/api/user/info/${id}`);
-                    const info = await res.json();
-                    return [id, info.username ?? id];
-                } catch {
-                    return [id, id];
-                }
-            })
-        )
-    );
-
     let is_odd = true;
 
     history.forEach(game => {
-        if ((game.actions_count-2) <= 0) return;
+        if ((game.actions_count - 2) <= 0) return;
         const isWhite = game.whiteId === profileUserId;
-        const opponentId = isWhite ? game.blackId : game.whiteId;
+
         const isDraw = game.winnerId === 'DRAW';
         const won = game.winnerId === profileUserId;
         const resultClass = isDraw ? 'draw' : (won ? 'win' : 'loss');
@@ -245,15 +244,15 @@ async function renderHistory() {
         const el = document.createElement('tr');
         el.className = `history-item ${is_odd ? "odd-item" : ""}`;
         el.innerHTML = `
-            <td class="game-type-col">${get_game_ico(game.gameType)}</td>
-            <td class="players-col">
+            <td class="game-type-col">${get_game_ico(game)}</td>
+            <td class="players-col player-containers">
                 <div class="player-container">
                     <div class="${isWhite ? "white-rect" : "black-rect"}"></div>
                     <span class="me player-name">${username}</span>
                 </div>
                 <div class="player-container">
                     <div class="${isWhite ? "black-rect" : "white-rect"}"></div>
-                    <span class="player-name">${opponentMap[opponentId] ?? opponentId}</span>
+                    <span class="player-name">${isWhite ? game.blackName : game.whiteName}</span>
                 </div>
             </td>
             <td class="result-col">
@@ -274,10 +273,14 @@ async function renderHistory() {
     });
 }
 
-function get_game_ico(gameType) {
-    switch (gameType) {
+function get_game_ico(game) {
+    switch (game.gameType) {
         case "MULTI":
-            return `<img class="game-type-ico" src="/assets/multiplayer.svg" alt="multi-ico">`
+            return `
+                <div class="game-type-ico-container">
+                        <img class="game-type-ico" src="/assets/multiplayer.svg" alt="multi-ico">
+                        <span class="game-timer">${Math.floor(game.initTimer / 60)} mins</span>
+                </div>`
         case "AI":
             return `<img class="game-type-ico" src="/assets/bot.svg" alt="bot-ico">`
         default:
@@ -536,29 +539,33 @@ function closeInventoryModal() {
 
 // ─── Achievements ─────────────────────────────────────────────────────────────
 
-function setAchievements(list) {
+function setAchievements(all_achievements, user_achievements_ids) {
 
-    if (list.length === 0) {
+    console.log(all_achievements, user_achievements_ids);
+
+    if (all_achievements.length === 0) {
         achievements.innerHTML = '<span class="empty-list">No achievements have been unlocked yet.</span>';
         return;
     }
 
-    list.forEach(({ picture, name, reward, description, isCompleted }) => {
+    console.log(typeof (all_achievements));
 
-        const completed_class = isCompleted ? "" : " not-completed"
+    all_achievements.forEach((achievement) => {
+
+        const completed_class = user_achievements_ids.includes(achievement.id) ? "" : " not-completed"
 
         achievements.innerHTML += `
             <div class="achievement-item${completed_class}">
-                <img class="achievement-picture" src="${GATEWAY_URL}${picture}" alt="${name}">
+                <img class="achievement-picture" src="${GATEWAY_URL}${achievement.picture}" alt="${achievement.name}">
                 <div class="achievement-right-side">
                     <div class="achievement-item-header">
-                        <span class="achievement-text">${name}</span>
+                        <span class="achievement-text">${achievement.name}</span>
                         <div class="reward-achievement-section">
-                        +${reward.snell_coins}<img src="/assets/snell-coin.png">
+                        +${achievement.reward.snell_coins}<img src="/assets/snell-coin.png">
                         </div>
                     </div>
                     <span class="achievement-description">
-                        ${description}
+                        ${achievement.description}
                     </span>
                 </div>
             </div>

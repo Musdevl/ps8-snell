@@ -17,6 +17,7 @@ const URLS = {
     ai: process.env.AI_SERVICE_URL || "http://localhost:8020",
     shop: process.env.SHOP_SERVICE_URL || "http://localhost:8005",
     admin: process.env.ADMIN_SERVICE_URL || "http://localhost:8007",
+    achievements: process.env.ACHIEVEMENT_SERVICE_URL || "http://localhost:8004"
 };
 
 const proxy = httpProxy.createProxyServer();
@@ -161,6 +162,17 @@ const requestHandler = (req, res) => {
                     );
                 }
 
+
+                if (parts[2] === "achievements") {
+                    return proxy.web(req, res,
+                        { target: URLS.achievements },
+                        err => {
+                            res.statusCode = 502;
+                            return res.end("Error: admin api unreachable");
+                        }
+                    );
+                }
+
                 if (parts[2] === "admin") {
                     return proxy.web(req, res,
                         { target: URLS.admin },
@@ -170,6 +182,7 @@ const requestHandler = (req, res) => {
                         }
                     );
                 }
+
 
                 res.statusCode = 404;
                 return res.end("Unknown API domain");
@@ -216,16 +229,30 @@ io.on('connection', socket => {
 const gameNamespace = io.of('/game');
 
 gameNamespace.on('connection', socket => {
+
     const eventToRedirect = [
         'join', 'action', 'leave', 'send-message',
         'ask-draw', 'deny-draw', 'accept-draw', 'forfeit'
     ];
 
-    eventToRedirect.forEach(event => socket.on(event, data => gameClient.emit(event, { clientId: socket.id, ...data })));
+    eventToRedirect.forEach(event => socket.on(event, data => {
+        try {
+            gameClient.emit(event, { clientId: socket.id, ...data })
+        } catch (error) {
+            console.log(error);
+        }
+    }));
 
     socket.on("game-ws-service", ({ webSocketIds, event, data }) => {
-        gameNamespace.to(webSocketIds).emit(event, data);
+        try {
+            gameNamespace.to(webSocketIds).emit(event, data);
+        } catch (error) {
+            console.log(error);
+        }
+
     });
+
+
 });
 
 // USER NAMESPACE
@@ -233,18 +260,33 @@ gameNamespace.on('connection', socket => {
 const userNamespace = io.of('/user');
 
 userNamespace.on('connection', socket => {
+
     const eventToRedirect = ['register'];
 
     eventToRedirect.forEach(event => socket.on(event, data => {
-        userClient.emit(event, { clientId: socket.id, ...data });
+        try {
+            userClient.emit(event, { clientId: socket.id, ...data });
+        } catch (error) {
+            console.log(error);
+        }
     }));
 
     socket.on('disconnect', () => {
-        userClient.emit('disconnection', { clientId: socket.id });
+        try {
+            userClient.emit('disconnection', { clientId: socket.id });
+        } catch (error) {
+            console.log(error);
+        }
+
     });
 
     socket.on("user-ws-service", ({ webSocketIds, event, data }) => {
-        userNamespace.to(webSocketIds).emit(event, data);
+        try {
+            userNamespace.to(webSocketIds).emit(event, data);
+        } catch (error) {
+            console.log(error);
+        }
+
     });
 });
 

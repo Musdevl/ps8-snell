@@ -37,9 +37,9 @@ export async function findGameById(gameId) {
     }
 }
 
-export async function saveGame(gameId, gameType, initGrid, actions, white_player_id, black_player_id, winnerId) {
+export async function saveGame(gameId, gameType, initGrid, actions, white_player_id, black_player_id, winnerId, aiColor) {
     try {
-        await game_collection.insertOne({ gameId, gameType, initGrid, actions, white_player_id, black_player_id, winnerId })
+        await game_collection.insertOne({ gameId, gameType, initGrid, actions, white_player_id, black_player_id, winnerId, aiColor })
     } catch (error) {
         console.log("[GAME REPO] - Error while saving the game with id: ", gameId)
     }

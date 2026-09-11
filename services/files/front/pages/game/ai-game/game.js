@@ -342,8 +342,8 @@ async function handleUpdate(data) {
     if (data.status !== "CONTINUE") {
         console.log("[GAME] - Game Over: ", data.status);
         const hasWon =
-            (data.status === "BLACK" && color === COLORS.BLACK) ||
-            (data.status === "WHITE" && color === COLORS.WHITE);
+            (data.status === "BLACK" && user_color === COLORS.BLACK) ||
+            (data.status === "WHITE" && user_color === COLORS.WHITE);
 
         if (hasWon) playWinAnimation();
         setTimeout(() => {

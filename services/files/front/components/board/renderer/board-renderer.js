@@ -21,23 +21,23 @@ export class BoardRenderer {
         this.boardSize = cellSize * CELL_NUMBER_IN_A_ROW;
 
         // Garder les références pour le resize
-        this.gridCanvas        = gridCanvas;
-        this.piecesCanvas      = piecesCanvas;
-        this.laserCanvas       = laserCanvas;
+        this.gridCanvas = gridCanvas;
+        this.piecesCanvas = piecesCanvas;
+        this.laserCanvas = laserCanvas;
         this.interactionCanvas = interactionCanvas;
-        this.highlightCanvas   = highlightCanvas;
+        this.highlightCanvas = highlightCanvas;
 
         this.orientation = new BoardOrientation(false);
 
         this._initAllCanvas();
 
         // Créer les renderers
-        this.gridRenderer        = new GridRenderer(gridCanvas, cellSize, this.orientation);
-        this.piecesRenderer      = new PiecesRenderer(piecesCanvas, cellSize, this.orientation);
-        this.laserRenderer       = new LaserRenderer(laserCanvas, cellSize, this.orientation);
+        this.gridRenderer = new GridRenderer(gridCanvas, cellSize, this.orientation);
+        this.piecesRenderer = new PiecesRenderer(piecesCanvas, cellSize, this.orientation);
+        this.laserRenderer = new LaserRenderer(laserCanvas, cellSize, this.orientation);
         this.interactionRenderer = new InteractionRenderer(interactionCanvas, cellSize);
         // Optionnel : un board.html plus ancien (ou en cache) n'a pas le calque.
-        this.highlightRenderer   = highlightCanvas
+        this.highlightRenderer = highlightCanvas
             ? new HighlightRenderer(highlightCanvas, cellSize)
             : null;
 
@@ -52,7 +52,7 @@ export class BoardRenderer {
     // ─── Canvas init / resize ────────────────────────────────────────────────
 
     _initCanvas(canvas) {
-        canvas.width  = this.boardSize;
+        canvas.width = this.boardSize;
         canvas.height = this.boardSize;
     }
 
@@ -70,15 +70,15 @@ export class BoardRenderer {
      * et propage la nouvelle taille à chaque sous-renderer.
      */
     resize(cellSize) {
-        this.cellSize  = cellSize;
+        this.cellSize = cellSize;
         this.boardSize = cellSize * CELL_NUMBER_IN_A_ROW;
 
         this._initAllCanvas();
 
         // Propager aux sous-renderers (ils ont tous un this.cellSize)
-        this.gridRenderer.cellSize        = cellSize;
-        this.piecesRenderer.cellSize      = cellSize;
-        this.laserRenderer.cellSize       = cellSize;
+        this.gridRenderer.cellSize = cellSize;
+        this.piecesRenderer.cellSize = cellSize;
+        this.laserRenderer.cellSize = cellSize;
         this.interactionRenderer.cellSize = cellSize;
         if (this.highlightRenderer) this.highlightRenderer.cellSize = cellSize;
 
@@ -151,20 +151,20 @@ export class BoardRenderer {
         this.laserRenderer.reset();
     }
 
-    highlightCell(row, col)      { this.gridRenderer.highlightCell(row, col); }
-    clearCell(row, col)          { this.gridRenderer.clearCell(row, col); }
-    showNearCases(cases)         { this.interactionRenderer.showNearCases(cases); }
-    clearInteractions()          { this.interactionRenderer.clear(); }
-    clearPieces()                { this.piecesRenderer.clearPieces(); }
+    highlightCell(row, col) { this.gridRenderer.highlightCell(row, col); }
+    clearCell(row, col) { this.gridRenderer.clearCell(row, col); }
+    showNearCases(cases) { this.interactionRenderer.showNearCases(cases); }
+    clearInteractions() { this.interactionRenderer.clear(); }
+    clearPieces() { this.piecesRenderer.clearPieces(); }
 
     /**
      * Assombrit tout le plateau sauf les cases passées en paramètre.
      * `cells` accepte [{row, col}] comme [[row, col]], en coordonnées logiques.
      */
-    highlightCells(cells, options)  { this.highlightRenderer?.show(cells, options); }
-    clearHighlightedCells()         { this.highlightRenderer?.clear(); }
+    highlightCells(cells, options) { this.highlightRenderer?.show(cells, options); }
+    clearHighlightedCells() { this.highlightRenderer?.clear(); }
 
-    highLightAllAvailableCell(availableCells)     { this.interactionRenderer.showNearCases(availableCells); }
+    highLightAllAvailableCell(availableCells) { this.interactionRenderer.showNearCases(availableCells); }
     highLightAllUnavailableCells(unavailableCells) { this.interactionRenderer.showUnavailableCells(unavailableCells); }
 
     onCellClick(callback) {
@@ -185,14 +185,14 @@ export class BoardRenderer {
 
         if (type === 'ROTATE') {
             const [posStr, deltaStr] = coords.split(',');
-            const row   = parseInt(posStr[0]);
-            const col   = parseInt(posStr[1]);
+            const row = parseInt(posStr[0]);
+            const col = parseInt(posStr[1]);
             const delta = parseInt(deltaStr);
 
             const piece = previousGridState[row][col];
             if (!piece) return;
 
-            const fromDir  = piece.direction;
+            const fromDir = piece.direction;
             const deltaRad = delta === 16 ? -Math.PI / 2 : Math.PI / 2;
 
             await this.piecesRenderer.animateRotation(piece, row, col, fromDir, deltaRad);
@@ -201,8 +201,8 @@ export class BoardRenderer {
             const [fromStr, toStr] = coords.split(',');
             const fromRow = parseInt(fromStr[0]);
             const fromCol = parseInt(fromStr[1]);
-            const toRow   = parseInt(toStr[0]);
-            const toCol   = parseInt(toStr[1]);
+            const toRow = parseInt(toStr[0]);
+            const toCol = parseInt(toStr[1]);
 
             const piece = previousGridState[fromRow][fromCol];
             if (!piece) return;
@@ -213,8 +213,8 @@ export class BoardRenderer {
             const [fromStr, toStr] = coords.split(',');
             const fromRow = parseInt(fromStr[0]);
             const fromCol = parseInt(fromStr[1]);
-            const toRow   = parseInt(toStr[0]);
-            const toCol   = parseInt(toStr[1]);
+            const toRow = parseInt(toStr[0]);
+            const toCol = parseInt(toStr[1]);
 
             const pieceA = previousGridState[fromRow][fromCol];
             const pieceB = previousGridState[toRow][toCol];
@@ -223,8 +223,8 @@ export class BoardRenderer {
             await this.piecesRenderer.animateSwap(pieceA, fromRow, fromCol, pieceB, toRow, toCol, previousGridState);
 
         } else if (type === 'PLACE') {
-            const row   = parseInt(coords[0]);
-            const col   = parseInt(coords[1]);
+            const row = parseInt(coords[0]);
+            const col = parseInt(coords[1]);
             const piece = newGridState[row][col];
             if (!piece) return;
 
