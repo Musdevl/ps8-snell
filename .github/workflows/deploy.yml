@@ -19,8 +19,8 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd ~/ps8-26-snell
+            git switch main
             git pull
             cd services
-            docker compose down
-            docker image prune -f
-            ./compose-aws.sh
+            ./stop-dockers.sh
+            ./launch.sh --build
