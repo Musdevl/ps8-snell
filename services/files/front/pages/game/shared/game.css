@@ -630,7 +630,35 @@ game-board.mistake {
         cursor: pointer;
         width: 1.5rem;
         height: 2rem;
-        padding: 0.5rem 1.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        border-bottom: 4px solid #000000;
+        background-color: #3a3734;
+        color: white;
+        transition: active 0.5s ease-in-out;
+
+        &:hover {
+            opacity: 0.60;
+        }
+
+        &:active {
+            border-bottom: 1px solid #000;
+        }
+    }
+
+    .sound-ico-container {
+        display: flex;
+        gap: 0.5em
+    }
+
+    .hint-ico,
+    .sound-ico {
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        width: 1.5rem;
+        height: 2rem;
+        padding: 0.5rem 1rem;
         border-radius: 6px;
         border-bottom: 4px solid #000000;
         background-color: #3a3734;
@@ -798,12 +826,12 @@ game-board.mistake {
     }
 
     @keyframes mistakeFlashMobile {
-    0% {
-        box-shadow: 0 0 4px 3px rgb(209 57 57 / 85%);
-    }
+        0% {
+            box-shadow: 0 0 4px 3px rgb(209 57 57 / 85%);
+        }
 
-    100% {
-        box-shadow: 0 0 4px 13px rgba(255, 72, 72, 0);
+        100% {
+            box-shadow: 0 0 4px 13px rgba(255, 72, 72, 0);
+        }
     }
-}
 }
