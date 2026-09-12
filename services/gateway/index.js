@@ -183,7 +183,6 @@ const requestHandler = (req, res) => {
                     );
                 }
 
-
                 res.statusCode = 404;
                 return res.end("Unknown API domain");
 

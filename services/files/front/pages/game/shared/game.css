@@ -12,6 +12,7 @@ body {
     justify-content: center;
     height: 100vh;
     gap: 2em;
+    gap: 2em;
     color: white;
     font-family: 'Segoe UI', sans-serif;
 }
@@ -20,6 +21,7 @@ main {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+    /* height: 80%; */
     /* height: 80%; */
     width: 100%;
     max-width: 100%;
@@ -65,6 +67,7 @@ chat-component {
 
 .chat-container {
     display: none;
+    display: none;
     height: 100%;
 }
 
@@ -109,9 +112,17 @@ end-message {
     align-items: center;
 }
 
+.head-btn-container {
+    display: flex;
+    justify-content: space-between;
+    width: 95%;
+    align-items: center;
+}
+
 .leave-btn {
     background-color: #3c3a37;
     color: #bababa;
+    box-shadow: 0 4px 0 #000;
     box-shadow: 0 4px 0 #000;
     justify-content: center;
     align-items: center;
@@ -179,6 +190,7 @@ end-message {
     font-family: 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif;
     text-align: center;
     max-width: 30%;
+    max-width: 30%;
 }
 
 .option-box p {
@@ -207,6 +219,7 @@ end-message {
     align-items: center;
     border-radius: 5px;
     height: 3rem;
+    height: 3rem;
     font-family: 'Rajdhani', sans-serif;
     font-size: 18px;
     font-weight: 800;
@@ -233,6 +246,7 @@ end-message {
 .cancel-btn {
     background-color: #3c3a37;
     color: #bababa;
+    box-shadow: 0 4px 0 #000;
     box-shadow: 0 4px 0 #000;
 }
 
@@ -567,6 +581,7 @@ game-board.mistake {
     main.flipped {
         flex-direction: column-reverse;
         justify-content: flex-end;
+        justify-content: flex-end;
     }
 
     /* Chat (mobile) */
@@ -591,6 +606,7 @@ game-board.mistake {
     }
 
     chat-component {
+        display: flex;
         display: flex;
         position: fixed;
         top: 0;
@@ -621,6 +637,7 @@ game-board.mistake {
     .leave-text {
         display: none;
     }
+
 
     .mobile-leave,
     .mobile-chat {
@@ -776,8 +793,10 @@ game-board.mistake {
 
     .option-btn {
         font-size: 1em;
+        font-size: 1em;
     }
 }
+
 
 @media (max-width:40em) {
     .option-box {

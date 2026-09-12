@@ -52,6 +52,8 @@ class Chat extends HTMLElement {
 
         this.leave_chat_btn = null;
 
+        this.leave_chat_btn = null;
+
         this.forfeit_button = null;
 
         this.error_message = null;
@@ -89,6 +91,7 @@ class Chat extends HTMLElement {
         this.typing_avatars = this.shadowRoot.querySelector('.typing-avatars');
         this.emote_section = this.shadowRoot.querySelector('.emote-section');
         this.leave_chat_btn = this.shadowRoot.querySelector('.mobile-leave-chat');
+        this.leave_chat_btn = this.shadowRoot.querySelector('.mobile-leave-chat');
 
         this.emote_section.addEventListener('wheel', e => {
             e.preventDefault();
@@ -106,6 +109,15 @@ class Chat extends HTMLElement {
             if (val && val.trim() !== '') {
                 this.sendMessage(this.userInput.value, "text");
             }
+        })
+
+        this.leave_chat_btn.addEventListener("click", () => {
+            this.dispatchEvent(new CustomEvent("leave-chat"), {
+                detail: {
+                    bubbles: true,
+                    composed: true
+                }
+            })
         })
 
         this.leave_chat_btn.addEventListener("click", () => {
