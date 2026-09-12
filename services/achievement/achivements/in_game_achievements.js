@@ -6,6 +6,7 @@ import * as pieceService from "../services/PieceService.js"
 const autismo_debilo =
 {
     content: {
+        id:1,
         name: "Maximo Debilo",
         picture: "/assets/achievements/autismo-debilo.gif",
         reward: {
@@ -30,6 +31,7 @@ function autismo_debilo_achievement(previous_game_state, next_game_state) {
 const protector_slayer =
 {
     content: {
+        id:2,
         name: "Protector Slayer",
         picture: "/assets/achievements/protector_slayer.png",
         reward: {
@@ -57,6 +59,7 @@ function protector_destroyer_achievement(previous_game_state, next_game_state) {
 export const already_a_master =
 {
     content: {
+        id:3,
         name: "Already a Master ?",
         picture: "/assets/achievements/already_a_master.svg",
         reward: {
@@ -93,8 +96,8 @@ export const in_game_achievements = [
 ]
 
 
-export const blank_achievemnets = [
-    { ...autismo_debilo.content, isCompleted: false },
-    { ...protector_slayer.content, isCompleted: false },
-    { ...already_a_master.content, isCompleted: false }
+export const all_achievements = [
+    { ...autismo_debilo.content },
+    { ...protector_slayer.content },
+    { ...already_a_master.content }
 ]

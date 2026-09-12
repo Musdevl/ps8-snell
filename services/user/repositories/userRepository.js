@@ -190,13 +190,13 @@ export async function pushInHistory(userId, game_history) {
 
 export async function completeAchievement(userId, achievement) {
     const user = await findUserById(userId);
-    const found = user.achievements?.find((a) => a.name === achievement.name);
+    const alreadyCompleted = user.completed_achievements?.includes(achievement.id);
 
-    if (found && !found.isCompleted) {
+    if (!alreadyCompleted) {
         await usersCollection.updateOne(
-            { _id: new ObjectId(userId), "achievements.name": achievement.name },
+            { _id: new ObjectId(userId) },
             {
-                $set: { "achievements.$.isCompleted": true },
+                $addToSet: { completed_achievements: achievement.id },
                 $inc: { snell_coins: achievement.reward?.snell_coins || 0 }
             }
         );

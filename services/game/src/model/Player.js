@@ -9,14 +9,14 @@ export class Player {
     inventory;
     connected;
 
-    constructor(color, websockerId, userId) {
+    constructor(color, websockerId, userId, userName = "None") {
         this.kingAlive = true;
         this.connected = true;
         this.time = 600;
         this.color = color;
         this.inventory = new Uint8Array(14);
         this.webSocketId = websockerId;
-        this.userName = "None"; //ToDo Change this
+        this.userName = userName;
         this.userId = userId;
     }
 

@@ -358,7 +358,7 @@ app.post('/api/user/hard-reset-password', async (req, res) => {
 
 })
 
-app.post('/api/user/achievement', async (req, res) => {
+app.post('/api/user/achievements', async (req, res) => {
     try {
         const achievement = req.body.achievement;
         const userId = req.body.userId;

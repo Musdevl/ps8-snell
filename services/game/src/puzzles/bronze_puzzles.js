@@ -27,8 +27,20 @@ const puzzle_5 =
             "PLACE/64,0",  // BLACK
             "MOVE/54,53",   // WHITE
             "ROTATE/02,16",  // BLACK
-            "PLACE/24,16"   // WHITE
+            "PLACE/34,16"   // WHITE
         ];
+
+        const hints = [
+            [[9, 1]],
+            [[7, 1]],
+            [[9, 7]],
+            [[6, 1]],
+            [[6, 7]],
+            [[0, 2]],
+            [[5, 6], [7, 4]],
+            [[0, 2]],
+            [[3, 4]]
+        ]
 
         const board = new Board();
 
@@ -64,7 +76,7 @@ const puzzle_5 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(5, "Faisceau croisé", game, puzzle_steps, PUZZLE_DIFFICULTY.BRONZE);
+        return new Puzzle(5, "Faisceau croisé", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.BRONZE);
     }
 }
 
@@ -86,6 +98,18 @@ const puzzle_6 =
             "PLACE/34,16"   // WHITE
         ];
 
+        const hints = [
+            [[9, 1]],
+            [[7, 1]],
+            [[9, 7]],
+            [[6, 1]],
+            [[6, 7]],
+            [[0, 2]],
+            [[5, 6], [7, 4]],
+            [[0, 2]],
+            [[3, 4]]
+        ]
+
         const board = new Board();
 
         const white_shooter = pieceService.createPiece(PIECE.SHOOTER, COLORS.WHITE, DIRECTIONS.WEST)
@@ -120,7 +144,7 @@ const puzzle_6 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(6, "Tir forcé", game, puzzle_steps, PUZZLE_DIFFICULTY.BRONZE);
+        return new Puzzle(6, "Tir forcé", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.BRONZE);
     }
 }
 

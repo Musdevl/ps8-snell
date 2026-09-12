@@ -23,6 +23,15 @@ class Chat extends HTMLElement {
 
     leave_chat_btn;
 
+    chat_scroll;
+
+    typing_indicator;
+
+    typing_avatars;
+
+    // Dernier etat "en train d'ecrire" envoye, pour ne dispatcher que les changements.
+    is_typing = false;
+
 
     constructor() {
         super();
@@ -40,6 +49,8 @@ class Chat extends HTMLElement {
         this.emote_section = null;
 
         this.draw_button = null;
+
+        this.leave_chat_btn = null;
 
         this.leave_chat_btn = null;
 
@@ -69,9 +80,17 @@ class Chat extends HTMLElement {
             }
         });
 
+        this.userInput.addEventListener('input', () => {
+            this.updateTypingState(this.userInput.value.trim() !== '');
+        });
+
         this.send_message_btn = this.shadowRoot.querySelector('.send-message-btn');
-        this.chat_content = this.shadowRoot.querySelector('.chat-section');
+        this.chat_scroll = this.shadowRoot.querySelector('.chat-section');
+        this.chat_content = this.shadowRoot.querySelector('.messages');
+        this.typing_indicator = this.shadowRoot.querySelector('.typing-indicator');
+        this.typing_avatars = this.shadowRoot.querySelector('.typing-avatars');
         this.emote_section = this.shadowRoot.querySelector('.emote-section');
+        this.leave_chat_btn = this.shadowRoot.querySelector('.mobile-leave-chat');
         this.leave_chat_btn = this.shadowRoot.querySelector('.mobile-leave-chat');
 
         this.emote_section.addEventListener('wheel', e => {
@@ -90,6 +109,15 @@ class Chat extends HTMLElement {
             if (val && val.trim() !== '') {
                 this.sendMessage(this.userInput.value, "text");
             }
+        })
+
+        this.leave_chat_btn.addEventListener("click", () => {
+            this.dispatchEvent(new CustomEvent("leave-chat"), {
+                detail: {
+                    bubbles: true,
+                    composed: true
+                }
+            })
         })
 
         this.leave_chat_btn.addEventListener("click", () => {
@@ -141,7 +169,40 @@ class Chat extends HTMLElement {
 
         if (kind === "text") {
             this.userInput.value = '';
+            // Vider le champ par code ne declenche pas 'input', on signale la fin de saisie a la main.
+            this.updateTypingState(false);
         }
+    }
+
+    updateTypingState(isTyping) {
+        if (isTyping === this.is_typing) return;
+        this.is_typing = isTyping;
+        this.dispatchEvent(new CustomEvent("typing", { detail: { isTyping } }));
+    }
+
+    isTyping() {
+        return this.is_typing;
+    }
+
+    // users : [{ userId, username, picture }]. Liste vide => indicateur masque.
+    setTypingUsers(users) {
+        if (!Array.isArray(users) || users.length === 0) {
+            this.typing_indicator.hidden = true;
+            this.typing_avatars.innerHTML = '';
+            return;
+        }
+
+        this.typing_avatars.innerHTML = users
+            .map(u => `<img class="chat-profile-picture" src="${u.picture}" title="${u.username}">`)
+            .join('');
+
+        const wasHidden = this.typing_indicator.hidden;
+        this.typing_indicator.hidden = false;
+        if (wasHidden) this.scrollToBottom();
+    }
+
+    scrollToBottom() {
+        this.chat_scroll.scrollTop = this.chat_scroll.scrollHeight;
     }
 
 
@@ -194,7 +255,7 @@ class Chat extends HTMLElement {
 
         this.displayed_message_list.push(message)
 
-        this.chat_content.scrollTop = this.chat_content.scrollHeight;
+        this.scrollToBottom();
     }
 
     disableInputs() {
@@ -226,6 +287,7 @@ class Chat extends HTMLElement {
     clearContent() {
         this.message_list = [];
         if (this.chat_content) this.chat_content.innerHTML = '';
+        if (this.typing_indicator) this.setTypingUsers([]);
         this.resetErrorMessage();
     }
 

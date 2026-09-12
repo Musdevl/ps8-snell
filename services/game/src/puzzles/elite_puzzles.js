@@ -28,6 +28,18 @@ const puzzle_11 =
             "PLACE/34,16"   // WHITE
         ];
 
+        const hints = [
+            [[9, 1]],
+            [[7, 1]],
+            [[9, 7]],
+            [[6, 1]],
+            [[6, 7]],
+            [[0, 2]],
+            [[5, 6], [7, 4]],
+            [[0, 2]],
+            [[3, 4]]
+        ]
+
         const board = new Board();
 
         const white_shooter = pieceService.createPiece(PIECE.SHOOTER, COLORS.WHITE, DIRECTIONS.WEST)
@@ -62,7 +74,7 @@ const puzzle_11 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(11, "Tir décisif", game, puzzle_steps, PUZZLE_DIFFICULTY.ELITE);
+        return new Puzzle(11, "Tir décisif", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.ELITE);
     }
 }
 
@@ -84,6 +96,18 @@ const puzzle_12 =
             "PLACE/34,16"   // WHITE
         ];
 
+        const hints = [
+            [[9, 1]],
+            [[7, 1]],
+            [[9, 7]],
+            [[6, 1]],
+            [[6, 7]],
+            [[0, 2]],
+            [[5, 6], [7, 4]],
+            [[0, 2]],
+            [[3, 4]]
+        ]
+
         const board = new Board();
 
         const white_shooter = pieceService.createPiece(PIECE.SHOOTER, COLORS.WHITE, DIRECTIONS.WEST)
@@ -118,7 +142,7 @@ const puzzle_12 =
         game.addPlayer(white_player);
         game.addPlayer(black_player);
 
-        return new Puzzle(12, "Photon Master", game, puzzle_steps, PUZZLE_DIFFICULTY.ELITE);
+        return new Puzzle(12, "Photon Master", game, puzzle_steps, hints, PUZZLE_DIFFICULTY.ELITE);
     }
 }
 

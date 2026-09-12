@@ -10,7 +10,6 @@ let gameManager;
 // POST /api/game
 app.post('/api/game', async (req, res) => {
     try {
-
         const gameType = req.body.gameType;
         const players = req.body.players;
 

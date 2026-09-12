@@ -104,7 +104,10 @@ async function setupGame() {
     await blackPlayerInfoComponent.setColor(COLORS.BLACK);
 
     whitePlayerInfoComponent.disableRotation();
+    whitePlayerInfoComponent.disableElo();
+
     blackPlayerInfoComponent.disableRotation();
+    blackPlayerInfoComponent.disableElo();
 
     whitePlayerInfoComponent.disableTimer();
     blackPlayerInfoComponent.disableTimer();
@@ -170,24 +173,76 @@ async function setupGame() {
 
     // Récuperer la review de la game et setup les params
 
-    const splitedPathName = window.location.pathname.split("/");
-    gameId = splitedPathName[splitedPathName.length - 1];
+    try {
+        const splitedPathName = window.location.pathname.split("/");
+        gameId = splitedPathName[splitedPathName.length - 1];
 
-    const res = await accountService.authFetch(`${GATEWAY_URL}/api/game/review/${gameId}`);
-    const raw = await res.json();
+        const res = await accountService.authFetch(`${GATEWAY_URL}/api/game/review/${gameId}`);
+        const raw = await res.json();
 
-    const moves = extractStatesAndMoves(raw);
+        const moves = extractStatesAndMoves(raw);
 
-    review_analytics.setActions(moves);
+        review_analytics.setActions(moves);
 
-    white_player_id = raw.white_player_id;
-    black_player_id = raw.black_player_id;
+        white_player_id = raw.white_player_id;
+        black_player_id = raw.black_player_id;
 
-    let whitePlayerInfo = await getUserInformation(white_player_id);
-    let blackPlayerInfo = await getUserInformation(black_player_id);
+        let whitePlayerInfo;
+        let blackPlayerInfo;
 
-    whitePlayerInfoComponent.setPlayerInfo(whitePlayerInfo)
-    blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo)
+        if (raw.gameType === "AI") {
+            if (raw.aiColor === COLORS.WHITE) {
+                whitePlayerInfo = await getAiInformation(white_player_id);
+                blackPlayerInfo = await getUserInformation(black_player_id);
+            } else {
+                whitePlayerInfo = await getUserInformation(white_player_id);
+                blackPlayerInfo = await getAiInformation(black_player_id);
+            }
+        } else {
+            whitePlayerInfo = await getUserInformation(white_player_id);
+            blackPlayerInfo = await getUserInformation(black_player_id);
+        }
+
+        whitePlayerInfoComponent.setPlayerInfo(whitePlayerInfo)
+        blackPlayerInfoComponent.setPlayerInfo(blackPlayerInfo)
+        
+    } catch (error) {
+        console.log(error);
+    }
+
+
+
+}
+
+
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
 
 }
 
@@ -354,7 +409,6 @@ function showGameOverModalOnce() {
             onConfirm: () => {
                 goToState(0);
                 closeModal();
-                startPlayback();
             },
             onCancel: () => {
                 window.location.replace(`/`);
@@ -484,6 +538,26 @@ async function getUserInformation(userId) {
         console.error('Failed to fetch user information:', error);
     }
 }
+
+
+async function getAiInformation(aiId) {
+    try {
+        const response = await accountService.authFetch(`${GATEWAY_URL}/api/ais/${aiId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error(`Error while getting user information: ${response.status}`);
+        const res = await response.json();
+        return {
+            _id: res.ai.id,
+            username: res.ai.name,
+            picture: { picture: res.ai.path }
+        }
+    } catch (error) {
+        console.error('Failed to fetch user information:', error);
+    }
+}
+
 
 // Lancer l'initialisation quand le DOM est prêt
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

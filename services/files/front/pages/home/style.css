@@ -68,9 +68,7 @@ notification-bar {
     width: 100%;
 }
 
-.hidden {
-    display: none !important;
-}
+
 
 /* ── Boutons de jeu ── */
 #play-section {
@@ -548,4 +546,8 @@ shop-component {
         display: none;
     }
 
+}
+
+.hidden {
+    display: none !important;
 }

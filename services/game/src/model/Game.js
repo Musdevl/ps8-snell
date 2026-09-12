@@ -16,6 +16,8 @@ export class Game extends EventEmitter {
     killedPiecePos;// [int]
     actions; // [string]
     gameType; // String
+    aiColor; // int
+    initTimers; // int
     eloGain; // int
     timers; // { [COLORS.WHITE]: int, [COLORS.BLACK]: int } (en secondes)
     intervalId; // Pour stopper le décompte
@@ -40,6 +42,7 @@ export class Game extends EventEmitter {
             [COLORS.WHITE]: timeLimit,
             [COLORS.BLACK]: timeLimit
         };
+        this.initTimer = timeLimit;
         this.eloGain = {
             [COLORS.WHITE]: {
                 win: 0,
@@ -56,6 +59,10 @@ export class Game extends EventEmitter {
         this.intervalId = null;
         this.isReview = isReview;
         this.startDate = new Date();
+    }
+
+    setAiColor(color) {
+        this.aiColor = color;
     }
 
     startTimer() {

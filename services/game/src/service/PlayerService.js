@@ -5,8 +5,8 @@ import { PIECE } from "../enum/Pieces.js";
 import { DIRECTIONS } from "../enum/Directions.js";
 
 
-export function createPlayer(color, webSocketId, userId) {
-    const player = new Player(color, webSocketId, userId);
+export function createPlayer(color, webSocketId, userId, userName) {
+    const player = new Player(color, webSocketId, userId, userName);
     return PlayerInitializer.initPlayer(player);
 }
 

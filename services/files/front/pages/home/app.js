@@ -181,10 +181,23 @@ async function renderChat() {
     // Réception des nouveaux messages en temps réel
     chatService.onMessage((message) => chat.addNewMessage(message));
 
+    // Indicateur "en train d'écrire" : on ne s'affiche pas soi-même
+    const myId = accountService.getUserId();
+    chatService.onTyping(({ users }) => {
+        chat.setTypingUsers(users.filter(u => u.userId !== myId));
+    });
+
     if (!accountService.isLoggedIn()) {
         chat.disableInputs();
         return;
     }
+
+    chat.addEventListener('typing', (e) => chatService.sendTyping(e.detail.isTyping));
+
+    // Après une reconnexion (nouveau socket id), le serveur a perdu notre état : on le renvoie
+    chatService.socket.on('connect', () => {
+        if (chat.isTyping()) chatService.sendTyping(true);
+    });
 
     chat.addEventListener('send-message', async (e) => {
         e.detail.message.userId = accountService.getUserId();

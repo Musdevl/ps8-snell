@@ -83,22 +83,22 @@ class Shop extends HTMLElement {
     }
 
     markOwnedItems(items) {
-    const ownedItems = [
-        ...accountService.getProfilePictureList(),
-        ...accountService.getThemes(),
-        ...accountService.getEmotes(),
-    ];
-    items.forEach(item => {
-        item.owned = false;     
-        item.fully_owned = false;  
-        let fullyOwned = true;
-        item.content.forEach(it => {
-            if (ownedItems.find(owned => owned.id === it.id)) item.owned = true;
-            else fullyOwned = false;
+        const ownedItems = [
+            ...accountService.getProfilePictureList(),
+            ...accountService.getThemes(),
+            ...accountService.getEmotes(),
+        ];
+        items.forEach(item => {
+            item.owned = false;
+            item.fully_owned = false;
+            let fullyOwned = true;
+            item.content.forEach(it => {
+                if (ownedItems.find(owned => owned.id === it.id)) item.owned = true;
+                else fullyOwned = false;
+            });
+            item.fully_owned = fullyOwned;
         });
-        item.fully_owned = fullyOwned;
-    });
-}
+    }
 
     createItemDiv(item, classes) {
         const totalPrice = getTotalPrice(item);
@@ -137,8 +137,8 @@ class Shop extends HTMLElement {
         const totalPrice = getTotalPrice(item);
         const colorClass = getColorClass(totalPrice);
 
-        sr.getElementById('popup-img').src = item.global_picture;
-        sr.getElementById('popup-img').style.border = `5px solid ${ITEM_BORDER_COLORS[colorClass]}`;
+        item.squared_picture ? sr.getElementById('popup-img').src = item.squared_picture : sr.getElementById('popup-img').style.display = "none";
+        item.squared_picture ? sr.getElementById('popup-img').style.border = `5px solid ${ITEM_BORDER_COLORS[colorClass]}` : sr.getElementById('popup-img').style.display = "none";
         sr.getElementById('popup-name').textContent = item.name;
         sr.getElementById('popup-type').textContent = item.content?.[0]?.type || '';
         sr.getElementById('popup-header').style.background = ITEM_GRADIENTS[colorClass];
@@ -146,14 +146,27 @@ class Shop extends HTMLElement {
 
         const contentList = sr.getElementById('popup-content-list');
         contentList.innerHTML = '';
+
         item.content.forEach(c => {
             const div = document.createElement('div');
             div.classList.add('popup-content-item');
             div.innerHTML = `
                 <img src="${c.picture || '/assets/default_item.png'}" alt="${c.name}">
-                <span>${c.name || c.type}</span>
+                <span>${c.name}</span>
             `;
             contentList.appendChild(div);
+
+            if (c.additional_pictures) {
+                c.additional_pictures.forEach(ap => {
+                    const div = document.createElement('div');
+                    div.classList.add('popup-content-item');
+                    div.innerHTML = `
+                <img src="${ap.picture || '/assets/default_item.png'}" alt="${ap.label}">
+                <span>${ap.label}</span>
+            `;
+                    contentList.appendChild(div);
+                });
+            }
         });
 
         const isOwned = item.fully_owned;

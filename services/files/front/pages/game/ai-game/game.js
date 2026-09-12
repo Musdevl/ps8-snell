@@ -21,6 +21,8 @@ let modal_cancel;
 
 let user_color;
 
+let user_color;
+
 await accountService.checkAuth();
 
 // Initialisation
@@ -89,6 +91,7 @@ async function setupGame() {
 
     // Setting up 
     setupSoundBtn();
+    setupSoundBtn();
     setupPlayerInfoEvents(whitePlayerInfoComponent);
     setupPlayerInfoEvents(blackPlayerInfoComponent);
     setupBoardComponentEvents(boardComponent);
@@ -98,6 +101,37 @@ async function setupGame() {
     startNewGame();
 }
 
+function setupSoundBtn() {
+    try {
+        const loud_btn = document.getElementById("loud-btn");
+        const mute_btn = document.getElementById("mute-btn");
+
+        loud_btn.addEventListener("click", () => {
+            accountService.setSound(false);
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        })
+
+        mute_btn.addEventListener("click", () => {
+            accountService.setSound(true);
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        })
+
+        if (accountService.hasSound()) {
+
+            mute_btn.style.display = "none";
+            loud_btn.style.display = "flex";
+        } else {
+            loud_btn.style.display = "none";
+            mute_btn.style.display = "flex";
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+}
 function setupSoundBtn() {
     try {
         const loud_btn = document.getElementById("loud-btn");
@@ -342,14 +376,28 @@ async function handleUpdate(data) {
     if (data.status !== "CONTINUE") {
         console.log("[GAME] - Game Over: ", data.status);
         const hasWon =
-            (data.status === "BLACK" && color === COLORS.BLACK) ||
-            (data.status === "WHITE" && color === COLORS.WHITE);
+            (data.status === "BLACK" && user_color === COLORS.BLACK) ||
+            (data.status === "WHITE" && user_color === COLORS.WHITE);
 
         if (hasWon) playWinAnimation();
         setTimeout(() => {
             endMessage.loadMessage(data.status)
         }, 700);
     };
+}
+
+function playWinAnimation() {
+    const confetti = document.querySelector('.win-animation');
+    const baseSrc = confetti.getAttribute('src').split('?')[0];
+
+    // On cache d'abord (utile si l'animation a déjà tourné une fois avant)
+    confetti.style.display = "none";
+    confetti.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+
+    // Puis on l'affiche
+    requestAnimationFrame(() => {
+        confetti.style.display = "block";
+    });
 }
 
 function playWinAnimation() {
@@ -389,10 +437,12 @@ async function setPlayerColor(white_id, black_id) {
     const main = document.querySelector('main');
     if (white_id === userId) {
         user_color = COLORS.WHITE;
+        user_color = COLORS.WHITE;
         blackPlayerInfoComponent.disableRotation();
         main.classList.remove('flipped');
     }
     else if (black_id === userId) {
+        user_color = COLORS.BLACK;
         user_color = COLORS.BLACK;
         whitePlayerInfoComponent.disableRotation();
         blackPlayerInfoComponent.reverse();
@@ -400,6 +450,13 @@ async function setPlayerColor(white_id, black_id) {
         // panneau du joueur de son cote, comme en multijoueur.
         main.classList.add('flipped');
     }
+    boardComponent.setPlayerColor(user_color);
+    boardComponent.setBoardOrientation(user_color);
+    whitePlayerInfoComponent.setPlayerColor(user_color);
+    blackPlayerInfoComponent.setPlayerColor(user_color);
+    whitePlayerInfoComponent.setBoardOrientation(user_color);
+    blackPlayerInfoComponent.setBoardOrientation(user_color);
+    await endMessage.setColor(user_color);
     boardComponent.setPlayerColor(user_color);
     boardComponent.setBoardOrientation(user_color);
     whitePlayerInfoComponent.setPlayerColor(user_color);

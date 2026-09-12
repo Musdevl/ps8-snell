@@ -75,7 +75,7 @@ button {
 .quit-btn {
     background-color: #3c3a37;
     color: #bababa;
-    box-shadow: 0 4px 0 #2a2825;
+    box-shadow: 0 4px 0 #000;
     width: 10rem;
 }
 
@@ -86,7 +86,7 @@ button {
 
 .quit-btn:active {
     transform: translateY(2px);
-    box-shadow: 0 2px 0 #2a2825;
+    box-shadow: 0 2px 0 #000;
 }
 
 .button-group-multi {
