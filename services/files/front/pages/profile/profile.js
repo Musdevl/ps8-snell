@@ -324,6 +324,8 @@ function renderThemes() {
     try {
         const themeList = document.querySelector('#theme-list');
 
+        console.log(accountService.getThemes())
+
         loadPictureList(themeList, accountService.getThemes(), "theme-item",
 
             async (theme) => { await updateSelectedTheme(theme); },
