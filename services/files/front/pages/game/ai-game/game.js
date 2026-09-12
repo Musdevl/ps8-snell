@@ -21,8 +21,6 @@ let modal_cancel;
 
 let user_color;
 
-let user_color;
-
 await accountService.checkAuth();
 
 // Initialisation
