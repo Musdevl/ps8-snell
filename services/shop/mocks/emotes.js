@@ -3,7 +3,7 @@ export const patrick_emotes = {
     name: "Dumb Bundle",
     type:"Emotes",
     id: 999,
-    global_picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR6m4jUvctN0VR8frc1zZ6UKyRQqgoeBoD3Q&s",
+    global_picture: "https://media.tenor.com/rmLJ_LmoZccAAAAM/brainlet-wojak.gif",
     content: [
         {
             id: 6,
