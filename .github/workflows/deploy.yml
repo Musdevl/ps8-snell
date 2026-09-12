@@ -22,4 +22,4 @@ jobs:
             git pull
             cd services
             ./stop-dockers.sh
-            ./launch.sh --build
+            ./launch.sh --build --detach

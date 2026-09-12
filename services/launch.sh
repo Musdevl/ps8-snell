@@ -11,6 +11,7 @@ export COMPOSE_PROJECT_NAME="snell"
 ENV_MODE_DEFAULT="prod"
 ENV_FILE="$SCRIPT_DIR/.env"
 BUILD=false
+DETACH=false
 
 for arg in "$@"; do
   case $arg in
@@ -20,8 +21,8 @@ for arg in "$@"; do
     --build)
       BUILD=true
       ;;
-    --build)
-      BUILD=true
+    --detach|-d)
+      DETACH=true
       ;;
     *)
       echo "⚠️  Argument inconnu ignoré : $arg"
@@ -93,8 +94,8 @@ export GATEWAY_INTERNAL_URL
 echo "🚀 Lancement en mode $ENV..."
 docker network inspect proxy >/dev/null 2>&1 || docker network create proxy
 
-if [ "$BUILD" = true ]; then
-  docker compose --env-file "$ENV_FILE" up --build
-else
-  docker compose --env-file "$ENV_FILE" up
-fi
+COMPOSE_ARGS=(--env-file "$ENV_FILE" up)
+[ "$BUILD" = true ] && COMPOSE_ARGS+=(--build)
+[ "$DETACH" = true ] && COMPOSE_ARGS+=(-d)
+
+docker compose "${COMPOSE_ARGS[@]}"
