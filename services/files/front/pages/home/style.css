@@ -352,7 +352,8 @@ shop-component {
     .shop-popup {
         overflow-y: auto;
         scrollbar-color: #232220 #3a3734;
-        max-height: 70%;
+        max-height: 80%;
+        margin-top: 10%;
     }
 
     .popup-header-content {

@@ -84,7 +84,7 @@ async function loadProfile() {
 
     document.querySelector("#mobile-logout-btn").addEventListener("click", async () => {
         await accountService.logout();
-        window.location.replace(`/pages/home/play`);
+        window.location.replace(`/pages/home/index.html?section=play`);
     });
 
     if (profileUserId !== accountService.getUserId()) {

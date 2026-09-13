@@ -219,7 +219,6 @@
     z-index: 500;
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 
 .shop-overlay.hidden {
@@ -402,7 +401,7 @@
     font-size: 2rem;
 }
 
-.modal-close-ico{
+.modal-close-ico {
     height: 2em;
     width: 2em;
     stroke: white;
@@ -479,9 +478,28 @@
         align-items: center;
     }
 
+    .popup-purchase-btn {
+        background: #eed923;
+        border: #fffca9 3px solid;
+        border-bottom: 3px solid rgba(0, 0, 0, 0.4);
+        color: #2a2a38;
+        font-size: 1.5rem;
+        font-weight: 800;
+        font-family: var(--font-game);
+        padding: 0.8rem 3rem;
+        border-radius: 6px;
+        cursor: pointer;
+        letter-spacing: 1px;
+        transition: all 0.2s ease;
+    }
+
     #popup-name {
         font-size: 2.5em;
         width: 120%;
+    }
+
+    .popup-footer-price {
+        font-size: 1.5rem;
     }
 
     .popup-content-title {
@@ -495,7 +513,12 @@
     .shop-popup {
         overflow-y: auto;
         scrollbar-color: #232220 #3a3734;
-        max-height: 70%;
+        max-height: 80%;
+        margin-top: 10%;
+    }
+
+    .popup-header{
+        min-height: 0px;
     }
 
     .popup-header-content {
