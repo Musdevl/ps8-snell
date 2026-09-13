@@ -86,8 +86,8 @@ social_bar.addEventListener("update-notification-dot", async () => {
 })
 
 document.querySelector(".mobile-logo-container").addEventListener("click", () => {
-    history.pushState({}, '', '?section=play');
-    showSection('play-section');
+    // history.pushState({}, '', '?section=play');
+    window.location.replace(`${GATEWAY_URL}/pages/home/index.html?section=play`)
 })
 
 
