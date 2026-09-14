@@ -38,7 +38,7 @@ export const deyann_emotes = {
         {
             id: 9,
             name: "Yes !!",
-            picture: "https://s1.elespanol.com/2016/12/16/social/memes-humor-redes_sociales_178744040_23538138_1706x960.jpg",
+            picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgfmEUspfATnI58SICpbxKMi8hg6QVGWerSQ&s",
             unit_price: 3,
             type: "emote",
         },
