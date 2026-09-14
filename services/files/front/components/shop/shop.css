@@ -21,7 +21,7 @@
     gap: 2em;
 }
 
-.hidden{
+.hidden {
     display: none !important;
 }
 
@@ -470,6 +470,10 @@
         height: auto;
         min-height: 18em;
         aspect-ratio: 3 / 5;
+    }
+
+    .shop-overlay {
+        align-items: flex-start;
     }
 
     #shop-wrapper {

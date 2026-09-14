@@ -21,8 +21,6 @@ let modal_cancel;
 
 let user_color;
 
-let user_color;
-
 await accountService.checkAuth();
 
 // Initialisation
@@ -68,11 +66,11 @@ async function waitForBoard() {
 }
 
 async function setupGame() {
+    
     // Écouter les événements du serveur
     setupSocketEvents();
 
     // Setup les composants
-
 
     await whitePlayerInfoComponent.setColor(COLORS.WHITE);
 
