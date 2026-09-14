@@ -219,7 +219,6 @@
     z-index: 500;
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 
 .shop-overlay.hidden {
@@ -522,7 +521,7 @@
         margin-top: 10%;
     }
 
-    .popup-header {
+    .popup-header{
         min-height: 0px;
     }
 
