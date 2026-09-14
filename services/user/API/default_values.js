@@ -36,6 +36,18 @@ export const ppList = [
         picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_lvjjRAVDQ-nBDq_4dy1xCyRjjDaHV-Tqcw&s",
         type: "profile-picture",
     },
+    {
+        id: 602,
+        name: "FISC",
+        picture: "https://play-lh.googleusercontent.com/USmEIorB00VniQ8OQ7QMw5Gp4TRXj_NsFrBE-xqIwvipF2AdwgFKBn63P_mpHwqD8do",
+        type: "profile-picture",
+    },
+    {
+        id: 603,
+        name: "Snell",
+        picture: "https://static.wikia.nocookie.net/logopedia/images/4/4a/Chess.com_2019_%28App_Icon%29.png/revision/latest/scale-to-width-down/250?cb=20221006103032",
+        type: "profile-picture",
+    }
 
 
 ]
