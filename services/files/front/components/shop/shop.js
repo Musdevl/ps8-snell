@@ -33,6 +33,7 @@ class Shop extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
         this.readyPromise = new Promise(resolve => { this.resolveReady = resolve; });
+        this._handleKeydown = this._handleKeydown.bind(this);
     }
 
     async connectedCallback() {
@@ -51,7 +52,17 @@ class Shop extends HTMLElement {
                 if (e.target === this.shadowRoot.getElementById('shop-overlay')) this.closePopup();
             });
 
+        document.addEventListener('keydown', this._handleKeydown);
+
         this.resolveReady();
+    }
+
+    disconnectedCallback() {
+        document.removeEventListener('keydown', this._handleKeydown);
+    }
+
+    _handleKeydown(e) {
+        if (e.key === 'Escape') this.closePopup();
     }
 
     // ── Rendu ────────────────────────────────────────────────────────────────
@@ -139,6 +150,7 @@ class Shop extends HTMLElement {
 
         item.squared_picture ? sr.getElementById('popup-img').src = item.squared_picture : sr.getElementById('popup-img').style.display = "none";
         item.squared_picture ? sr.getElementById('popup-img').style.border = `5px solid ${ITEM_BORDER_COLORS[colorClass]}` : sr.getElementById('popup-img').style.display = "none";
+
         sr.getElementById('popup-name').textContent = item.name;
         sr.getElementById('popup-type').textContent = item.content?.[0]?.type || '';
         sr.getElementById('popup-header').style.background = ITEM_GRADIENTS[colorClass];
@@ -169,7 +181,9 @@ class Shop extends HTMLElement {
             }
         });
 
-        const isOwned = item.fully_owned;
+        const isOwned = !!item.fully_owned;
+        // Je transforme en boolean pour éviter d'avoir un undefined
+
         sr.querySelector('.popup-footer').classList.toggle('hidden', isOwned);
         sr.querySelector('.popup-owned-footer').classList.toggle('hidden', !isOwned);
 
@@ -178,6 +192,8 @@ class Shop extends HTMLElement {
         }
 
         sr.getElementById('shop-overlay').classList.remove('hidden');
+
+
     }
 
     closePopup() {
