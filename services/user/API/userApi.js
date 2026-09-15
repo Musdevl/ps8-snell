@@ -26,6 +26,13 @@ app.post('/api/user/register', async (req, res) => {
         if (!email || !username || !password) {
             return res.json({ error: 'Bad request' }, 400);
         }
+
+        // Un compte créé avec une adresse invalide ne recevra jamais ni le mail
+        // de bienvenue ni un lien de réinitialisation.
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.json({ error: 'Invalid email', message: 'Invalid email address' }, 400);
+        }
+
         await UserApiHandler.createUser(email, username, password);
 
         const user = await UserApiHandler.findUser(email, password);

@@ -22,7 +22,7 @@ app.post('/api/chat/game/{gameId}', async (req, res) => {
 
         await chatService.addMessageToGameChat(gameId, message);
 
-        res.json({ success: true });
+        res.json({ success: true }, 200);
     } catch (error) {
         console.log("[Chat API] - Error while adding a new message in game chat")
         res.json({ error: 'Error while adding a new message' }, 400);
@@ -34,7 +34,7 @@ app.get('/api/chat/game/{gameId}', async (req, res) => {
     try {
         const gameId = req.params.gameId;
         const chat = await gameChatRepo.getGameChat(gameId);
-        res.json(chat);
+        res.json(chat, 200);
     } catch (error) {
         res.json({ error: 'Error while retrieving game chat' }, 400);
     }
@@ -46,7 +46,7 @@ app.post('/api/chat/game', async (req, res) => {
     try {
         const gameId = req.body.gameId;
         await gameChatRepo.initGameChat(gameId);
-        res.json({ success: true });
+        res.json({ success: true }, 200);
     } catch (error) {
         res.json({ error: 'Error while creating game chat' }, 400);
     }
@@ -65,7 +65,7 @@ app.get('/api/chat/friend/{chatId}', async (req, res) => {
         const chatId = req.params.chatId;
         const chat = await friendChatRepo.findChatById(chatId);
         if (!chat) return res.json({ error: 'Chat not found' }, 400);
-        res.json(chat.messages);
+        res.json(chat.messages, 200);
     } catch (error) {
         res.json({ error: 'Error while adding a new message' }, 400);
     }

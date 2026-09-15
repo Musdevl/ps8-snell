@@ -43,8 +43,8 @@ export async function postGlobalMessage(message) {
     await globalChatRepo.addMessageToGlobalChat(message);
 }
 
-function normalize(msg) {
-    return msg.value
+function normalize(text) {
+    return text
         .toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // accents → e, é → e
         .replace(/[1!]/g, 'i')   // leet speak
@@ -53,7 +53,8 @@ function normalize(msg) {
         .replace(/[0]/g, 'o')
         .replace(/[5]/g, 's')
         .replace(/[7]/g, 't')
-        .replace(/[\W_]+/g, '') // supprime tout ce qui n'est pas alphanumérique
+        .replace(/[^a-z0-9]+/g, ' ') // tout ce qui n'est pas alphanumérique devient un espace
+        .trim();
 }
 
 
@@ -135,9 +136,15 @@ const BANNED_WORDS = [
     'chintoque',
 ];
 
+// Correspondance par mot entier (\b) pour ne pas bloquer "declarez" à cause de "ez",
+// "computer" à cause de "pute", "technique" à cause de "nique", etc.
+const BANNED_WORDS_REGEX = new RegExp(`\\b(${BANNED_WORDS.map(normalize).join('|')})\\b`);
+
 export function filterMessage(msg) {
-    const clean = normalize(msg);
-    return BANNED_WORDS.some(word => clean.includes(word));
+    const clean = normalize(msg.value);
+    // Recolle les lettres épelées une par une ("p.u.t.e" → "p u t e" → "pute")
+    const unspelled = clean.replace(/\b([a-z0-9]) (?=[a-z0-9]\b)/g, '$1');
+    return BANNED_WORDS_REGEX.test(clean) || BANNED_WORDS_REGEX.test(unspelled);
 }
 
 export function isAsciiArt(msg) {

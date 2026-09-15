@@ -8,6 +8,12 @@ const app = express();
 
 app.use(express.json());
 
+// Nodemailer ignore silencieusement un destinataire sans "@" et échoue ensuite
+// avec "No recipients defined" : on refuse en amont, avec un message clair.
+function isEmail(value) {
+    return typeof value === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 // GET /api/mail/health
 app.get("/api/mail/health", async (req, res) => {
     const smtp = await mailService.checkTransport();
@@ -19,8 +25,9 @@ app.post("/api/mail/welcome", async (req, res) => {
     try {
         const { to, username } = req.body || {};
 
-        if (!to) {
-            return res.status(400).json({ error: "to est requis" });
+        if (!isEmail(to)) {
+            console.log(`[MAIL API] - Destinataire invalide refusé : ${JSON.stringify(to)}`);
+            return res.status(400).json({ error: "to doit être une adresse mail valide" });
         }
 
         await mailService.send(to, welcomeMail({ username }));
@@ -37,8 +44,9 @@ app.post("/api/mail/password-reset", async (req, res) => {
     try {
         const { to, username, link } = req.body || {};
 
-        if (!to || !link) {
-            return res.status(400).json({ error: "to et link sont requis" });
+        if (!isEmail(to) || !link) {
+            console.log(`[MAIL API] - Destinataire invalide refusé : ${JSON.stringify(to)}`);
+            return res.status(400).json({ error: "to doit être une adresse mail valide, et link est requis" });
         }
 
         await mailService.send(to, resetPasswordMail({ username, link }));

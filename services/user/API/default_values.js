@@ -44,7 +44,7 @@ export const ppList = [
     },
     {
         id: 605,
-        name: "Donald Trump",
+        name: "Barack Obama",
         picture: `${GATEWAY_URL}/assets/profile-picture/obama.webp`,
         type: "profile-picture",
     },
