@@ -36,6 +36,18 @@ export const ppList = [
         picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_lvjjRAVDQ-nBDq_4dy1xCyRjjDaHV-Tqcw&s",
         type: "profile-picture",
     },
+    {
+        id: 604,
+        name: "Donald Trump",
+        picture: `${GATEWAY_URL}/assets/profile-picture/trump.webp`,
+        type: "profile-picture",
+    },
+    {
+        id: 605,
+        name: "Donald Trump",
+        picture: `${GATEWAY_URL}/assets/profile-picture/obama.webp`,
+        type: "profile-picture",
+    },
 
 
 ]
