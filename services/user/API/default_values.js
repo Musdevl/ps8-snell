@@ -39,13 +39,13 @@ export const ppList = [
     {
         id: 604,
         name: "Donald Trump",
-        picture: `${GATEWAY_URL}/assets/profile-picture/trump.webp`,
+        picture: `${GATEWAY_URL}/assets/profile-pictures/trump.webp`,
         type: "profile-picture",
     },
     {
         id: 605,
         name: "Barack Obama",
-        picture: `${GATEWAY_URL}/assets/profile-picture/obama.webp`,
+        picture: `${GATEWAY_URL}/assets/profile-pictures/obama.webp`,
         type: "profile-picture",
     },
 

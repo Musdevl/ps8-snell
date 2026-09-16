@@ -8,6 +8,7 @@ import { GATEWAY_URL } from "../../env.js";
 
 const params = new URLSearchParams(window.location.search);
 const username = params.get("username");
+console.log(username);
 // Nombre de slots d'emotes affiches sur le profil. Un slot sans emote vaut
 // null : la position est conservee pour pouvoir la remplir plus tard.
 const EMOTE_SLOT_COUNT = 8;
