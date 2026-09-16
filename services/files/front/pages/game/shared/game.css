@@ -341,6 +341,7 @@ end-message {
     background-color: #312e2b;
     border: 10px solid #000;
     border-radius: 50%;
+    object-fit: cover;
 }
 
 .vs-text {
